@@ -1,0 +1,50 @@
+﻿@page
+@model WebApplication1.Views.Shared._HeaderPartialModel
+@{
+}
+@inject IConfiguration config
+@{
+	AppConfig? appConfig = config.GetSection("Project").Get<AppConfig>();
+}
+@using Microsoft.AspNetCore.Identity
+@inject UserManager<ApplicationUser> UserManager
+@inject SignInManager<ApplicationUser> SignInManager
+<!-- Header -->
+<header>
+    <div class="header-left">
+        <a asp-controller="Home" asp-action="Index" class="logo">AchiveRush</a>
+        <nav>
+            <a asp-controller="Home" asp-action="Catalog">
+                <span>Каталог игр</span>
+            </a>
+            <a asp-controller="Home" asp-action="Leaderboard">
+                <span>Таблица лидеров</span>
+            </a>
+            <a asp-controller="Home" asp-action="Challenges">
+                <span>Челленджи</span>
+            </a>
+        </nav>
+    </div>
+    @if (SignInManager.IsSignedIn(User))
+    {
+        var user = await UserManager.GetUserAsync(User);
+
+        <div class="user-info">
+            <img src="@user.AvatarUrl" class="avatar" />
+            <div class="user-text">
+                <div>Привет,</div>
+                <div class="username">@user.PersonaName</div>
+            </div>
+        </div>
+    }
+    else
+    {
+        <div class="steam-badge">
+            <a asp-controller="Account" asp-action="Login">
+                <img src="~/img/steam.png" alt="Steam login" height="50" width="225">
+            </a>
+        </div>
+    }
+
+	@* TODO: ViewComponent *@
+</header>
