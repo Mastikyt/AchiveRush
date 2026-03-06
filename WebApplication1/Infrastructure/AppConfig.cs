@@ -1,6 +1,4 @@
-﻿using SteamKit2.Internal;
-
-namespace WebApplication1.infrastructure
+﻿namespace WebApplication1.infrastructure
 {
     public class AppConfig
     {

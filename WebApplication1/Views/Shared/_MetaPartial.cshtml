@@ -1,7 +1,4 @@
-﻿@page
-@model WebApplication1.Views.Shared._MetaPartialModel
-@{
-}
+﻿
 @inject IConfiguration config
 @{
 	AppConfig? appConfig = config.GetSection("Project").Get<AppConfig>(); 

@@ -1,0 +1,22 @@
+﻿@model List<Game>
+
+<main class="layout">
+    <aside class="sidebar">
+        <h2>Сортировка</h2>
+        <p>будет<br>обещаю</p>
+    </aside>
+
+    <section class="catalog">
+        @foreach (var game in Model)
+        {
+            <a asp-controller="Games"
+               asp-action="Details"
+               asp-route-id="@game.Id"
+               class="card">
+
+                <img src="@game.AvatarUrl" class="game-img" />
+                <div class="game-title">@game.Name</div>
+            </a>
+        }
+    </section>
+</main>

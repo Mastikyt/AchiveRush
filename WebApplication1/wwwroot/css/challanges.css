@@ -5,7 +5,55 @@
     padding: 10px 15px;
     border-radius: 12px;
 }
+.logout-form {
+    display: inline-block;
+    margin-left: 15px;
+}
 
+.logout-btn {
+    background: rgba(255, 0, 0, 0.8);
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    padding: 5px 12px;
+    font-size: 14px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+    .logout-btn:hover {
+        background: rgba(255, 0, 0, 1);
+    }
+
+.dropdown-menu {
+    display: none;
+    position: absolute;
+    top: 60px;
+    right: 0;
+    background: rgba(20,20,40,.95);
+    border-radius: 8px;
+    min-width: 150px;
+    padding: 8px 0;
+    z-index: 200;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.4);
+}
+
+    .dropdown-menu a,
+    .dropdown-menu button {
+        display: block;
+        padding: 10px 15px;
+        color: #fff;
+        text-decoration: none;
+        background: none;
+        border: none;
+        width: 100%;
+        text-align: left;
+    }
+
+        .dropdown-menu a:hover,
+        .dropdown-menu button:hover {
+            background: rgba(138, 43, 226, 0.3);
+        }
 .avatar {
     width: 48px;
     height: 48px;

@@ -1,15 +1,49 @@
-﻿<main class="layout">
+﻿@model List<WebApplication1.Models.Game>
+
+<main class="layout">
+
+    <!-- Фильтры -->
     <aside class="sidebar">
-        <h2>Сортировка</h2>
-        <p>будет<br>обещаю</p>
+        <h2>Фильтры</h2>
+        <input type="text" id="filterName" placeholder="Поиск по названию" />
+        <input type="number" id="filterAchievements" placeholder="Мин. количество достижений" min="0" />
+        <button id="applyFilters">Применить</button>
+        <button id="resetFilters">Сбросить</button>
     </aside>
 
+    <!-- Каталог -->
     <section class="catalog">
-        <div class="card">Пример игры</div>
-        <div class="card"></div>
-        <div class="card"></div>
-        <div class="card"></div>
-        <div class="card"></div>
-        <div class="card"></div>
+        @foreach (var game in Model)
+        {
+            <div class="card game-card" data-name="@game.Name" data-achievements="@game.Achievements.Count">
+                <img src="@game.AvatarUrl" alt="@game.Name" class="game-image" />
+                <div class="game-content">
+                    <h3>@game.Name</h3>
+                    <p class="game-description">@game.Description</p>
+                    <span class="achievements-count">🏆 @game.Achievements.Count достижений</span>
+                </div>
+            </div>
+        }
+
+        <!-- Кнопка добавления -->
+        <div class="card add-game-card" id="openAddGame">
+            <div>+ Добавить игру</div>
+        </div>
     </section>
 </main>
+
+<!-- Модальное окно -->
+<div id="addGameModal" class="add-game-modal hidden">
+    <div class="modal-content">
+        <h3>Добавить игру по ссылке Steam</h3>
+        <form id="addGameForm">
+            <input type="text" id="steamUrl" name="steamUrl" placeholder="https://store.steampowered.com/app/12345" required />
+            <div class="modal-buttons">
+                <button type="submit">Добавить</button>
+                <button type="button" id="cancelModal">Отмена</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script src="~/js/catalog.js"></script>

@@ -1,0 +1,35 @@
+﻿@model Game
+
+<main class="layout">
+
+    <aside class="sidebar">
+        <img src="@Model.AvatarUrl" class="game-big-img" />
+
+        <h2>@Model.Name</h2>
+
+        <p>@Model.Description</p>
+
+        <p><b>Достижений:</b> @Model.Achievements.Count</p>
+    </aside>
+
+    <section class="catalog">
+
+        @foreach (var ach in Model.Achievements)
+        {
+            <div class="card achievement-card">
+                <h3>@ach.Title</h3>
+                <p>@ach.Description</p>
+
+                @if (ach.Completed)
+                {
+                    <span class="completed">Выполнено ✓</span>
+                }
+                else
+                {
+                    <span class="not-completed">Не выполнено</span>
+                }
+            </div>
+        }
+
+    </section>
+</main>

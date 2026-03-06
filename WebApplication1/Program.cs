@@ -13,11 +13,26 @@ public class Program
         var builder = WebApplication.CreateBuilder(args);
 
         builder.Services.AddDbContext<ApplicationDbContext>(options =>
-     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+            options.UseSqlServer(
+                builder.Configuration.GetConnectionString("DefaultConnection")));
 
-        builder.Services.AddIdentity<ApplicationUser, IdentityRole>()
-            .AddEntityFrameworkStores<ApplicationDbContext>()
-            .AddDefaultTokenProviders();
+
+
+        builder.Services.AddIdentity<ApplicationUser, IdentityRole>(options =>
+        {
+            options.Password.RequireDigit = false;
+            options.Password.RequireLowercase = false;
+            options.Password.RequireUppercase = false;
+            options.Password.RequireNonAlphanumeric = false;
+            options.Password.RequiredLength = 3;
+
+            options.User.RequireUniqueEmail = false;
+        })
+        .AddEntityFrameworkStores<ApplicationDbContext>()
+        .AddDefaultTokenProviders();
+
+
+
 
         builder.Services.AddAuthentication(options =>
         {
@@ -26,17 +41,22 @@ public class Program
         .AddCookie()
         .AddSteam(options =>
         {
-            options.ApplicationKey = builder.Configuration["Project:Steam:ApiKey"];
+            options.ApplicationKey = builder.Configuration["Steam:ApiKey"];
         });
+
+
+
 
         builder.Services.AddControllersWithViews();
         builder.Services.AddHttpClient();
+        builder.Services.AddHttpClient<SteamService>();
         builder.Services.AddScoped<SteamService>();
         builder.Services.AddScoped<SteamUserManager>();
-
+        builder.Services.AddScoped<SteamSyncService>();
         var app = builder.Build();
 
         app.UseStaticFiles();
+
         app.UseRouting();
 
         app.UseAuthentication();

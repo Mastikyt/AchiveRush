@@ -1,0 +1,28 @@
+﻿@model WebApplication1.Models.User
+
+<section class="profile">
+
+	<div class="profile-card">
+
+		<img class="avatar" src="@Model.AvatarID" />
+
+		<div class="profile-info">
+
+			<h2>@Model.SteamName</h2>
+
+			<p>Steam player</p>
+
+		</div>
+
+		<div class="profile-stats">
+
+			<div>
+				<h3>#@Model.TotalAchievements</h3>
+				<p>achievements</p>
+			</div>
+
+		</div>
+
+	</div>
+
+</section>
