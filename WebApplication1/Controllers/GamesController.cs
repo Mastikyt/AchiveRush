@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using System.Text.RegularExpressions;
 using WebApplication1.Models;
 using WebApplication1.DTO;
@@ -25,7 +26,10 @@ public class GamesController : Controller
         if (appId == null)
             return BadRequest("Не удалось извлечь AppID");
 
-        var existingGame = _context.Games.FirstOrDefault(g => g.SteamAppId == appId.Value);
+        var existingGame = await _context.Games
+            .Include(g => g.Achievements)
+            .FirstOrDefaultAsync(g => g.SteamAppId == appId.Value);
+
         if (existingGame != null)
             return RedirectToAction("Catalog", "Home");
 
@@ -56,6 +60,8 @@ public class GamesController : Controller
         _context.Games.Add(game);
         await _context.SaveChangesAsync();
 
+        await SyncNewGameForAllUsersAsync(game.Id);
+
         return RedirectToAction("Catalog", "Home");
     }
 
@@ -66,5 +72,72 @@ public class GamesController : Controller
             return int.Parse(match.Groups[1].Value);
 
         return null;
+    }
+
+    private async Task SyncNewGameForAllUsersAsync(int gameId)
+    {
+        var game = await _context.Games
+            .Include(g => g.Achievements)
+            .FirstOrDefaultAsync(g => g.Id == gameId);
+
+        if (game == null || game.SteamAppId <= 0 || !game.Achievements.Any())
+            return;
+
+        var users = await _context.Users.ToListAsync();
+
+        foreach (var user in users)
+        {
+            List<SteamPlayerAchievement> steamAchievements;
+
+            try
+            {
+                steamAchievements = await _steamService.GetPlayerAchievements(user.SteamId, game.SteamAppId);
+            }
+            catch
+            {
+                continue;
+            }
+
+            if (steamAchievements == null || steamAchievements.Count == 0)
+                continue;
+
+            foreach (var steamAch in steamAchievements)
+            {
+                var dbAchievement = game.Achievements.FirstOrDefault(a => a.ApiName == steamAch.ApiName);
+                if (dbAchievement == null)
+                    continue;
+
+                var userAchievement = await _context.UserAchievements
+                    .FirstOrDefaultAsync(ua => ua.UserId == user.Id && ua.AchievementId == dbAchievement.Id);
+
+                if (userAchievement == null)
+                {
+                    userAchievement = new UserAchievement
+                    {
+                        UserId = user.Id,
+                        AchievementId = dbAchievement.Id,
+                        Completed = steamAch.Achieved,
+                        UnlockTime = steamAch.Achieved ? DateTime.UtcNow : null
+                    };
+
+                    _context.UserAchievements.Add(userAchievement);
+                }
+                else
+                {
+                    userAchievement.Completed = steamAch.Achieved;
+
+                    if (steamAch.Achieved && userAchievement.UnlockTime == null)
+                        userAchievement.UnlockTime = DateTime.UtcNow;
+                }
+            }
+
+            await _context.SaveChangesAsync();
+
+            user.TotalAchievements = await _context.UserAchievements
+                .CountAsync(x => x.UserId == user.Id && x.Completed);
+
+            user.LastSync = DateTime.UtcNow;
+            await _context.SaveChangesAsync();
+        }
     }
 }

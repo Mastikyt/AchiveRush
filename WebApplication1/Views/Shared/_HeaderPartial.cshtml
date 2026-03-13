@@ -1,6 +1,9 @@
 @using Microsoft.AspNetCore.Identity
+@using Microsoft.EntityFrameworkCore
+@using WebApplication1.Models
 @inject UserManager<ApplicationUser> UserManager
 @inject SignInManager<ApplicationUser> SignInManager
+@inject ApplicationDbContext Db
 
 <header>
     <div class="header-left">
@@ -15,9 +18,19 @@
     <div class="header-right">
         @if (SignInManager.IsSignedIn(User))
         {
-            var user = await UserManager.GetUserAsync(User);
-            var avatarUrl = string.IsNullOrWhiteSpace(user?.AvatarUrl) ? "/images/default_avatar.png" : user.AvatarUrl;
-            var personaName = string.IsNullOrWhiteSpace(user?.PersonaName) ? "Player" : user.PersonaName;
+            var identityUser = await UserManager.GetUserAsync(User);
+
+            var publicUser = identityUser != null && !string.IsNullOrWhiteSpace(identityUser.SteamId)
+            ? await Db.Users.FirstOrDefaultAsync(x => x.SteamId == identityUser.SteamId)
+            : null;
+
+            var avatarUrl = !string.IsNullOrWhiteSpace(publicUser?.AvatarID)
+            ? publicUser!.AvatarID
+            : "/images/default_avatar.png";
+
+            var personaName = !string.IsNullOrWhiteSpace(publicUser?.SteamName)
+            ? publicUser!.SteamName
+            : (!string.IsNullOrWhiteSpace(identityUser?.PersonaName) ? identityUser!.PersonaName : "Player");
 
             <div class="user-info dropdown">
                 <img src="@avatarUrl" class="avatar" alt="Avatar" />
@@ -27,7 +40,7 @@
                     <a class="dropdown-item"
                        asp-controller="Profile"
                        asp-action="UserProfile"
-                       asp-route-steamId="@user?.SteamId">
+                       asp-route-steamId="@identityUser?.SteamId">
                         Профиль
                     </a>
 

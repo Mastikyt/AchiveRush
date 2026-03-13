@@ -1,6 +1,6 @@
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using System.Security.Claims;
 using WebApplication1.DTO;
 using WebApplication1.Models;
 
@@ -10,21 +10,25 @@ namespace WebApplication1.Controllers
     {
         private readonly ApplicationDbContext _db;
         private readonly SteamService _steamService;
+        private readonly UserManager<ApplicationUser> _userManager;
 
-        public ProfileController(ApplicationDbContext db, SteamService steamService)
+        public ProfileController(
+            ApplicationDbContext db,
+            SteamService steamService,
+            UserManager<ApplicationUser> userManager)
         {
             _db = db;
             _steamService = steamService;
+            _userManager = userManager;
         }
 
-        public IActionResult Index()
+        public async Task<IActionResult> Index()
         {
-            var rawSteamId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-            if (string.IsNullOrWhiteSpace(rawSteamId))
+            var identityUser = await _userManager.GetUserAsync(User);
+            if (identityUser == null || string.IsNullOrWhiteSpace(identityUser.SteamId))
                 return RedirectToAction("Login", "Account");
 
-            var steamId = rawSteamId.Contains("/") ? rawSteamId.Split('/').Last() : rawSteamId;
-            return RedirectToAction(nameof(UserProfile), new { steamId });
+            return RedirectToAction(nameof(UserProfile), new { steamId = identityUser.SteamId });
         }
 
         [HttpGet]
@@ -41,11 +45,8 @@ namespace WebApplication1.Controllers
             if (user == null)
                 return NotFound("Профиль пользователя не найден");
 
-            var currentSteamIdRaw = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-            var currentSteamId = string.IsNullOrWhiteSpace(currentSteamIdRaw)
-                ? null
-                : (currentSteamIdRaw.Contains("/") ? currentSteamIdRaw.Split('/').Last() : currentSteamIdRaw);
-
+            var identityUser = await _userManager.GetUserAsync(User);
+            var currentSteamId = identityUser?.SteamId;
             var isOwner = currentSteamId == user.SteamId;
 
             if (isOwner)
@@ -53,15 +54,17 @@ namespace WebApplication1.Controllers
                 var steamProfile = await _steamService.GetProfileAsync(user.SteamId);
                 if (steamProfile != null)
                 {
-                    user.SteamName = string.IsNullOrWhiteSpace(steamProfile.Personaname) ? user.SteamName : steamProfile.Personaname;
-                    user.AvatarID = string.IsNullOrWhiteSpace(steamProfile.Avatarfull) ? user.AvatarID : steamProfile.Avatarfull;
+                    if (!string.IsNullOrWhiteSpace(steamProfile.Personaname))
+                        user.SteamName = steamProfile.Personaname;
+
+                    if (!string.IsNullOrWhiteSpace(steamProfile.Avatarfull))
+                        user.AvatarID = steamProfile.Avatarfull;
+
                     await _db.SaveChangesAsync();
                 }
 
                 if (user.LastSync == DateTime.MinValue || (DateTime.UtcNow - user.LastSync).TotalMinutes > 10)
-                {
                     await SyncAchievementsForUserAsync(user);
-                }
             }
 
             var orderedUsers = await _db.Users
@@ -89,11 +92,11 @@ namespace WebApplication1.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Sync()
         {
-            var rawSteamId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-            if (string.IsNullOrWhiteSpace(rawSteamId))
+            var identityUser = await _userManager.GetUserAsync(User);
+            if (identityUser == null || string.IsNullOrWhiteSpace(identityUser.SteamId))
                 return RedirectToAction("Login", "Account");
 
-            var steamId = rawSteamId.Contains("/") ? rawSteamId.Split('/').Last() : rawSteamId;
+            var steamId = identityUser.SteamId;
 
             var user = await _db.Users.FirstOrDefaultAsync(x => x.SteamId == steamId);
             if (user == null)
@@ -111,10 +114,6 @@ namespace WebApplication1.Controllers
                 .Where(g => g.SteamAppId > 0)
                 .ToListAsync();
 
-            var totalMatched = 0;
-            var totalCompleted = 0;
-            var errors = new List<string>();
-
             foreach (var game in games)
             {
                 List<SteamPlayerAchievement> steamAchievements;
@@ -123,22 +122,16 @@ namespace WebApplication1.Controllers
                 {
                     steamAchievements = await _steamService.GetPlayerAchievements(user.SteamId, game.SteamAppId);
                 }
-                catch (Exception ex)
+                catch
                 {
-                    errors.Add($"{game.Name}: {ex.Message}");
                     continue;
                 }
-
-                if (steamAchievements.Count == 0)
-                    continue;
 
                 foreach (var steamAch in steamAchievements)
                 {
                     var dbAchievement = game.Achievements.FirstOrDefault(a => a.ApiName == steamAch.ApiName);
                     if (dbAchievement == null)
                         continue;
-
-                    totalMatched++;
 
                     var userAchievement = await _db.UserAchievements
                         .FirstOrDefaultAsync(ua => ua.UserId == user.Id && ua.AchievementId == dbAchievement.Id);
@@ -162,9 +155,6 @@ namespace WebApplication1.Controllers
                         if (steamAch.Achieved && userAchievement.UnlockTime == null)
                             userAchievement.UnlockTime = DateTime.UtcNow;
                     }
-
-                    if (steamAch.Achieved)
-                        totalCompleted++;
                 }
             }
 
@@ -176,14 +166,6 @@ namespace WebApplication1.Controllers
             user.LastSync = DateTime.UtcNow;
             await _db.SaveChangesAsync();
 
-            if (errors.Count > 0 && user.TotalAchievements == 0)
-            {
-                TempData["SyncError"] = "Steam не отдал достижения хотя бы по части игр. Проверь открытость профиля и наличие локально добавленных игр.";
-            }
-            else if (totalMatched == 0)
-            {
-                TempData["SyncError"] = "Не найдено совпадений между локальными ачивками и данными Steam. Заново добавь игры в каталог после очистки БД.";
-            }
         }
     }
 }

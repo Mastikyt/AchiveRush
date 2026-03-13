@@ -19,22 +19,16 @@
                 <div class="profile-top">
                     <div class="profile-identity">
                         <h1 class="profile-name">@Model.SteamName</h1>
-                        <div class="profile-description">description zone</div>
                     </div>
 
-                    @if (isOwner)
+@*                     @if (isOwner)
                     {
                         <form asp-controller="Profile" asp-action="Sync" method="post">
                             @Html.AntiForgeryToken()
                             <button type="submit" class="sync-button">Синхронизировать ачивки</button>
                         </form>
-                    }
+                    } *@
                 </div>
-
-                @if (TempData["SyncError"] != null)
-                {
-                    <div class="profile-sync-error">@TempData["SyncError"]</div>
-                }
 
                 <div class="profile-stats">
                     <div class="profile-stat">
