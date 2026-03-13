@@ -1,12 +1,12 @@
-﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using System.Security.Claims;
 
 namespace WebApplication1.Controllers
 {
     public class HomeController : Controller
     {
         private readonly ApplicationDbContext _context;
+
         public HomeController(ApplicationDbContext context)
         {
             _context = context;
@@ -14,12 +14,6 @@ namespace WebApplication1.Controllers
 
         public IActionResult Index()
         {
-            if (User.Identity.IsAuthenticated)
-            {
-                var steamId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-                ViewBag.SteamId = steamId;
-            }
-
             return View();
         }
 
@@ -31,10 +25,18 @@ namespace WebApplication1.Controllers
 
             return View(games);
         }
-        public IActionResult Leaderboard()
+
+        public async Task<IActionResult> Leaderboard()
         {
-            return View();
+            var users = await _context.Users
+                .Where(u => !string.IsNullOrEmpty(u.SteamId))
+                .OrderByDescending(u => u.TotalAchievements)
+                .ThenBy(u => u.SteamName)
+                .ToListAsync();
+
+            return View(users);
         }
+
         public IActionResult Challenges()
         {
             return View();

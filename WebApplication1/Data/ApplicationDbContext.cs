@@ -9,4 +9,5 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser>
     public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : base(options) { }
     public DbSet<User> Users { get; set; }
     public DbSet<UserAchievement> UserAchievements { get; set; }
+    public DbSet<UserScore> UserScores { get; set; }
 }

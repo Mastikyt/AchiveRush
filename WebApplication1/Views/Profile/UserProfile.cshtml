@@ -1,0 +1,52 @@
+@model WebApplication1.Models.User
+
+@{
+    ViewData["Title"] = $"{Model.SteamName} - Профиль";
+    var gamesCount = ViewBag.GamesCount ?? 0;
+    var rank = ViewBag.Rank ?? 1;
+    var isOwner = ViewBag.IsOwner == true;
+    var avatar = string.IsNullOrWhiteSpace(Model.AvatarID) ? "/images/default_avatar.png" : Model.AvatarID;
+}
+
+<section class="profile-page">
+    <div class="profile-card">
+        <div class="profile-main">
+            <div class="profile-avatar-wrap">
+                <img src="@avatar" alt="@Model.SteamName" class="profile-avatar" />
+            </div>
+
+            <div class="profile-content">
+                <div class="profile-top">
+                    <div class="profile-identity">
+                        <h1 class="profile-name">@Model.SteamName</h1>
+                    </div>
+
+                    @if (isOwner)
+                    {
+                        <form asp-controller="Profile" asp-action="Sync" method="post">
+                            @Html.AntiForgeryToken()
+                            <button type="submit" class="sync-button">Синхронизировать ачивки</button>
+                        </form>
+                    }
+                </div>
+
+                <div class="profile-stats">
+                    <div class="profile-stat">
+                        <div class="profile-stat-value">#@rank</div>
+                        <div class="profile-stat-label">Место</div>
+                    </div>
+
+                    <div class="profile-stat">
+                        <div class="profile-stat-value">@Model.TotalAchievements</div>
+                        <div class="profile-stat-label">Ачивок</div>
+                    </div>
+
+                    <div class="profile-stat">
+                        <div class="profile-stat-value">@gamesCount</div>
+                        <div class="profile-stat-label">Игр</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>

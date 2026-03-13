@@ -52,7 +52,6 @@ public class Program
         builder.Services.AddHttpClient<SteamService>();
         builder.Services.AddScoped<SteamService>();
         builder.Services.AddScoped<SteamUserManager>();
-        builder.Services.AddScoped<SteamSyncService>();
         var app = builder.Build();
 
         app.UseStaticFiles();

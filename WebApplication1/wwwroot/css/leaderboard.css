@@ -1,330 +1,112 @@
-
-.user-info {
-    display: flex;
-    align-items: center;
-    background: #111827;
-    padding: 10px 15px;
-    border-radius: 12px;
+.leaderboard-page {
+    max-width: 1180px;
+    margin: 50px auto 80px;
+    padding: 0 24px;
 }
-
-.avatar {
-    width: 48px;
-    height: 48px;
-    border-radius: 50%;
-    margin-right: 12px;
-}
-
-.user-text {
-    display: flex;
-    flex-direction: column;
-    color: white;
-}
-
-.username {
-    font-weight: bold;
-}
-.logout-form {
-    display: inline-block;
-    margin-left: 15px;
-}
-
-.logout-btn {
-    background: rgba(255, 0, 0, 0.8);
-    color: #fff;
-    border: none;
-    border-radius: 8px;
-    padding: 5px 12px;
-    font-size: 14px;
-    cursor: pointer;
-    transition: all 0.3s ease;
-}
-
-    .logout-btn:hover {
-        background: rgba(255, 0, 0, 1);
-    }
-
-.dropdown-menu {
-    display: none;
-    position: absolute;
-    top: 60px;
-    right: 0;
-    background: rgba(20,20,40,.95);
-    border-radius: 8px;
-    min-width: 150px;
-    padding: 8px 0;
-    z-index: 200;
-    box-shadow: 0 8px 20px rgba(0,0,0,0.4);
-}
-
-    .dropdown-menu a,
-    .dropdown-menu button {
-        display: block;
-        padding: 10px 15px;
-        color: #fff;
-        text-decoration: none;
-        background: none;
-        border: none;
-        width: 100%;
-        text-align: left;
-    }
-
-        .dropdown-menu a:hover,
-        .dropdown-menu button:hover {
-            background: rgba(138, 43, 226, 0.3);
-        }
-
-/* ===== Leaderboard ===== */
 
 .leaderboard-container {
-    width: 100%;
-    max-width: 1200px;
-    margin: 0 auto;
-    padding: 30px;
-    background: rgba(10, 10, 30, 0.65);
-    backdrop-filter: blur(30px);
-    border-radius: 22px;
-    border: 1px solid rgba(138, 43, 226, 0.35);
-    box-shadow: 0 25px 50px rgba(0,0,0,0.5);
+    background: linear-gradient(135deg, rgba(8, 12, 40, 0.88), rgba(8, 46, 88, 0.72));
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 28px;
+    padding: 24px;
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.28);
+    backdrop-filter: blur(10px);
 }
 
-/* Header row */
-
-.leaderboard-header {
-    display: grid;
-    grid-template-columns: 150px 1fr 200px;
-    padding: 18px 25px;
-    font-weight: 700;
-    font-size: 18px;
-    border-bottom: 1px solid rgba(255,255,255,0.1);
-    color: #e0e0ff;
-}
-
-/* Body */
-
-.leaderboard-body {
-    display: flex;
-    flex-direction: column;
-}
-
-/* Row */
-
+.leaderboard-header,
 .leaderboard-row {
     display: grid;
-    grid-template-columns: 150px 1fr 200px;
-    padding: 18px 25px;
+    grid-template-columns: 140px 1fr 180px;
     align-items: center;
-    border-bottom: 1px solid rgba(255,255,255,0.05);
-    transition: 0.25s ease;
+    gap: 20px;
 }
 
-.leaderboard-row:hover {
-    background: rgba(138,43,226,0.15);
-}
-
-/* Columns */
-
-.col-place {
-    font-weight: 700;
+.leaderboard-header {
+    padding: 16px 20px;
+    color: #d6def5;
     font-size: 18px;
-}
-
-.col-name {
-    font-weight: 600;
-    color: #dcdcff;
-}
-
-.col-achievements {
-    text-align: right;
     font-weight: 700;
-    color: #bfa3ff;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    margin-bottom: 12px;
 }
 
-header {
-    display: flex;
-    align-items: center;
-    padding: 25px 50px;
-    background: rgba(10, 10, 30, 0.4);
-    backdrop-filter: blur(25px);
-    -webkit-backdrop-filter: blur(25px);
-    border: 1px solid rgba(138, 43, 226, 0.3);
-    border-radius: 0 0 20px 20px;
-    position: sticky;
-    top: 0;
-    z-index: 100;
-    backdrop-filter: saturate(180%) blur(30px);
-    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
-}
-
-.header-left {
-    display: flex;
-    align-items: center;
-    gap: 40px;
-}
-
-.logo {
-    font-size: 28px;
-    font-weight: 900;
-    background: linear-gradient(135deg, #9370db 0%, #8a2be2 50%, #00bfff 100%);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
+.leaderboard-row {
+    padding: 18px 20px;
+    margin-bottom: 12px;
+    border-radius: 20px;
     text-decoration: none;
+    color: #ffffff;
+    background: rgba(255, 255, 255, 0.04);
+    transition: transform 0.15s ease, background 0.15s ease;
 }
 
-.logo:hover {
-    filter: brightness(1.15);
-}
+    .leaderboard-row:hover {
+        transform: translateY(-2px);
+        background: rgba(139, 92, 246, 0.14);
+    }
 
-nav {
-    display: flex;
-    gap: 25px;
-}
-
-nav a {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    color: #d0d0ff;
-    text-decoration: none;
-    font-size: 15px;
-    font-weight: 600;
-    padding: 12px 22px;
-    border-radius: 10px;
-    transition: all 0.3s ease;
-    background: rgba(255, 255, 255, 0.05);
-    backdrop-filter: blur(15px);
-    border: 1px solid rgba(255, 255, 255, 0.1);
-}
-
-nav a:hover {
-    background: rgba(138, 43, 226, 0.2);
-    color: #9370db;
-    border-color: rgba(138, 43, 226, 0.4);
-    transform: translateY(-2px);
-    box-shadow: 0 8px 20px rgba(138, 43, 226, 0.25);
-}
-
-nav svg {
-    width: 20px;
-    height: 20px;
-    stroke: currentColor;
-    stroke-width: 2;
-    stroke-linecap: round;
-    stroke-linejoin: round;
-}
-
-.steam-badge {
-    position: absolute;
-    bottom: 24px;
-    right: 40px;
-    backdrop-filter: blur(15px);
-    font-size: 13px;
-    font-weight: 600;
+.leaderboard-col-place {
+    font-size: 26px;
+    font-weight: 800;
     color: #ffffff;
 }
 
-* {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-}
-
-body {
-    min-height: 100vh;
-    font-family: Segoe UI, sans-serif;
-    background:
-        radial-gradient(circle at 15% 85%, rgba(120,40,200,.35), transparent 60%),
-        radial-gradient(circle at 85% 15%, rgba(0,180,255,.35), transparent 60%),
-        linear-gradient(135deg, #060612, #0c0c1f 55%, #14142e);
-    color: #fff;
-        flex: 1;
-}
-
-.layout {
-    max-width: 1600px;
-    margin: 0 auto;
-    padding: 60px 50px;
-    display: flex;
-    gap: 40px;
-}
-
-
-
-.footer {
-    margin-top: 80px;
-    padding-top: 50px;
-    background: rgba(10,10,30,.65);
-    backdrop-filter: blur(30px);
-    border-top: 1px solid rgba(140,80,255,.35);
-}
-
-.footer-content {
-    max-width: 1600px;
-    margin: 0 auto;
-    padding: 0 50px 40px 50px;
-    display: flex;
-    justify-content: space-between;
-    gap: 60px;
-}
-
-.footer-logo {
-    font-size: 22px;
+.leaderboard-col-achievements {
+    font-size: 24px;
     font-weight: 800;
-    margin-bottom: 18px;
-    background: linear-gradient(135deg,#a78bfa,#7c3aed,#38bdf8);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
+    color: #ffffff;
+    text-align: right;
 }
 
-.footer-tagline {
-    max-width: 420px;
-    color: #c8c8ff;
-    line-height: 1.5;
-    font-size: 15px;
+.leaderboard-user-block {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    min-width: 0;
 }
 
-.footer-contacts h4 {
-    margin-bottom: 14px;
-    font-size: 16px;
+.leaderboard-avatar {
+    width: 72px;
+    height: 72px;
+    object-fit: cover;
+    border-radius: 18px;
+    flex-shrink: 0;
+    border: 1px solid rgba(255, 255, 255, 0.12);
 }
 
-.footer-contacts a {
-    color: #dcdcff;
-    text-decoration: none;
-    transition: .25s;
+.leaderboard-name {
+    font-size: 24px;
+    font-weight: 700;
+    color: #ffffff;
+    word-break: break-word;
 }
 
-.footer-contacts a:hover {
-    color: #bfa3ff;
-}
-
-.footer-bottom {
+.leaderboard-empty {
+    padding: 30px 20px;
     text-align: center;
-    padding: 20px;
-    font-size: 13px;
-    color: #9999cc;
-    border-top: 1px solid rgba(255,255,255,.08);
-}
-
-
-@media (max-width: 1200px) {
-    .catalog {
-        grid-template-columns: repeat(2,1fr);
-    }
+    color: #d6def5;
+    font-size: 18px;
 }
 
 @media (max-width: 768px) {
-    .layout {
-        flex-direction: column;
+    .leaderboard-header,
+    .leaderboard-row {
+        grid-template-columns: 90px 1fr 110px;
+        gap: 12px;
     }
-    .sidebar {
-        width: 100%;
+
+    .leaderboard-avatar {
+        width: 56px;
+        height: 56px;
+        border-radius: 14px;
     }
-    .catalog {
-        grid-template-columns: 1fr;
+
+    .leaderboard-name {
+        font-size: 18px;
     }
-    .footer-content {
-        flex-direction: column;
-        gap: 40px;
+
+    .leaderboard-col-place,
+    .leaderboard-col-achievements {
+        font-size: 18px;
     }
 }

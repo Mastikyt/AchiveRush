@@ -55,18 +55,12 @@ public class SteamService
     {
         var key = _config["Steam:ApiKey"];
 
-        var url = $"https://api.steampowered.com/ISteamUserStats/GetSchemaForGame/v2/?key={key}&appid={appId}";
+        var url =
+            $"https://api.steampowered.com/ISteamUserStats/GetSchemaForGame/v2/?key={key}&appid={appId}";
 
-        var response = await _client.GetAsync(url);
+        var response = await _client.GetStringAsync(url);
 
-        
-
-        if (!response.IsSuccessStatusCode)
-            return new List<SteamAchievementDto>();
-
-        var json = await response.Content.ReadAsStringAsync();
-
-        var data = JsonSerializer.Deserialize<SteamSchemaResponse>(json);
+        var data = JsonSerializer.Deserialize<SteamSchemaResponse>(response);
 
         if (data?.game?.availableGameStats?.achievements == null)
             return new List<SteamAchievementDto>();

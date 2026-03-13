@@ -1,15 +1,12 @@
-﻿using Microsoft.AspNetCore.Authentication;
-using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using SteamKit2;
 using System.Security.Claims;
 using WebApplication1.Models;
 
 public class AccountController : Controller
 {
-
     private readonly ApplicationDbContext _context;
     private readonly UserManager<ApplicationUser> _userManager;
     private readonly SignInManager<ApplicationUser> _signInManager;
@@ -24,8 +21,6 @@ public class AccountController : Controller
         _signInManager = signInManager;
     }
 
-
-
     [HttpGet]
     public async Task<IActionResult> SteamResponse()
     {
@@ -34,47 +29,69 @@ public class AccountController : Controller
         if (!result.Succeeded)
             return RedirectToAction("Index", "Home");
 
-        // Получаем SteamID
         var rawSteamId = result.Principal.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-        if (rawSteamId == null)
+        if (string.IsNullOrWhiteSpace(rawSteamId))
             return Content("Не удалось получить SteamID.");
 
         var steamId = rawSteamId.Split('/').Last();
+        var personaName = result.Principal.FindFirst(ClaimTypes.Name)?.Value ?? steamId;
+        var avatarUrl = result.Principal.FindFirst("urn:steam:avatarfull")?.Value ?? "/images/default_avatar.png";
 
-        // Проверяем, есть ли пользователь в базе
-        var user = await _userManager.FindByLoginAsync("Steam", steamId);
+        var identityUser = await _userManager.FindByLoginAsync("Steam", steamId);
 
-        if (user == null)
+        if (identityUser == null)
         {
-            // Получаем ник и аватар из Steam
-            var personaName = result.Principal.FindFirst(ClaimTypes.Name)?.Value;
-            var avatarUrl = result.Principal.FindFirst("urn:steam:avatarfull")?.Value;
-
-            user = new ApplicationUser
+            identityUser = new ApplicationUser
             {
-                UserName = personaName ?? steamId,        // уникальное имя в Identity
-                PersonaName = personaName ?? steamId,    // ник для фронта
+                UserName = steamId,
+                PersonaName = personaName,
                 SteamId = steamId,
-                AvatarUrl = avatarUrl ?? "/images/default_avatar.png"
+                AvatarUrl = avatarUrl
             };
 
-            var createResult = await _userManager.CreateAsync(user);
+            var createResult = await _userManager.CreateAsync(identityUser);
             if (!createResult.Succeeded)
-            {
-                var errors = string.Join("\n", createResult.Errors.Select(e => e.Description));
-                return Content(errors);
-            }
+                return Content(string.Join("\n", createResult.Errors.Select(e => e.Description)));
 
-            var loginResult = await _userManager.AddLoginAsync(user, new UserLoginInfo("Steam", steamId, "Steam"));
+            var loginResult = await _userManager.AddLoginAsync(identityUser, new UserLoginInfo("Steam", steamId, "Steam"));
             if (!loginResult.Succeeded)
-            {
-                var errors = string.Join("\n", loginResult.Errors.Select(e => e.Description));
-                return Content(errors);
-            }
+                return Content(string.Join("\n", loginResult.Errors.Select(e => e.Description)));
+        }
+        else
+        {
+            identityUser.PersonaName = personaName;
+            identityUser.AvatarUrl = avatarUrl;
+            identityUser.SteamId = steamId;
+            await _userManager.UpdateAsync(identityUser);
         }
 
-        await _signInManager.SignInAsync(user, true);
-        return RedirectToAction("Index", "Home");
+        var publicUser = await _context.Users.FirstOrDefaultAsync(x => x.SteamId == steamId);
+
+        if (publicUser == null)
+        {
+            publicUser = new User
+            {
+                SteamId = steamId,
+                SteamName = personaName,
+                AvatarID = avatarUrl,
+                CreatedAt = DateTime.UtcNow,
+                LastSync = DateTime.MinValue,
+                TotalAchievements = 0
+            };
+
+            _context.Users.Add(publicUser);
+        }
+        else
+        {
+            publicUser.SteamName = personaName;
+            publicUser.AvatarID = avatarUrl;
+        }
+
+        await _context.SaveChangesAsync();
+
+        await _signInManager.SignInAsync(identityUser, true);
+
+        return RedirectToAction("Index", "Profile");
     }
 
     public IActionResult Login()
@@ -89,12 +106,7 @@ public class AccountController : Controller
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> Logout()
     {
-        // Разлогиниваем пользователя из Identity
         await _signInManager.SignOutAsync();
-
         return RedirectToAction("Index", "Home");
     }
-
-    
-
 }

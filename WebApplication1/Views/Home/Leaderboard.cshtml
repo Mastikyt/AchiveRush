@@ -1,16 +1,45 @@
-﻿<main class="layout">
-    <section class="leaderboard-container">
+@model List<WebApplication1.Models.User>
 
+@{
+    ViewData["Title"] = "Таблица лидеров";
+}
+
+<section class="leaderboard-page">
+    <div class="leaderboard-container">
         <div class="leaderboard-header">
-            <div class="col-place">Place</div>
-            <div class="col-name">Name</div>
-            <div class="col-achievements">Achievements</div>
+            <div class="leaderboard-col-place">Место</div>
+            <div class="leaderboard-col-user">Пользователь</div>
+            <div class="leaderboard-col-achievements">Ачивки</div>
         </div>
 
-        <div class="leaderboard-body" id="leaderboardBody">
-            <!-- Пользователи будут вставляться сюда -->
-        </div>
+        @if (Model != null && Model.Any())
+        {
+            @for (int i = 0; i < Model.Count; i++)
+            {
+                var user = Model[i];
+                var avatar = string.IsNullOrWhiteSpace(user.AvatarID)
+                ? "/images/default_avatar.png"
+                : user.AvatarID;
 
-    </section>
+                <a class="leaderboard-row"
+                   asp-controller="Profile"
+                   asp-action="UserProfile"
+                   asp-route-steamId="@user.SteamId">
 
-</main>
+                    <div class="leaderboard-col-place">#@(i + 1)</div>
+
+                    <div class="leaderboard-col-user leaderboard-user-block">
+                        <img src="@avatar" alt="@user.SteamName" class="leaderboard-avatar" />
+                        <span class="leaderboard-name">@user.SteamName</span>
+                    </div>
+
+                    <div class="leaderboard-col-achievements">@user.TotalAchievements</div>
+                </a>
+            }
+        }
+        else
+        {
+            <div class="leaderboard-empty">Пока нет пользователей в таблице лидеров</div>
+        }
+    </div>
+</section>

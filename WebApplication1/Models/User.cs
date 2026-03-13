@@ -1,4 +1,6 @@
-﻿namespace WebApplication1.Models
+﻿using System.ComponentModel.DataAnnotations.Schema;
+
+namespace WebApplication1.Models
 {
     public class User
     {
@@ -17,5 +19,19 @@
         public DateTime LastSync { get; set; }
 
         public ICollection<UserAchievement> Achievements { get; set; } = new List<UserAchievement>();
+    }
+    public class UserScore
+    {
+        public int Id { get; set; }
+
+        public string UserId { get; set; }
+
+        public int Score { get; set; }
+
+        public DateTime DateAchieved { get; set; } = DateTime.UtcNow;
+
+
+        [ForeignKey("UserId")]
+        public virtual ApplicationUser User { get; set; }
     }
 }

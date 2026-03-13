@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc;
 using System.Text.RegularExpressions;
 using WebApplication1.Models;
 using WebApplication1.DTO;
@@ -8,8 +8,7 @@ public class GamesController : Controller
     private readonly ApplicationDbContext _context;
     private readonly SteamService _steamService;
 
-    public GamesController(ApplicationDbContext context,
-                           SteamService steamService)
+    public GamesController(ApplicationDbContext context, SteamService steamService)
     {
         _context = context;
         _steamService = steamService;
@@ -26,6 +25,10 @@ public class GamesController : Controller
         if (appId == null)
             return BadRequest("Не удалось извлечь AppID");
 
+        var existingGame = _context.Games.FirstOrDefault(g => g.SteamAppId == appId.Value);
+        if (existingGame != null)
+            return RedirectToAction("Catalog", "Home");
+
         var gameData = await _steamService.GetGameDataAsync(appId.Value);
         if (gameData == null)
             return BadRequest("Не удалось получить данные игры");
@@ -34,6 +37,7 @@ public class GamesController : Controller
 
         var game = new Game
         {
+            SteamAppId = appId.Value,
             Name = gameData.Name,
             Description = gameData.ShortDescription,
             AvatarUrl = gameData.HeaderImage
@@ -43,15 +47,16 @@ public class GamesController : Controller
         {
             game.Achievements.Add(new Achievement
             {
-                Title = ach.DisplayName,
-                Description = ach.Description,
+                Title = ach.DisplayName ?? "",
+                Description = ach.Description ?? "",
+                ApiName = ach.Name ?? ""
             });
         }
 
         _context.Games.Add(game);
         await _context.SaveChangesAsync();
 
-        return Ok();
+        return RedirectToAction("Catalog", "Home");
     }
 
     private int? ExtractAppId(string url)
