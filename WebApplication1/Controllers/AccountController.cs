@@ -25,17 +25,19 @@ public class AccountController : Controller
     public async Task<IActionResult> SteamResponse()
     {
         var result = await HttpContext.AuthenticateAsync("Steam");
-
         if (!result.Succeeded)
             return RedirectToAction("Index", "Home");
 
-        var rawSteamId = result.Principal.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+        var rawSteamId = result.Principal?.FindFirst(ClaimTypes.NameIdentifier)?.Value;
         if (string.IsNullOrWhiteSpace(rawSteamId))
             return Content("Не удалось получить SteamID.");
 
-        var steamId = rawSteamId.Split('/').Last();
-        var personaName = result.Principal.FindFirst(ClaimTypes.Name)?.Value ?? steamId;
-        var avatarUrl = result.Principal.FindFirst("urn:steam:avatarfull")?.Value ?? "/images/default_avatar.png";
+        var steamId = rawSteamId.Contains("/") ? rawSteamId.Split('/').Last() : rawSteamId;
+        var personaName = result.Principal?.FindFirst(ClaimTypes.Name)?.Value ?? steamId;
+        var avatarUrl = result.Principal?.FindFirst("urn:steam:avatarfull")?.Value;
+
+        if (string.IsNullOrWhiteSpace(avatarUrl))
+            avatarUrl = "/images/default_avatar.png";
 
         var identityUser = await _userManager.FindByLoginAsync("Steam", steamId);
 
@@ -53,7 +55,10 @@ public class AccountController : Controller
             if (!createResult.Succeeded)
                 return Content(string.Join("\n", createResult.Errors.Select(e => e.Description)));
 
-            var loginResult = await _userManager.AddLoginAsync(identityUser, new UserLoginInfo("Steam", steamId, "Steam"));
+            var loginResult = await _userManager.AddLoginAsync(
+                identityUser,
+                new UserLoginInfo("Steam", steamId, "Steam"));
+
             if (!loginResult.Succeeded)
                 return Content(string.Join("\n", loginResult.Errors.Select(e => e.Description)));
         }
@@ -85,11 +90,11 @@ public class AccountController : Controller
         {
             publicUser.SteamName = personaName;
             publicUser.AvatarID = avatarUrl;
+            publicUser.LastSync = DateTime.MinValue;
         }
 
         await _context.SaveChangesAsync();
-
-        await _signInManager.SignInAsync(identityUser, true);
+        await _signInManager.SignInAsync(identityUser, isPersistent: true);
 
         return RedirectToAction("Index", "Profile");
     }
