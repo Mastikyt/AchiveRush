@@ -5,11 +5,11 @@
 }
 
 .leaderboard-container {
-    background: linear-gradient(135deg, rgba(8, 12, 40, 0.88), rgba(8, 46, 88, 0.72));
-    border: 1px solid rgba(255, 255, 255, 0.08);
+    background: #1c1812;
+    border: 1px solid rgba(212, 175, 55, 0.3);
     border-radius: 28px;
     padding: 24px;
-    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.28);
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.4);
 }
 
 .leaderboard-header,
@@ -22,10 +22,10 @@
 
 .leaderboard-header {
     padding: 16px 20px;
-    color: #d6def5;
+    color: #e6c87a;
     font-size: 18px;
     font-weight: 700;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    border-bottom: 1px solid rgba(212, 175, 55, 0.25);
     margin-bottom: 12px;
 }
 
@@ -37,27 +37,29 @@ a.leaderboard-row:active {
     margin-bottom: 12px;
     border-radius: 20px;
     text-decoration: none;
-    color: #ffffff;
-    background: rgba(255, 255, 255, 0.04);
+    color: #fef3d6;
+    background: rgba(212, 175, 55, 0.03);
     transition: transform 0.15s ease, background 0.15s ease;
     display: grid;
+    border: 1px solid rgba(212, 175, 55, 0.08);
 }
 
     a.leaderboard-row:hover {
         transform: translateY(-2px);
-        background: rgba(139, 92, 246, 0.14);
+        background: rgba(212, 175, 55, 0.08);
+        border-color: rgba(212, 175, 55, 0.25);
     }
 
 .leaderboard-place {
     font-size: 26px;
     font-weight: 800;
-    color: #ffffff;
+    color: #d4af37;
 }
 
 .leaderboard-achievements {
     font-size: 24px;
     font-weight: 800;
-    color: #ffffff;
+    color: #d4af37;
     text-align: right;
 }
 
@@ -74,20 +76,20 @@ a.leaderboard-row:active {
     object-fit: cover;
     border-radius: 18px;
     flex-shrink: 0;
-    border: 1px solid rgba(255, 255, 255, 0.12);
+    border: 1px solid rgba(212, 175, 55, 0.35);
     display: block;
 }
 
 .leaderboard-name {
     font-size: 24px;
     font-weight: 700;
-    color: #ffffff;
+    color: #fef3d6;
     word-break: break-word;
 }
 
 .leaderboard-empty {
     padding: 30px 20px;
     text-align: center;
-    color: #d6def5;
+    color: #e6c87a;
     font-size: 18px;
 }

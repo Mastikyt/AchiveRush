@@ -6,37 +6,12 @@
 
 body {
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    background: radial-gradient(circle at 20% 80%, rgba(138,43,226,0.4) 0%, transparent 50%), radial-gradient(circle at 80% 20%, rgba(75,0,130,0.4) 0%, transparent 50%), radial-gradient(circle at 40% 40%, rgba(0,191,255,0.3) 0%, transparent 50%), linear-gradient(135deg, #0a0a1a 0%, #0f0f2a 50%, #1a1a3a 100%);
+    background: #12100c;
+    background-image: radial-gradient(circle at 20% 30%, rgba(212, 175, 55, 0.06) 0%, transparent 50%), radial-gradient(circle at 85% 70%, rgba(212, 175, 55, 0.04) 0%, transparent 45%);
     background-attachment: fixed;
-    color: #fff;
+    color: #fef3d6;
     min-height: 100vh;
     overflow-x: hidden;
-    position: relative;
-}
-
-    body::before {
-        content: '';
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        background-image: radial-gradient(2px 2px at 20px 30px, #9370db, transparent), radial-gradient(2px 2px at 40px 70px, rgba(147,112,219,0.8), transparent), radial-gradient(1px 1px at 90px 40px, #00bfff, transparent), radial-gradient(1px 1px at 130px 80px, rgba(0,191,255,0.6), transparent);
-        background-repeat: repeat;
-        background-size: 200px 100px;
-        animation: float 25s ease-in-out infinite;
-        opacity: 0.15;
-        z-index: -1;
-    }
-
-@keyframes float {
-    0%, 100% {
-        transform: translateY(0px) rotate(0deg);
-    }
-
-    50% {
-        transform: translateY(-25px) rotate(180deg);
-    }
 }
 
 header {
@@ -44,15 +19,16 @@ header {
     align-items: center;
     justify-content: space-between;
     padding: 25px 50px;
-    background: rgba(10, 10, 30, 0.4);
-    backdrop-filter: blur(25px);
-    -webkit-backdrop-filter: blur(25px);
-    border: 1px solid rgba(138, 43, 226, 0.3);
-    border-radius: 0 0 20px 20px;
+    background: rgba(18, 16, 12, 0.92);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border-bottom: 2px solid #d4af37;
+    border-top: none;
+    border-left: none;
+    border-right: none;
     position: sticky;
     top: 0;
     z-index: 100;
-    backdrop-filter: saturate(180%) blur(30px);
     box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
 }
 
@@ -65,15 +41,18 @@ header {
 .logo {
     font-size: 28px;
     font-weight: 900;
-    background: linear-gradient(135deg, #9370db 0%, #8a2be2 50%, #00bfff 100%);
+    background: none;
     -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
+    -webkit-text-fill-color: #d4af37;
     background-clip: text;
+    color: #d4af37;
     text-decoration: none;
+    text-shadow: 0 0 5px rgba(212, 175, 55, 0.3);
 }
 
     .logo:hover {
-        filter: brightness(1.15);
+        filter: brightness(1.1);
+        text-shadow: 0 0 12px rgba(212, 175, 55, 0.5);
     }
 
 nav {
@@ -85,24 +64,24 @@ nav {
         display: flex;
         align-items: center;
         gap: 10px;
-        color: #d0d0ff;
+        color: #e6c87a;
         text-decoration: none;
         font-size: 15px;
         font-weight: 600;
         padding: 12px 22px;
         border-radius: 10px;
         transition: all 0.3s ease;
-        background: rgba(255, 255, 255, 0.05);
+        background: rgba(212, 175, 55, 0.08);
         backdrop-filter: blur(15px);
-        border: 1px solid rgba(255, 255, 255, 0.1);
+        border: 1px solid rgba(212, 175, 55, 0.25);
     }
 
         nav a:hover {
-            background: rgba(138, 43, 226, 0.2);
-            color: #9370db;
-            border-color: rgba(138, 43, 226, 0.4);
+            background: rgba(212, 175, 55, 0.18);
+            color: #fff3e0;
+            border-color: #d4af37;
             transform: translateY(-2px);
-            box-shadow: 0 8px 20px rgba(138, 43, 226, 0.25);
+            box-shadow: 0 8px 20px rgba(212, 175, 55, 0.2);
         }
 
     nav svg {
@@ -117,9 +96,10 @@ nav {
 .user-info {
     display: flex;
     align-items: center;
-    background: #111827;
+    background: #1e1a14;
     padding: 10px 15px;
     border-radius: 12px;
+    border: 1px solid rgba(212, 175, 55, 0.3);
 }
 
 .avatar {
@@ -127,16 +107,18 @@ nav {
     height: 48px;
     border-radius: 50%;
     margin-right: 12px;
+    border: 1px solid #d4af37;
 }
 
 .user-text {
     display: flex;
     flex-direction: column;
-    color: white;
+    color: #fef3d6;
 }
 
 .username {
     font-weight: bold;
+    color: #e6c87a;
 }
 
 .steam-badge {
@@ -146,7 +128,7 @@ nav {
     backdrop-filter: blur(15px);
     font-size: 13px;
     font-weight: 600;
-    color: #ffffff;
+    color: #e6c87a;
 }
 
 .main-content {
@@ -162,53 +144,44 @@ nav {
 .main-title {
     font-size: 68px;
     font-weight: 900;
-    background: linear-gradient(135deg, #ffffff 0%, #8a2be2 50%, #ffffff 100%);
+    background: none;
     -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
     background-clip: text;
+    color: #d4af37;
     margin-bottom: 25px;
     line-height: 1.05;
-    animation: glow 2.5s ease-in-out infinite alternate;
-}
-
-@keyframes glow {
-    from {
-        text-shadow: 0 0 20px rgba(147,112,219,0.6), 0 0 40px rgba(138,43,226,0.4);
-    }
-
-    to {
-        text-shadow: 0 0 30px rgba(0,191,255,0.7), 0 0 50px rgba(138,43,226,0.5);
-    }
+    text-shadow: 0 0 20px rgba(212, 175, 55, 0.3), 0 2px 5px rgba(0, 0, 0, 0.3);
 }
 
 .subtitle {
     font-size: 25px;
-    color: #c0c0ff;
+    color: #e6c87a;
     margin-bottom: 50px;
     max-width: 650px;
     line-height: 1.45;
 }
 
 .start-btn {
-    background: linear-gradient(135deg, #9370db 0%, #8a2be2 50%, #483d8b 100%);
-    color: #fff;
+    background: linear-gradient(135deg, #2a241a, #1e1912);
+    color: #e6c87a;
     padding: 22px 70px;
     font-size: 22px;
     font-weight: 800;
-    border: none;
+    border: 1px solid rgba(212, 175, 55, 0.5);
     border-radius: 60px;
     cursor: pointer;
     transition: all 0.4s ease;
-    box-shadow: 0 15px 40px rgba(138, 43, 226, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.2);
+    box-shadow: 0 15px 40px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(212, 175, 55, 0.2);
     text-decoration: none;
     display: inline-block;
-    text-shadow: 0 1px 2px rgba(0,0,0,0.3);
 }
 
     .start-btn:hover {
         transform: translateY(-6px);
-        box-shadow: 0 25px 50px rgba(138, 43, 226, 0.7), inset 0 1px 0 rgba(255, 255, 255, 0.3);
-        filter: brightness(1.1);
+        background: linear-gradient(135deg, #3a3226, #2a241a);
+        box-shadow: 0 25px 50px rgba(0, 0, 0, 0.5), 0 0 15px rgba(212, 175, 55, 0.3);
+        border-color: #d4af37;
+        color: #fff3e0;
     }
 
 .checkmark {
@@ -217,26 +190,27 @@ nav {
     right: 40px;
     width: 44px;
     height: 44px;
-    background: rgba(138, 43, 226, 0.3);
+    background: rgba(212, 175, 55, 0.12);
     backdrop-filter: blur(12px);
-    border: 2px solid rgba(147, 112, 219, 0.6);
+    border: 2px solid rgba(212, 175, 55, 0.4);
     border-radius: 50%;
     display: flex;
     align-items: center;
     justify-content: center;
     font-size: 26px;
     font-weight: 900;
-    color: #9370db;
+    color: #d4af37;
 }
+
 .logout-form {
     display: inline-block;
     margin-left: 15px;
 }
 
 .logout-btn {
-    background: rgba(255, 0, 0, 0.8);
-    color: #fff;
-    border: none;
+    background: rgba(212, 175, 55, 0.12);
+    color: #e6c87a;
+    border: 1px solid rgba(212, 175, 55, 0.35);
     border-radius: 8px;
     padding: 5px 12px;
     font-size: 14px;
@@ -244,28 +218,30 @@ nav {
     transition: all 0.3s ease;
 }
 
-.logout-btn:hover {
-    background: rgba(255, 0, 0, 1);
-}
+    .logout-btn:hover {
+        background: rgba(212, 175, 55, 0.25);
+        border-color: #d4af37;
+    }
 
 .dropdown-menu {
     display: none;
     position: absolute;
     top: 60px;
     right: 0;
-    background: rgba(20,20,40,.95);
-    border-radius: 8px;
+    background: #1e1914;
+    border-radius: 12px;
     min-width: 150px;
     padding: 8px 0;
     z-index: 200;
-    box-shadow: 0 8px 20px rgba(0,0,0,0.4);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.5);
+    border: 1px solid rgba(212, 175, 55, 0.3);
 }
 
     .dropdown-menu a,
     .dropdown-menu button {
         display: block;
         padding: 10px 15px;
-        color: #fff;
+        color: #e6c87a;
         text-decoration: none;
         background: none;
         border: none;
@@ -275,14 +251,16 @@ nav {
 
         .dropdown-menu a:hover,
         .dropdown-menu button:hover {
-            background: rgba(138, 43, 226, 0.3);
+            background: rgba(212, 175, 55, 0.12);
+            color: #fff3e0;
         }
+
 .footer {
     margin-top: auto;
     padding-top: 50px;
-    background: rgba(10,10,30,.65);
-    backdrop-filter: blur(30px);
-    border-top: 1px solid rgba(140,80,255,.35);
+    background: rgba(18, 16, 12, 0.85);
+    backdrop-filter: blur(20px);
+    border-top: 1px solid rgba(212, 175, 55, 0.25);
 }
 
 @media (max-width: 768px) {

@@ -8,99 +8,145 @@
 .sidebar {
     width: 260px;
     padding: 20px;
-    background: rgba(10,10,30,0.7);
-    border-radius: 12px;
+    background: #1c1812;
+    border-radius: 20px;
     display: flex;
     flex-direction: column;
     gap: 10px;
+    border: 1px solid rgba(212, 175, 55, 0.25);
 }
 
     .sidebar h2 {
-        color: #fff;
+        color: #fef3d6;
         margin-bottom: 10px;
+        font-size: 20px;
     }
 
-    .sidebar input, .sidebar button {
+    .sidebar input {
         padding: 8px;
-        border-radius: 6px;
-        border: 1px solid rgba(255,255,255,.2);
-        background: rgba(0,0,0,.5);
-        color: #fff;
+        border-radius: 8px;
+        border: 1px solid rgba(212, 175, 55, 0.25);
+        background: #0f0d0a;
+        color: #e6c87a;
     }
+
+        .sidebar input:focus {
+            outline: none;
+            border-color: #d4af37;
+        }
 
     .sidebar button {
+        padding: 8px;
+        border-radius: 8px;
+        border: 1px solid rgba(212, 175, 55, 0.4);
+        background: linear-gradient(135deg, #2a241a, #1e1912);
+        color: #e6c87a;
         cursor: pointer;
-        background: linear-gradient(135deg,#9370db,#8a2be2);
-        border: none;
         transition: 0.3s;
     }
 
         .sidebar button:hover {
-            filter: brightness(1.2);
+            background: linear-gradient(135deg, #3a3226, #2a241a);
+            border-color: #d4af37;
         }
 
 .catalog {
     flex: 1;
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(180px,1fr));
-    gap: 20px;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 24px;
 }
 
 .card {
-    background: rgba(10,10,30,.6);
-    border-radius: 12px;
-    padding: 10px;
+    background: #1c1812;
+    border-radius: 20px;
+    padding: 0;
     display: flex;
     flex-direction: column;
-    align-items: center;
     cursor: pointer;
-    transition: 0.3s;
+    transition: all 0.3s ease;
+    border: 1px solid rgba(212, 175, 55, 0.18);
+    overflow: hidden;
 }
 
     .card:hover {
-        transform: translateY(-4px);
-        box-shadow: 0 5px 15px rgba(140,80,255,0.5);
+        transform: translateY(-6px);
+        border-color: #d4af37;
+        box-shadow: 0 12px 28px rgba(212, 175, 55, 0.2);
     }
 
 .game-image {
     width: 100%;
-    border-radius: 8px;
+    aspect-ratio: 16 / 9;
     object-fit: cover;
-    height: 100px;
-    margin-bottom: 8px;
+    display: block;
+    border-bottom: 1px solid rgba(212, 175, 55, 0.2);
 }
 
-.game-content h3 {
-    font-size: 16px;
-    color: #fff;
-    margin-bottom: 4px;
+.game-content {
+    padding: 14px 12px 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
 }
 
-.game-content p {
-    font-size: 12px;
-    color: #d0d0ff;
-    height: 36px;
-    overflow: hidden;
-    text-overflow: ellipsis;
-}
+    .game-content h3 {
+        font-size: 18px;
+        font-weight: 700;
+        color: #fef3d6;
+        margin: 0;
+        line-height: 1.3;
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        min-height: 46px;
+    }
+
+    .game-content p {
+        font-size: 13px;
+        color: #e6c87a;
+        line-height: 1.45;
+        margin: 0;
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        min-height: 38px;
+    }
 
 .achievements-count {
-    font-size: 12px;
-    color: #ffd700;
+    font-size: 13px;
+    color: #d4af37;
+    font-weight: 600;
+    margin-top: 6px;
+    padding-top: 6px;
+    border-top: 1px solid rgba(212, 175, 55, 0.15);
+    display: inline-block;
 }
 
 .add-game-card {
     display: flex;
     justify-content: center;
     align-items: center;
-    font-size: 20px;
-    color: #fff;
+    font-size: 22px;
+    font-weight: bold;
+    color: #e6c87a;
+    background: rgba(212, 175, 55, 0.05);
+    min-height: 220px;
 }
+
+    .add-game-card:hover {
+        background: rgba(212, 175, 55, 0.12);
+        color: #d4af37;
+    }
 
 .add-game-modal {
     position: fixed;
     inset: 0;
-    background: rgba(0,0,0,.6);
+    background: rgba(0, 0, 0, 0.7);
     display: flex;
     justify-content: center;
     align-items: center;
@@ -112,46 +158,63 @@
     }
 
 .modal-content {
-    background: #111827;
-    padding: 25px;
-    border-radius: 12px;
-    border: 1px solid rgba(140,80,255,.35);
-    min-width: 320px;
+    background: #1c1812;
+    padding: 28px;
+    border-radius: 24px;
+    border: 1px solid rgba(212, 175, 55, 0.35);
+    min-width: 360px;
 }
 
     .modal-content h3 {
-        color: #d0d0ff;
-        margin-bottom: 15px;
+        color: #fef3d6;
+        margin-bottom: 20px;
+        font-size: 24px;
     }
 
     .modal-content input {
         width: 100%;
-        margin-bottom: 12px;
-        padding: 8px;
-        border-radius: 6px;
-        border: 1px solid rgba(255,255,255,.2);
-        background: rgba(0,0,0,.5);
-        color: #fff;
+        margin-bottom: 16px;
+        padding: 12px;
+        border-radius: 12px;
+        border: 1px solid rgba(212, 175, 55, 0.25);
+        background: #0f0d0a;
+        color: #e6c87a;
+        font-size: 15px;
     }
+
+        .modal-content input:focus {
+            outline: none;
+            border-color: #d4af37;
+        }
 
 .modal-buttons {
     display: flex;
     justify-content: flex-end;
-    gap: 10px;
+    gap: 12px;
+    margin-top: 8px;
 }
 
     .modal-buttons button {
-        padding: 6px 12px;
-        border-radius: 6px;
-        border: none;
+        padding: 10px 20px;
+        border-radius: 10px;
+        border: 1px solid rgba(212, 175, 55, 0.4);
         cursor: pointer;
-        background: linear-gradient(135deg,#9370db,#8a2be2);
-        color: #fff;
+        background: linear-gradient(135deg, #2a241a, #1e1912);
+        color: #e6c87a;
+        font-weight: 600;
+        transition: all 0.2s ease;
     }
 
+        .modal-buttons button:hover {
+            background: linear-gradient(135deg, #3a3226, #2a241a);
+            border-color: #d4af37;
+        }
+
 #cancelModal {
-    background: rgba(255,0,0,.7);
+    background: rgba(212, 175, 55, 0.08);
+    border-color: rgba(212, 175, 55, 0.25);
 }
+
 .game-card-link,
 .game-card-link:visited,
 .game-card-link:hover,
@@ -159,4 +222,30 @@
     text-decoration: none;
     color: inherit;
     display: block;
+}
+
+@media (max-width: 768px) {
+    .layout {
+        flex-direction: column;
+        padding: 0 16px;
+    }
+
+    .sidebar {
+        width: 100%;
+    }
+
+    .catalog {
+        grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+        gap: 16px;
+    }
+
+    .game-content h3 {
+        font-size: 16px;
+        min-height: 40px;
+    }
+
+    .game-content p {
+        font-size: 12px;
+        min-height: 34px;
+    }
 }

@@ -13,11 +13,11 @@
 
 .game-main-card,
 .game-achievements-panel {
-    background: linear-gradient(135deg, rgba(8, 12, 40, 0.88), rgba(8, 46, 88, 0.72));
-    border: 1px solid rgba(255, 255, 255, 0.08);
+    background: linear-gradient(145deg, #1c1812, #16130e);
+    border: 1px solid rgba(212, 175, 55, 0.3);
     border-radius: 28px;
-    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.28);
-    backdrop-filter: blur(10px);
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.4), 0 0 0 1px rgba(212, 175, 55, 0.08) inset;
+    backdrop-filter: blur(8px);
 }
 
 .game-main-card {
@@ -36,24 +36,27 @@
     border-radius: 22px;
     display: block;
     object-fit: cover;
+    border: 1px solid rgba(212, 175, 55, 0.25);
 }
 
 .game-title {
     margin: 0 0 18px;
     font-size: 44px;
     font-weight: 800;
-    color: #fff;
+    color: #fef3d6;
     line-height: 1.05;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
 }
 
 .game-description {
-    background: rgba(255, 255, 255, 0.06);
+    background: rgba(212, 175, 55, 0.06);
     border-radius: 18px;
-    padding: 18px 20px;
-    color: #d9e4ff;
+    padding: 4px 20px;
+    color: #e6c87a;
     font-size: 17px;
     line-height: 1.6;
     margin-bottom: 22px;
+    border: 1px solid rgba(212, 175, 55, 0.12);
 }
 
 .game-stats {
@@ -63,21 +66,21 @@
 }
 
 .game-stat {
-    background: rgba(255, 255, 255, 0.05);
-    border: 1px solid rgba(255, 255, 255, 0.08);
+    background: rgba(212, 175, 55, 0.05);
+    border: 1px solid rgba(212, 175, 55, 0.18);
     border-radius: 18px;
     padding: 18px;
 }
 
 .game-stat-value {
-    color: #fff;
+    color: #d4af37;
     font-size: 30px;
     font-weight: 800;
     margin-bottom: 6px;
 }
 
 .game-stat-label {
-    color: #d6def5;
+    color: #e6c87a;
     font-size: 14px;
 }
 
@@ -89,7 +92,7 @@
     .game-achievements-panel h2 {
         margin: 0 0 18px;
         text-align: center;
-        color: #fff;
+        color: #fef3d6;
         font-size: 30px;
         font-weight: 800;
         letter-spacing: 1px;
@@ -104,6 +107,16 @@
     padding-right: 4px;
 }
 
+    .game-achievements-list::-webkit-scrollbar {
+        width: 6px;
+        background: #1e1914;
+    }
+
+    .game-achievements-list::-webkit-scrollbar-thumb {
+        background: #d4af37;
+        border-radius: 3px;
+    }
+
 .game-achievement {
     display: grid;
     grid-template-columns: 52px 1fr;
@@ -111,15 +124,16 @@
     align-items: start;
     padding: 16px;
     border-radius: 18px;
-    border: 1px solid rgba(255, 255, 255, 0.08);
+    border: 1px solid rgba(212, 175, 55, 0.18);
 }
 
     .game-achievement.completed {
-        background: rgba(70, 190, 120, 0.12);
+        background: rgba(212, 175, 55, 0.08);
+        border-left: 3px solid #d4af37;
     }
 
     .game-achievement.locked {
-        background: rgba(255, 255, 255, 0.05);
+        background: rgba(212, 175, 55, 0.03);
     }
 
 .game-achievement-status {
@@ -131,25 +145,25 @@
     justify-content: center;
     font-size: 26px;
     font-weight: 900;
-    color: #fff;
-    background: rgba(255, 255, 255, 0.08);
+    color: #e6c87a;
+    background: rgba(212, 175, 55, 0.1);
 }
 
 .game-achievement-title {
-    color: #fff;
+    color: #fef3d6;
     font-size: 18px;
     font-weight: 700;
     margin-bottom: 6px;
 }
 
 .game-achievement-description {
-    color: #d6def5;
+    color: #e6c87a;
     font-size: 14px;
     line-height: 1.5;
 }
 
 .game-achievements-empty {
-    color: #d6def5;
+    color: #e6c87a;
     text-align: center;
     padding: 40px 10px;
 }
