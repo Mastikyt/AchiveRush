@@ -1,18 +1,74 @@
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System.Text.RegularExpressions;
-using WebApplication1.Models;
 using WebApplication1.DTO;
+using WebApplication1.Models;
 
 public class GamesController : Controller
 {
     private readonly ApplicationDbContext _context;
     private readonly SteamService _steamService;
+    private readonly UserManager<ApplicationUser> _userManager;
 
-    public GamesController(ApplicationDbContext context, SteamService steamService)
+    public GamesController(
+        ApplicationDbContext context,
+        SteamService steamService,
+        UserManager<ApplicationUser> userManager)
     {
         _context = context;
         _steamService = steamService;
+        _userManager = userManager;
+    }
+
+    [HttpGet]
+    public async Task<IActionResult> Details(int id)
+    {
+        var game = await _context.Games
+            .Include(g => g.Achievements)
+            .FirstOrDefaultAsync(g => g.Id == id);
+
+        if (game == null)
+            return NotFound("Игра не найдена");
+
+        var identityUser = await _userManager.GetUserAsync(User);
+        User? publicUser = null;
+
+        if (identityUser != null && !string.IsNullOrWhiteSpace(identityUser.SteamId))
+        {
+            publicUser = await _context.Users
+                .FirstOrDefaultAsync(x => x.SteamId == identityUser.SteamId);
+        }
+
+        var completedAchievementIds = new HashSet<int>();
+
+        if (publicUser != null)
+        {
+            completedAchievementIds = await _context.UserAchievements
+                .Where(x => x.UserId == publicUser.Id &&
+                            x.Completed &&
+                            x.Achievement.GameId == game.Id)
+                .Select(x => x.AchievementId)
+                .ToHashSetAsync();
+        }
+
+        var model = new GameDetailsViewModel
+        {
+            Game = game,
+            TotalAchievements = game.Achievements.Count,
+            CompletedAchievements = completedAchievementIds.Count,
+            AchievementItems = game.Achievements
+                .Select(a => new GameAchievementItemViewModel
+                {
+                    AchievementId = a.Id,
+                    Title = a.Title,
+                    Description = a.Description,
+                    IsCompleted = completedAchievementIds.Contains(a.Id)
+                })
+                .ToList()
+        };
+
+        return View(model);
     }
 
     [HttpPost]
@@ -37,7 +93,8 @@ public class GamesController : Controller
         if (gameData == null)
             return BadRequest("Не удалось получить данные игры");
 
-        var achievements = await _steamService.GetAchievementsAsync(appId.Value) ?? new List<SteamAchievementDto>();
+        var achievements = await _steamService.GetAchievementsAsync(appId.Value)
+                           ?? new List<SteamAchievementDto>();
 
         var game = new Game
         {
@@ -98,7 +155,7 @@ public class GamesController : Controller
                 continue;
             }
 
-            if (steamAchievements == null || steamAchievements.Count == 0)
+            if (steamAchievements.Count == 0)
                 continue;
 
             foreach (var steamAch in steamAchievements)

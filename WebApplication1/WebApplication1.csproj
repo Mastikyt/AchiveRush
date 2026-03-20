@@ -34,7 +34,6 @@
     <Folder Include="Domain\Repositories\Abstract\" />
     <Folder Include="Domain\Repositories\EntityFramework\" />
     <Folder Include="Models\ViewComponents\" />
-    <Folder Include="wwwroot\css\" />
     <Folder Include="wwwroot\img\" />
     <Folder Include="wwwroot\scss\" />
   </ItemGroup>

@@ -1,35 +1,78 @@
-﻿@model Game
+﻿@model WebApplication1.Models.GameDetailsViewModel
 
-<main class="layout">
+@{
+    ViewData["Title"] = Model.Game.Name;
+    var completionPercent = Model.TotalAchievements == 0
+        ? 0
+        : (int)Math.Round((double)Model.CompletedAchievements / Model.TotalAchievements * 100);
+}
 
-    <aside class="sidebar">
-        <img src="@Model.AvatarUrl" class="game-big-img" />
+<section class="game-page">
+    <div class="game-layout">
+        <div class="game-main-card">
+            <div class="game-main-top">
+                <div class="game-cover-wrap">
+                    <img src="@Model.Game.AvatarUrl" alt="@Model.Game.Name" class="game-cover" />
+                </div>
 
-        <h2>@Model.Name</h2>
+                <div class="game-main-content">
+                    <h1 class="game-title">@Model.Game.Name</h1>
 
-        <p>@Model.Description</p>
+                    <div class="game-description">
+                        @(string.IsNullOrWhiteSpace(Model.Game.Description)
+                                                ? "Описание игры пока отсутствует."
+                                                : Model.Game.Description)
+                    </div>
 
-        <p><b>Достижений:</b> @Model.Achievements.Count</p>
-    </aside>
+                    <div class="game-stats">
+                        <div class="game-stat">
+                            <div class="game-stat-value">@Model.TotalAchievements</div>
+                            <div class="game-stat-label">Всего ачивок</div>
+                        </div>
 
-    <section class="catalog">
+                        <div class="game-stat">
+                            <div class="game-stat-value">@Model.CompletedAchievements</div>
+                            <div class="game-stat-label">Выполнено</div>
+                        </div>
 
-        @foreach (var ach in Model.Achievements)
-        {
-            <div class="card achievement-card">
-                <h3>@ach.Title</h3>
-                <p>@ach.Description</p>
-
-                @if (ach.Completed)
-                {
-                    <span class="completed">Выполнено ✓</span>
-                }
-                else
-                {
-                    <span class="not-completed">Не выполнено</span>
-                }
+                        <div class="game-stat">
+                            <div class="game-stat-value">@completionPercent%</div>
+                            <div class="game-stat-label">Прогресс</div>
+                        </div>
+                    </div>
+                </div>
             </div>
-        }
+        </div>
 
-    </section>
-</main>
+        <aside class="game-achievements-panel">
+            <h2>ACHIEVEMENTS</h2>
+
+            @if (Model.AchievementItems.Any())
+            {
+                <div class="game-achievements-list">
+                    @foreach (var achievement in Model.AchievementItems)
+                    {
+                        <div class="game-achievement @(achievement.IsCompleted ? "completed" : "locked")">
+                            <div class="game-achievement-status">
+                                @(achievement.IsCompleted ? "✓" : "×")
+                            </div>
+
+                            <div class="game-achievement-content">
+                                <div class="game-achievement-title">@achievement.Title</div>
+                                <div class="game-achievement-description">
+                                    @(string.IsNullOrWhiteSpace(achievement.Description)
+                                                                ? "Без описания"
+                                                                : achievement.Description)
+                        </div>
+                    </div>
+                </div>
+                                }
+                </div>
+            }
+            else
+            {
+                <div class="game-achievements-empty">У этой игры нет ачивок в базе.</div>
+            }
+        </aside>
+    </div>
+</section>
