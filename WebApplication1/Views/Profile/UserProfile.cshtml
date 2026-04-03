@@ -21,13 +21,13 @@
                         <h1 class="profile-name">@Model.SteamName</h1>
                     </div>
 
-@*                     @if (isOwner)
+                    @if (isOwner)
                     {
-                        <form asp-controller="Profile" asp-action="Sync" method="post">
+                    @* <form asp-controller="Profile" asp-action="Sync" method="post">
                             @Html.AntiForgeryToken()
                             <button type="submit" class="sync-button">Синхронизировать ачивки</button>
-                        </form>
-                    } *@
+                        </form> *@
+                    }
                 </div>
 
                 <div class="profile-stats">
@@ -50,3 +50,18 @@
         </div>
     </div>
 </section>
+<h2 class="profile-section-title">Последние достижения</h2>
+
+<div class="achievements-grid">
+    @foreach (var ua in ViewBag.RecentAchievements)
+    {
+        <div class="achievement-card">
+            <img src="@ua.Achievement.Game.AvatarUrl" class="achievement-icon" />
+
+            <div class="achievement-info">
+                <div class="achievement-name">@ua.Achievement.Title</div>
+                <div class="achievement-game">@ua.Achievement.Game.Name</div>
+            </div>
+        </div>
+    }
+</div>

@@ -1,60 +1,119 @@
-﻿const addGameModal = document.getElementById('addGameModal');
-const openAddGameBtn = document.getElementById('openAddGame');
-const cancelModalBtn = document.getElementById('cancelModal');
-const addGameForm = document.getElementById('addGameForm');
+﻿document.addEventListener('DOMContentLoaded', () => {
+    // ===== МОДАЛКА =====
+    const addGameModal = document.getElementById('addGameModal');
+    const openAddGameBtn = document.getElementById('openAddGame');
+    const cancelModalBtn = document.getElementById('cancelModal');
+    const cancelModalTopBtn = document.getElementById('cancelModalTop');
+    const closeModalOverlay = document.getElementById('closeModalOverlay');
+    const steamUrlInput = document.getElementById('steamUrl');
 
-openAddGameBtn.addEventListener('click', () => addGameModal.classList.remove('hidden'));
-cancelModalBtn.addEventListener('click', () => addGameModal.classList.add('hidden'));
+    function openModal() {
+        if (!addGameModal) return;
 
-addGameForm.addEventListener('submit', async (e) => {
-    e.preventDefault();
+        addGameModal.classList.remove('hidden');
+        document.body.style.overflow = 'hidden';
 
-    const steamUrl = document.getElementById('steamUrl').value;
-    const token = document.querySelector('input[name="__RequestVerificationToken"]')?.value || '';
-
-    try {
-        const res = await fetch('/Games/AddFromSteam', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-            body: `steamUrl=${encodeURIComponent(steamUrl)}&__RequestVerificationToken=${encodeURIComponent(token)}`
-        });
-
-        if (res.ok) {
-            location.reload();
-        } else {
-            const text = await res.text();
-            alert(`Ошибка: ${text}`);
-        }
-    } catch (err) {
-        console.error(err);
-        alert('Ошибка запроса');
+        setTimeout(() => {
+            steamUrlInput?.focus();
+        }, 50);
     }
-});
 
-// Фильтры
-const filterName = document.getElementById('filterName');
-const filterAchievements = document.getElementById('filterAchievements');
-const applyFiltersBtn = document.getElementById('applyFilters');
-const resetFiltersBtn = document.getElementById('resetFilters');
+    function closeModal() {
+        if (!addGameModal) return;
 
-applyFiltersBtn.addEventListener('click', () => {
-    const nameVal = filterName.value.toLowerCase();
-    const achVal = parseInt(filterAchievements.value) || 0;
+        addGameModal.classList.add('hidden');
+        document.body.style.overflow = '';
+    }
 
-    document.querySelectorAll('.game-card').forEach(card => {
-        const cardName = card.dataset.name.toLowerCase();
-        const cardAch = parseInt(card.dataset.achievements);
+    if (openAddGameBtn) {
+        openAddGameBtn.addEventListener('click', openModal);
+    }
 
-        if (cardName.includes(nameVal) && cardAch >= achVal) {
-            card.style.display = '';
-        } else {
-            card.style.display = 'none';
+    if (cancelModalBtn) {
+        cancelModalBtn.addEventListener('click', closeModal);
+    }
+
+    if (cancelModalTopBtn) {
+        cancelModalTopBtn.addEventListener('click', closeModal);
+    }
+
+    if (closeModalOverlay) {
+        closeModalOverlay.addEventListener('click', closeModal);
+    }
+
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape' && addGameModal && !addGameModal.classList.contains('hidden')) {
+            closeModal();
         }
     });
-});
 
-resetFiltersBtn.addEventListener('click', () => {
-    filterName.value = '';
-    filterAchievements.value = '';
-    document.querySelectorAll('.game-card').forEach(card => card.style.display = '');
+    // ===== ФИЛЬТРЫ =====
+    const filterName = document.getElementById('filterName');
+    const filterAchievements = document.getElementById('filterAchievements');
+    const applyFiltersBtn = document.getElementById('applyFilters');
+    const resetFiltersBtn = document.getElementById('resetFilters');
+
+    const catalogItems = document.querySelectorAll('.catalog > *');
+
+    function applyFilters() {
+        const nameVal = (filterName?.value || '').toLowerCase().trim();
+        const achVal = parseInt(filterAchievements?.value, 10) || 0;
+
+        catalogItems.forEach((el) => {
+            if (el.id === 'openAddGame') {
+                el.style.display = '';
+                return;
+            }
+
+            const card = el.querySelector('.game-card');
+
+            if (!card) {
+                el.style.display = 'none';
+                return;
+            }
+
+            const gameName = (card.dataset.name || '').toLowerCase();
+            const achievementsCount = parseInt(card.dataset.achievements, 10) || 0;
+
+            const matchName = !nameVal || gameName.includes(nameVal);
+            const matchAchievements = achievementsCount >= achVal;
+
+            el.style.display = matchName && matchAchievements ? '' : 'none';
+        });
+    }
+
+    function resetFilters() {
+        if (filterName) filterName.value = '';
+        if (filterAchievements) filterAchievements.value = '';
+
+        catalogItems.forEach((el) => {
+            el.style.display = '';
+        });
+    }
+
+    if (applyFiltersBtn) {
+        applyFiltersBtn.addEventListener('click', applyFilters);
+    }
+
+    if (resetFiltersBtn) {
+        resetFiltersBtn.addEventListener('click', resetFilters);
+    }
+
+    if (filterName) {
+        filterName.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                applyFilters();
+            }
+        });
+    }
+
+    if (filterAchievements) {
+        filterAchievements.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                applyFilters();
+            }
+        });
+    }
 });

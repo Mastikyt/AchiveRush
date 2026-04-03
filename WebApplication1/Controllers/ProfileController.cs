@@ -39,7 +39,8 @@ namespace WebApplication1.Controllers
 
             var user = await _db.Users
                 .Include(x => x.Achievements)
-                .ThenInclude(x => x.Achievement)
+                    .ThenInclude(x => x.Achievement)
+                        .ThenInclude(a => a.Game) 
                 .FirstOrDefaultAsync(x => x.SteamId == steamId);
 
             if (user == null)
@@ -84,7 +85,13 @@ namespace WebApplication1.Controllers
             ViewBag.Rank = rank > 0 ? rank : 1;
             ViewBag.GamesCount = gamesCount;
             ViewBag.IsOwner = isOwner;
+            var recentAchievements = user.Achievements
+                .Where(a => a.Completed && a.UnlockTime != null)
+                .OrderByDescending(a => a.UnlockTime)
+                .Take(5)
+                .ToList();
 
+            ViewBag.RecentAchievements = recentAchievements;
             return View(user);
         }
 

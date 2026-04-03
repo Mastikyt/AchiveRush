@@ -31,7 +31,13 @@ public class Program
         .AddEntityFrameworkStores<ApplicationDbContext>()
         .AddDefaultTokenProviders();
 
-
+        builder.Services.AddDistributedMemoryCache();
+        builder.Services.AddSession(options =>
+        {
+            options.IdleTimeout = TimeSpan.FromHours(3);
+            options.Cookie.HttpOnly = true;
+            options.Cookie.IsEssential = true;
+        });
 
 
         builder.Services.AddAuthentication(options =>
@@ -43,8 +49,6 @@ public class Program
         {
             options.ApplicationKey = builder.Configuration["Steam:ApiKey"];
         });
-
-
 
 
         builder.Services.AddControllersWithViews();
@@ -60,6 +64,8 @@ public class Program
 
         app.UseAuthentication();
         app.UseAuthorization();
+        app.UseSession();
+
 
         app.MapControllerRoute(
             name: "default",

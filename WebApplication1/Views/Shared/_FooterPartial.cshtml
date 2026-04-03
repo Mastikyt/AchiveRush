@@ -1,8 +1,9 @@
-﻿
-@inject IConfiguration config
+﻿@inject IConfiguration config
+@using WebApplication1.infrastructure
 @{
-	AppConfig? appConfig = config.GetSection("Project").Get<AppConfig>();
+    AppConfig? appConfig = config.GetSection("Project").Get<AppConfig>();
 }
+
 <footer class="footer">
     <div class="footer-content">
 
@@ -23,6 +24,12 @@
     </div>
 
     <div class="footer-bottom">
-        © 2026 AchiveRush. Все права защищены.
+        <a asp-controller="Admin"
+           asp-action="Login"
+           class="footer-secret-link"
+           aria-label="Admin login">
+            ©
+        </a>
+        2026 AchiveRush. Все права защищены.
     </div>
 </footer>

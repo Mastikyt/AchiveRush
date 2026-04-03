@@ -1,0 +1,495 @@
+﻿@model List<WebApplication1.Models.GameRequest>
+
+@{
+    ViewData["Title"] = "Админка";
+    var pendingCount = Model.Count(x => x.Status == "Pending");
+    var approvedCount = Model.Count(x => x.Status == "Approved");
+    var rejectedCount = Model.Count(x => x.Status == "Rejected");
+}
+
+<div class="admin-page">
+    <div class="admin-container">
+
+        <div class="admin-header">
+            <div>
+                <div class="admin-badge">AchiveRush Control Panel</div>
+                <h1>Админка</h1>
+                <p>Проверка заявок на добавление игр и будущий раздел заявок на достижения.</p>
+            </div>
+
+            <form method="post" asp-controller="Admin" asp-action="Logout">
+                @Html.AntiForgeryToken()
+                <button type="submit" class="admin-logout-btn">Выйти</button>
+            </form>
+        </div>
+
+        @if (TempData["AdminSuccess"] != null)
+        {
+            <div class="admin-flash admin-flash-success">@TempData["AdminSuccess"]</div>
+        }
+
+        @if (TempData["AdminError"] != null)
+        {
+            <div class="admin-flash admin-flash-error">@TempData["AdminError"]</div>
+        }
+
+        <div class="admin-stats">
+            <div class="admin-stat-card">
+                <span>Ожидают</span>
+                <strong>@pendingCount</strong>
+            </div>
+            <div class="admin-stat-card">
+                <span>Одобрено</span>
+                <strong>@approvedCount</strong>
+            </div>
+            <div class="admin-stat-card">
+                <span>Отклонено</span>
+                <strong>@rejectedCount</strong>
+            </div>
+        </div>
+
+        <section class="admin-section">
+            <div class="admin-section-head">
+                <h2>Заявки на добавление игр</h2>
+                <p>В основную БД игра попадает только после одобрения администратором.</p>
+            </div>
+
+            @if (!Model.Any())
+            {
+                <div class="admin-empty">
+                    Пока нет ни одной заявки.
+                </div>
+            }
+            else
+            {
+                <div class="admin-grid">
+                    @foreach (var item in Model)
+                    {
+                        var statusClass = item.Status switch
+                        {
+                            "Approved" => "approved",
+                            "Rejected" => "rejected",
+                            _ => "pending"
+                        };
+
+                        <div class="request-card">
+                            <div class="request-image-wrap">
+                                <img src="@item.ImageUrl" alt="@item.Name" class="request-image" />
+                                <div class="request-status @statusClass">@item.Status</div>
+                            </div>
+
+                            <div class="request-body">
+                                <h3>@item.Name</h3>
+
+                                <div class="request-meta">
+                                    <div class="request-meta-item">
+                                        <span>Steam App ID</span>
+                                        <strong>@item.SteamAppId</strong>
+                                    </div>
+                                    <div class="request-meta-item">
+                                        <span>Достижений</span>
+                                        <strong>@item.AchievementsCount</strong>
+                                    </div>
+                                </div>
+
+                                <div class="request-link-box">
+                                    <span>Ссылка на игру</span>
+                                    <a href="@item.SteamUrl" target="_blank">@item.SteamUrl</a>
+                                </div>
+
+                                <div class="request-date">
+                                    Создано: @item.CreatedAt.ToLocalTime().ToString("dd.MM.yyyy HH:mm")
+                                </div>
+
+                                @if (item.Status == "Pending")
+                                {
+                                    <div class="request-actions">
+                                        <form method="post" asp-controller="Admin" asp-action="ApproveGameRequest">
+                                            @Html.AntiForgeryToken()
+                                            <input type="hidden" name="id" value="@item.Id" />
+                                            <button type="submit" class="btn-approve">Одобрить</button>
+                                        </form>
+
+                                        <form method="post" asp-controller="Admin" asp-action="RejectGameRequest">
+                                            @Html.AntiForgeryToken()
+                                            <input type="hidden" name="id" value="@item.Id" />
+                                            <button type="submit" class="btn-reject">Отклонить</button>
+                                        </form>
+                                    </div>
+                                }
+                            </div>
+                        </div>
+                    }
+                </div>
+            }
+        </section>
+
+        <section class="admin-section admin-placeholder">
+            <div class="admin-section-head">
+                <h2>Запрос на добавление достижения в игру</h2>
+                <p>Пока заглушка. Позже можно сделать отдельную таблицу заявок, модерацию и ручную привязку к игре.</p>
+            </div>
+
+            <div class="placeholder-card">
+                <div class="placeholder-icon">★</div>
+                <div>
+                    <h3>Раздел скоро появится</h3>
+                    <p>
+                        Тут позже будет список заявок на новые достижения, статус проверки и действия администратора.
+                    </p>
+                </div>
+            </div>
+        </section>
+
+    </div>
+</div>
+
+<style>
+    .admin-page {
+        min-height: 100vh;
+        padding: 36px 20px 60px;
+        background: radial-gradient(circle at top left, rgba(212,175,55,0.08), transparent 28%), radial-gradient(circle at top right, rgba(212,175,55,0.06), transparent 30%), linear-gradient(180deg, #0b0907, #12100c 45%, #0f0d0a);
+        color: #fef3d6;
+    }
+
+    .admin-container {
+        max-width: 1280px;
+        margin: 0 auto;
+    }
+
+    .admin-header {
+        display: flex;
+        justify-content: space-between;
+        gap: 20px;
+        align-items: flex-start;
+        margin-bottom: 28px;
+        flex-wrap: wrap;
+    }
+
+    .admin-badge {
+        display: inline-block;
+        margin-bottom: 14px;
+        padding: 8px 14px;
+        border-radius: 999px;
+        background: rgba(212,175,55,0.12);
+        color: #e6c87a;
+        font-weight: 700;
+        font-size: 0.88rem;
+        border: 1px solid rgba(212,175,55,0.18);
+    }
+
+    .admin-header h1 {
+        margin: 0 0 8px;
+        font-size: 2.4rem;
+        font-weight: 800;
+        color: #fef3d6;
+    }
+
+    .admin-header p {
+        margin: 0;
+        max-width: 760px;
+        color: #dcbc6a;
+        line-height: 1.6;
+    }
+
+    .admin-logout-btn {
+        border: 1px solid rgba(212,175,55,0.2);
+        background: rgba(212,175,55,0.06);
+        color: #f3d58e;
+        border-radius: 14px;
+        padding: 12px 18px;
+        font-weight: 700;
+        cursor: pointer;
+        transition: 0.2s ease;
+    }
+
+        .admin-logout-btn:hover {
+            background: rgba(212,175,55,0.1);
+            border-color: rgba(212,175,55,0.35);
+        }
+
+    .admin-flash {
+        border-radius: 18px;
+        padding: 14px 18px;
+        margin-bottom: 18px;
+        font-weight: 600;
+    }
+
+    .admin-flash-success {
+        background: rgba(48, 158, 92, 0.12);
+        border: 1px solid rgba(74, 222, 128, 0.18);
+        color: #a7f3d0;
+    }
+
+    .admin-flash-error {
+        background: rgba(185,40,40,0.12);
+        border: 1px solid rgba(248,113,113,0.2);
+        color: #fecaca;
+    }
+
+    .admin-stats {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(180px, 1fr));
+        gap: 16px;
+        margin-bottom: 28px;
+    }
+
+    .admin-stat-card {
+        background: linear-gradient(180deg, rgba(33,27,20,0.95), rgba(24,20,14,0.95));
+        border: 1px solid rgba(212,175,55,0.12);
+        border-radius: 22px;
+        padding: 22px;
+        backdrop-filter: blur(8px);
+    }
+
+        .admin-stat-card span {
+            display: block;
+            color: #dcbc6a;
+            margin-bottom: 10px;
+            font-size: 0.95rem;
+        }
+
+        .admin-stat-card strong {
+            font-size: 2rem;
+            font-weight: 800;
+            color: #fff;
+        }
+
+    .admin-section {
+        background: linear-gradient(180deg, rgba(33,27,20,0.96), rgba(24,20,14,0.96));
+        border: 1px solid rgba(212,175,55,0.14);
+        border-radius: 28px;
+        padding: 24px;
+        margin-bottom: 26px;
+        box-shadow: 0 16px 40px rgba(0,0,0,0.18);
+    }
+
+    .admin-section-head {
+        margin-bottom: 22px;
+    }
+
+        .admin-section-head h2 {
+            margin: 0 0 8px;
+            font-size: 1.55rem;
+            font-weight: 800;
+            color: #fef3d6;
+        }
+
+        .admin-section-head p {
+            margin: 0;
+            color: #dcbc6a;
+            line-height: 1.55;
+        }
+
+    .admin-empty {
+        padding: 22px;
+        border-radius: 20px;
+        background: rgba(255,255,255,0.03);
+        color: #dcbc6a;
+    }
+
+    .admin-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+        gap: 20px;
+    }
+
+    .request-card {
+        overflow: hidden;
+        border-radius: 24px;
+        background: linear-gradient(180deg, rgba(33,27,20,0.98), rgba(24,20,14,0.98));
+        border: 1px solid rgba(212,175,55,0.12);
+        box-shadow: 0 14px 34px rgba(0,0,0,0.2);
+    }
+
+    .request-image-wrap {
+        position: relative;
+        height: 190px;
+        overflow: hidden;
+        background: #0f172a;
+    }
+
+    .request-image {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        display: block;
+    }
+
+    .request-status {
+        position: absolute;
+        top: 14px;
+        right: 14px;
+        border-radius: 999px;
+        padding: 7px 12px;
+        font-size: 0.82rem;
+        font-weight: 700;
+        backdrop-filter: blur(8px);
+    }
+
+        .request-status.pending {
+            background: rgba(245,158,11,0.18);
+            color: #fcd34d;
+            border: 1px solid rgba(245,158,11,0.25);
+        }
+
+        .request-status.approved {
+            background: rgba(48, 158, 92, 0.16);
+            color: #a7f3d0;
+            border: 1px solid rgba(74, 222, 128, 0.18);
+        }
+
+        .request-status.rejected {
+            background: rgba(185,40,40,0.12);
+            color: #fecaca;
+            border: 1px solid rgba(248,113,113,0.2);
+        }
+
+    .request-body {
+        padding: 20px;
+    }
+
+        .request-body h3 {
+            margin: 0 0 16px;
+            font-size: 1.2rem;
+            font-weight: 800;
+            line-height: 1.35;
+            color: #fef3d6;
+        }
+
+    .request-meta {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 12px;
+        margin-bottom: 16px;
+    }
+
+    .request-meta-item {
+        padding: 14px;
+        border-radius: 16px;
+        background: rgba(255,255,255,0.03);
+        border: 1px solid rgba(212,175,55,0.08);
+    }
+
+        .request-meta-item span {
+            display: block;
+            color: #dcbc6a;
+            font-size: 0.82rem;
+            margin-bottom: 6px;
+        }
+
+        .request-meta-item strong {
+            font-size: 1rem;
+            color: #fff;
+        }
+
+    .request-link-box {
+        margin-bottom: 14px;
+        padding: 14px;
+        border-radius: 16px;
+        background: rgba(255,255,255,0.03);
+        border: 1px solid rgba(212,175,55,0.08);
+    }
+
+        .request-link-box span {
+            display: block;
+            color: #dcbc6a;
+            font-size: 0.82rem;
+            margin-bottom: 6px;
+        }
+
+        .request-link-box a {
+            color: #f0c95c;
+            text-decoration: none;
+            word-break: break-all;
+        }
+
+            .request-link-box a:hover {
+                text-decoration: underline;
+            }
+
+    .request-date {
+        color: #dcbc6a;
+        font-size: 0.9rem;
+        margin-bottom: 16px;
+    }
+
+    .request-actions {
+        display: flex;
+        gap: 12px;
+        flex-wrap: wrap;
+    }
+
+        .request-actions form {
+            flex: 1;
+        }
+
+        .request-actions button {
+            width: 100%;
+            border: none;
+            border-radius: 14px;
+            padding: 12px 14px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: 0.2s ease;
+        }
+
+    .btn-approve {
+        color: #fef3d6;
+        background: linear-gradient(135deg, #4b3a1d, #2c2214);
+        border: 1px solid rgba(212,175,55,0.28);
+    }
+
+    .btn-reject {
+        color: #fef3d6;
+        background: linear-gradient(135deg, #4a1f1f, #2a1414);
+        border: 1px solid rgba(220,120,120,0.2);
+    }
+
+    .request-actions button:hover {
+        transform: translateY(-1px);
+    }
+
+    .admin-placeholder .placeholder-card {
+        display: flex;
+        align-items: center;
+        gap: 18px;
+        padding: 22px;
+        border-radius: 20px;
+        background: rgba(255,255,255,0.03);
+        border: 1px solid rgba(212,175,55,0.08);
+    }
+
+    .placeholder-icon {
+        width: 58px;
+        height: 58px;
+        border-radius: 18px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.5rem;
+        font-weight: 800;
+        color: #f0c95c;
+        background: rgba(212,175,55,0.08);
+        border: 1px solid rgba(212,175,55,0.16);
+    }
+
+    .placeholder-card h3 {
+        margin: 0 0 8px;
+        font-size: 1.1rem;
+        font-weight: 800;
+        color: #fef3d6;
+    }
+
+    .placeholder-card p {
+        margin: 0;
+        color: #dcbc6a;
+        line-height: 1.6;
+    }
+
+    @@media (max-width: 900px) {
+        .admin-stats {
+            grid-template-columns: 1fr;
+        }
+    }
+</style>

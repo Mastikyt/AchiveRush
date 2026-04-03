@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 
 namespace WebApplication1.Models
-{ 
+{
     public class UserAchievement
     {
         public int Id { get; set; }
@@ -17,5 +17,6 @@ namespace WebApplication1.Models
         public bool Completed { get; set; }
 
         public DateTime? UnlockTime { get; set; }
+        public string? IconUrl { get; set; }
     }
 }
