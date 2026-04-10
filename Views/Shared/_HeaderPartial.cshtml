@@ -1,0 +1,144 @@
+@using Microsoft.AspNetCore.Identity
+@using Microsoft.EntityFrameworkCore
+@using WebApplication1.Models
+@inject UserManager<ApplicationUser> UserManager
+@inject SignInManager<ApplicationUser> SignInManager
+@inject ApplicationDbContext Db
+
+<header>
+    <div class="header-left">
+        <a asp-controller="Home" asp-action="Index" class="logo">AchiveRush</a>
+        <nav>
+            <a asp-controller="Home" asp-action="Catalog">Каталог игр</a>
+            <a asp-controller="Home" asp-action="Leaderboard">Таблица лидеров</a>
+            <a asp-controller="Home" asp-action="Challenges">Челленджи</a>
+        </nav>
+    </div>
+
+    <div class="header-right">
+        @if (SignInManager.IsSignedIn(User))
+        {
+            var identityUser = await UserManager.GetUserAsync(User);
+
+            var publicUser = identityUser != null && !string.IsNullOrWhiteSpace(identityUser.SteamId)
+            ? await Db.Users.FirstOrDefaultAsync(x => x.SteamId == identityUser.SteamId)
+            : null;
+
+            var avatarUrl = !string.IsNullOrWhiteSpace(publicUser?.AvatarID)
+            ? publicUser!.AvatarID
+            : "/images/default_avatar.png";
+
+            var personaName = !string.IsNullOrWhiteSpace(publicUser?.SteamName)
+            ? publicUser!.SteamName
+            : (!string.IsNullOrWhiteSpace(identityUser?.PersonaName) ? identityUser!.PersonaName : "Player");
+
+            <div class="user-info dropdown">
+                <img src="@avatarUrl" class="avatar" alt="Avatar" />
+                <div class="dropdown-toggle">@personaName</div>
+
+                <div class="dropdown-menu">
+                    <a class="dropdown-item"
+                       asp-controller="Profile"
+                       asp-action="UserProfile"
+                       asp-route-steamId="@identityUser?.SteamId">
+                        Профиль
+                    </a>
+
+                    <form asp-controller="Account" asp-action="Logout" method="post">
+                        @Html.AntiForgeryToken()
+                        <button type="submit" class="dropdown-item logout-btn">Выйти</button>
+                    </form>
+                </div>
+            </div>
+        }
+        else
+        {
+            <div class="steam-badge">
+                <a asp-controller="Account" asp-action="Login">
+                    <img src="~/img/steam.png" alt="Steam login" height="50" width="225" />
+                </a>
+            </div>
+        }
+    </div>
+</header>
+
+<style>
+    .header-left {
+        display: flex;
+        align-items: center;
+        gap: 25px;
+    }
+
+    nav a {
+        color: #d0d0ff;
+        text-decoration: none;
+        padding: 10px 15px;
+        border-radius: 8px;
+        transition: .2s;
+    }
+
+        nav a:hover {
+            background: rgba(140,80,255,.3);
+        }
+
+    .header-right {
+        margin-left: auto;
+        display: flex;
+        align-items: center;
+        gap: 15px;
+    }
+
+    .user-info.dropdown {
+        position: relative;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .user-info .avatar {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        object-fit: cover;
+    }
+
+    .user-info .dropdown-toggle {
+        color: #fff;
+        font-weight: bold;
+        margin-left: 8px;
+    }
+
+    .dropdown-menu {
+        display: none;
+        position: absolute;
+        top: 50px;
+        right: 0;
+        background: rgba(20,20,40,.95);
+        border-radius: 8px;
+        min-width: 150px;
+        padding: 5px 0;
+        z-index: 200;
+        box-shadow: 0 5px 20px rgba(0,0,0,0.5);
+    }
+
+        .dropdown-menu a, .dropdown-menu button {
+            display: block;
+            padding: 10px 15px;
+            color: #fff;
+            text-decoration: none;
+            width: 100%;
+            text-align: left;
+            border: none;
+            background: none;
+            cursor: pointer;
+        }
+
+            .dropdown-menu a:hover, .dropdown-menu button:hover {
+                background: rgba(138, 43, 226, 0.3);
+            }
+
+    .user-info.dropdown:hover .dropdown-menu {
+        display: block;
+    }
+</style>

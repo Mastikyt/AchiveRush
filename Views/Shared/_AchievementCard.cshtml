@@ -1,0 +1,18 @@
+﻿@model WebApplication1.Models.UserAchievement
+@{
+    var rate = Model.Achievement.GlobalUnlockRate;
+    var rarityClass = rate < 1 ? "legendary"
+                    : rate < 5 ? "epic"
+                    : "common";
+}
+
+<div class="achievement-card @rarityClass">
+    <img src="@Model.Achievement.Game.AvatarUrl" class="achievement-icon" loading="lazy" />
+    <div class="achievement-info">
+        <div class="achievement-name">@Model.Achievement.Title</div>
+        <div class="achievement-game">
+            @Model.Achievement.Game.Name
+            • @if (rate > 0) {  @rate.ToString("0.##")  } %
+        </div>
+    </div>
+</div>

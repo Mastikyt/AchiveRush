@@ -1,0 +1,135 @@
+@model WebApplication1.Models.User
+@{
+    ViewData["Title"] = $"{Model.SteamName} - Профиль";
+    var isOwner = ViewBag.IsOwner == true;
+    var avatarUrl = string.IsNullOrWhiteSpace(Model.AvatarID)
+        ? "/images/default_avatar.png"
+        : Model.AvatarID.StartsWith("http") ? Model.AvatarID
+        : $"https://steamcdn-a.akamaihd.net/steamcommunity/public/images/avatars/{Model.AvatarID.Substring(0, 2)}/{Model.AvatarID}_full.jpg";
+}
+
+<section class="profile-page">
+    <div class="profile-card">
+        <div class="profile-main">
+            <img src="@avatarUrl" class="profile-avatar" />
+
+            <div class="profile-content">
+                <div class="profile-top">
+                    <h1 class="profile-name">@Model.SteamName</h1>
+                    @if (isOwner)
+                    {
+                        <form asp-action="TogglePrivacy" method="post">
+                            @Html.AntiForgeryToken()
+                            <button class="profile-sync-btn">
+                                @(Model.IsProfilePublic ? "Сделать приватным" : "Сделать публичным")
+                            </button>
+                        </form>
+
+                        <form asp-action="Sync" method="post">
+                            @Html.AntiForgeryToken()
+                            <button class="profile-sync-btn">Синхронизировать ачивки</button>
+                        </form>
+                    }
+                </div>
+
+                <div class="profile-stats">
+                    <div class="profile-stat"><div class="profile-stat-value">#@ViewBag.Rank</div><div class="profile-stat-label">Место</div></div>
+                    <div class="profile-stat"><div class="profile-stat-value">@Model.TotalAchievements</div><div class="profile-stat-label">Ачивок</div></div>
+                    <div class="profile-stat"><div class="profile-stat-value">@ViewBag.GamesCount</div><div class="profile-stat-label">Игр</div></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <h2>Редкие достижения</h2>
+    <div class="achievements-grid">
+        @foreach (var ua in ViewBag.RareAchievements)
+        {
+            var rate = ua.Achievement.GlobalUnlockRate;
+            var rarityClass = rate < 1 ? "legendary" : rate < 5 ? "epic" : "common";
+            <div class="achievement-card @rarityClass">
+                <img src="@ua.Achievement.Game.AvatarUrl" class="achievement-icon" />
+                <div class="achievement-info">
+                    <div class="achievement-name">@ua.Achievement.Title</div>
+                    <div class="achievement-game">@ua.Achievement.Game.Name • @rate.ToString("0.##")%</div>
+                </div>
+            </div>
+        }
+    </div>
+
+    <h2>Последние достижения</h2>
+    <div class="achievements-grid">
+        @foreach (var ua in ViewBag.RecentAchievements)
+        {
+            <div class="achievement-card">
+                <img src="@ua.Achievement.Game.AvatarUrl" class="achievement-icon" />
+                <div class="achievement-info">
+                    <div class="achievement-name">@ua.Achievement.Title</div>
+                    <div class="achievement-game">@ua.Achievement.Game.Name</div>
+                </div>
+            </div>
+        }
+    </div>
+
+    <h2>Все достижения по редкости</h2>
+
+    @if (((IEnumerable<WebApplication1.Models.UserAchievement>)ViewBag.LegendaryAchievements).Any())
+    {
+        <h3>Легендарные (&lt; 1%)</h3>
+        <div class="achievements-grid">
+            @foreach (var ua in ViewBag.LegendaryAchievements)
+            {
+                <partial name="_AchievementCard" model="ua" />
+            }
+        </div>
+    }
+
+    @if (((IEnumerable<WebApplication1.Models.UserAchievement>)ViewBag.EpicAchievements).Any())
+    {
+        <h3>Эпические (1% – 4.99%)</h3>
+        <div class="achievements-grid">
+            @foreach (var ua in ViewBag.EpicAchievements)
+            {
+                <partial name="_AchievementCard" model="ua" />
+            }
+        </div>
+    }
+
+    @if (((IEnumerable<WebApplication1.Models.UserAchievement>)ViewBag.RareGroupedAchievements).Any())
+    {
+        <h3>Редкие (5% – 9.99%)</h3>
+        <div class="achievements-grid">
+            @foreach (var ua in ViewBag.RareGroupedAchievements)
+            {
+                <partial name="_AchievementCard" model="ua" />
+            }
+        </div>
+    }
+
+    @if (((IEnumerable<WebApplication1.Models.UserAchievement>)ViewBag.CommonAchievements).Any())
+    {
+        <h3>Обычные (10%+)</h3>
+        <div class="achievements-grid">
+            @foreach (var ua in ViewBag.CommonAchievements)
+            {
+                <partial name="_AchievementCard" model="ua" />
+            }
+        </div>
+    }
+
+    @* Пагинация *@
+    <div class="pagination">
+        @if (ViewBag.CurrentPage > 1)
+        {
+            <a asp-action="UserProfile" asp-route-steamId="@Model.SteamId" asp-route-page="@(ViewBag.CurrentPage - 1)" class="page-btn">« Назад</a>
+        }
+        @for (int i = 1; i <= ViewBag.TotalPages; i++)
+        {
+            <a asp-action="UserProfile" asp-route-steamId="@Model.SteamId" asp-route-page="@i" class="page-btn">@i</a>
+        }
+        @if (ViewBag.CurrentPage < ViewBag.TotalPages)
+        {
+            <a asp-action="UserProfile" asp-route-steamId="@Model.SteamId" asp-route-page="@(ViewBag.CurrentPage + 1)" class="page-btn">Вперед »</a>
+        }
+    </div>
+</section>
