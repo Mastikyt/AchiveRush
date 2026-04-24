@@ -17,97 +17,97 @@ build_property._SupportedPlatformList = Linux,macOS,Windows
 build_property._SupportedPlatformList = Linux,macOS,Windows
 build_property.RootNamespace = WebApplication1
 build_property.RootNamespace = WebApplication1
-build_property.ProjectDir = D:\Колледж\3 курс\Практика 2 сим\AchiveRush\WebApplication1\
+build_property.ProjectDir = D:\Колледж\3 курс\Практика 2 сим\AchiveRush\AchiveRushCode\
 build_property.EnableComHosting = 
 build_property.EnableGeneratedComInterfaceComImportInterop = 
 build_property.RazorLangVersion = 9.0
 build_property.SupportLocalizedComponentNames = 
 build_property.GenerateRazorMetadataSourceChecksumAttributes = 
-build_property.MSBuildProjectDirectory = D:\Колледж\3 курс\Практика 2 сим\AchiveRush\WebApplication1
+build_property.MSBuildProjectDirectory = D:\Колледж\3 курс\Практика 2 сим\AchiveRush\AchiveRushCode
 build_property._RazorSourceGeneratorDebug = 
 build_property.EffectiveAnalysisLevelStyle = 9.0
 build_property.EnableCodeStyleSeverity = 
 
-[D:/Колледж/3 курс/Практика 2 сим/AchiveRush/WebApplication1/Views/Admin/Index.cshtml]
+[D:/Колледж/3 курс/Практика 2 сим/AchiveRush/AchiveRushCode/Views/Admin/Index.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQWRtaW5cSW5kZXguY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
-[D:/Колледж/3 курс/Практика 2 сим/AchiveRush/WebApplication1/Views/Admin/Login.cshtml]
+[D:/Колледж/3 курс/Практика 2 сим/AchiveRush/AchiveRushCode/Views/Admin/Login.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQWRtaW5cTG9naW4uY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
-[D:/Колледж/3 курс/Практика 2 сим/AchiveRush/WebApplication1/Views/Games/Details.cshtml]
+[D:/Колледж/3 курс/Практика 2 сим/AchiveRush/AchiveRushCode/Views/Games/Details.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcR2FtZXNcRGV0YWlscy5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
-[D:/Колледж/3 курс/Практика 2 сим/AchiveRush/WebApplication1/Views/Games/Index.cshtml]
+[D:/Колледж/3 курс/Практика 2 сим/AchiveRush/AchiveRushCode/Views/Games/Index.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcR2FtZXNcSW5kZXguY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
-[D:/Колледж/3 курс/Практика 2 сим/AchiveRush/WebApplication1/Views/Home/Catalog.cshtml]
+[D:/Колледж/3 курс/Практика 2 сим/AchiveRush/AchiveRushCode/Views/Home/Catalog.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcSG9tZVxDYXRhbG9nLmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
 
-[D:/Колледж/3 курс/Практика 2 сим/AchiveRush/WebApplication1/Views/Home/Challenges.cshtml]
+[D:/Колледж/3 курс/Практика 2 сим/AchiveRush/AchiveRushCode/Views/Home/Challenges.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcSG9tZVxDaGFsbGVuZ2VzLmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
 
-[D:/Колледж/3 курс/Практика 2 сим/AchiveRush/WebApplication1/Views/Home/Index.cshtml]
+[D:/Колледж/3 курс/Практика 2 сим/AchiveRush/AchiveRushCode/Views/Home/Index.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcSG9tZVxJbmRleC5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
-[D:/Колледж/3 курс/Практика 2 сим/AchiveRush/WebApplication1/Views/Home/Leaderboard.cshtml]
+[D:/Колледж/3 курс/Практика 2 сим/AchiveRush/AchiveRushCode/Views/Home/Leaderboard.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcSG9tZVxMZWFkZXJib2FyZC5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
-[D:/Колледж/3 курс/Практика 2 сим/AchiveRush/WebApplication1/Views/Profile/UserProfile.cshtml]
+[D:/Колледж/3 курс/Практика 2 сим/AchiveRush/AchiveRushCode/Views/Profile/UserProfile.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcUHJvZmlsZVxVc2VyUHJvZmlsZS5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
-[D:/Колледж/3 курс/Практика 2 сим/AchiveRush/WebApplication1/Views/Shared/_AchievementCard.cshtml]
+[D:/Колледж/3 курс/Практика 2 сим/AchiveRush/AchiveRushCode/Views/Shared/_AchievementCard.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcU2hhcmVkXF9BY2hpZXZlbWVudENhcmQuY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
-[D:/Колледж/3 курс/Практика 2 сим/AchiveRush/WebApplication1/Views/Shared/_Catalog.cshtml]
+[D:/Колледж/3 курс/Практика 2 сим/AchiveRush/AchiveRushCode/Views/Shared/_Catalog.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcU2hhcmVkXF9DYXRhbG9nLmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
 
-[D:/Колледж/3 курс/Практика 2 сим/AchiveRush/WebApplication1/Views/Shared/_Challanges.cshtml]
+[D:/Колледж/3 курс/Практика 2 сим/AchiveRush/AchiveRushCode/Views/Shared/_Challanges.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcU2hhcmVkXF9DaGFsbGFuZ2VzLmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
 
-[D:/Колледж/3 курс/Практика 2 сим/AchiveRush/WebApplication1/Views/Shared/_CssPartial.cshtml]
+[D:/Колледж/3 курс/Практика 2 сим/AchiveRush/AchiveRushCode/Views/Shared/_CssPartial.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcU2hhcmVkXF9Dc3NQYXJ0aWFsLmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
 
-[D:/Колледж/3 курс/Практика 2 сим/AchiveRush/WebApplication1/Views/Shared/_FooterPartial.cshtml]
+[D:/Колледж/3 курс/Практика 2 сим/AchiveRush/AchiveRushCode/Views/Shared/_FooterPartial.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcU2hhcmVkXF9Gb290ZXJQYXJ0aWFsLmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
 
-[D:/Колледж/3 курс/Практика 2 сим/AchiveRush/WebApplication1/Views/Shared/_HeaderPartial.cshtml]
+[D:/Колледж/3 курс/Практика 2 сим/AchiveRush/AchiveRushCode/Views/Shared/_HeaderPartial.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcU2hhcmVkXF9IZWFkZXJQYXJ0aWFsLmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
 
-[D:/Колледж/3 курс/Практика 2 сим/AchiveRush/WebApplication1/Views/Shared/_Layout.cshtml]
+[D:/Колледж/3 курс/Практика 2 сим/AchiveRush/AchiveRushCode/Views/Shared/_Layout.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcU2hhcmVkXF9MYXlvdXQuY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
-[D:/Колледж/3 курс/Практика 2 сим/AchiveRush/WebApplication1/Views/Shared/_Leaderboard.cshtml]
+[D:/Колледж/3 курс/Практика 2 сим/AchiveRush/AchiveRushCode/Views/Shared/_Leaderboard.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcU2hhcmVkXF9MZWFkZXJib2FyZC5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
-[D:/Колледж/3 курс/Практика 2 сим/AchiveRush/WebApplication1/Views/Shared/_MetaPartial.cshtml]
+[D:/Колледж/3 курс/Практика 2 сим/AchiveRush/AchiveRushCode/Views/Shared/_MetaPartial.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcU2hhcmVkXF9NZXRhUGFydGlhbC5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
-[D:/Колледж/3 курс/Практика 2 сим/AchiveRush/WebApplication1/Views/Shared/_ScriptsPartial.cshtml]
+[D:/Колледж/3 курс/Практика 2 сим/AchiveRush/AchiveRushCode/Views/Shared/_ScriptsPartial.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcU2hhcmVkXF9TY3JpcHRzUGFydGlhbC5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
-[D:/Колледж/3 курс/Практика 2 сим/AchiveRush/WebApplication1/Views/_ViewImports.cshtml]
+[D:/Колледж/3 курс/Практика 2 сим/AchiveRush/AchiveRushCode/Views/_ViewImports.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcX1ZpZXdJbXBvcnRzLmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
 
-[D:/Колледж/3 курс/Практика 2 сим/AchiveRush/WebApplication1/Views/_ViewStart.cshtml]
+[D:/Колледж/3 курс/Практика 2 сим/AchiveRush/AchiveRushCode/Views/_ViewStart.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcX1ZpZXdTdGFydC5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 

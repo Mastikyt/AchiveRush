@@ -14,4 +14,35 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser>
     public DbSet<UserScore> UserScores { get; set; }
 
     public DbSet<GameRequest> GameRequests { get; set; }
+
+    protected override void OnModelCreating(ModelBuilder builder)
+    {
+        base.OnModelCreating(builder);
+
+        builder.Entity<User>()
+            .Property(u => u.SteamId)
+            .HasMaxLength(64);
+
+        builder.Entity<Achievement>()
+            .Property(a => a.ApiName)
+            .HasMaxLength(256);
+
+        builder.Entity<User>()
+            .HasIndex(u => u.SteamId);
+
+        builder.Entity<User>()
+            .HasIndex(u => u.TotalAchievements);
+
+        builder.Entity<Game>()
+            .HasIndex(g => g.SteamAppId);
+
+        builder.Entity<Achievement>()
+            .HasIndex(a => new { a.GameId, a.ApiName });
+
+        builder.Entity<UserAchievement>()
+            .HasIndex(ua => new { ua.UserId, ua.Completed, ua.UnlockTime });
+
+        builder.Entity<UserAchievement>()
+            .HasIndex(ua => new { ua.UserId, ua.AchievementId });
+    }
 }

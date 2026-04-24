@@ -2,7 +2,9 @@
 
 @{
     ViewData["Title"] = "Каталог игр";
+    var achievementCounts = ViewBag.AchievementCounts as IDictionary<int, int> ?? new Dictionary<int, int>();
 }
+
 
 <main class="layout">
 
@@ -46,7 +48,7 @@
 
                     <div class="card game-card"
                          data-name="@(game.Name ?? "")"
-                         data-achievements="@(game.Achievements?.Count ?? 0)">
+                         data-achievements="@(achievementCounts.TryGetValue(game.Id, out var cnt) ? cnt : 0)">
 
                         <div class="game-image-wrap">
                             <img src="@game.AvatarUrl" alt="@game.Name" class="game-image" />
@@ -60,12 +62,12 @@
                                                             : game.Description)
                         </p>
                         <span class="achievements-count">
-                            🏆 @(game.Achievements?.Count ?? 0) достижений
+                            🏆 @(achievementCounts.TryGetValue(game.Id, out var count) ? count : 0) достижений
                         </span>
                     </div>
                 </div>
             </a>
-                        }
+            }
 
             <div class="card add-game-card" id="openAddGame">
                 <div class="add-game-inner">

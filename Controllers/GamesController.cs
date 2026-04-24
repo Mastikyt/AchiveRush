@@ -21,6 +21,46 @@ public class GamesController : Controller
         _userManager = userManager;
     }
 
+    private static string Normalize(string? s)
+    {
+        if (string.IsNullOrWhiteSpace(s))
+            return "";
+
+        return s.Trim().ToLowerInvariant();
+    }
+
+    private async Task EnsureGameAchievementsLoadedAsync(Game game)
+    {
+        if (game.Achievements.Any())
+            return;
+
+        var schemaAchievementsTask = _steamService.GetAchievementsAsync(game.SteamAppId);
+        var globalRatesTask = _steamService.GetGlobalRates(game.SteamAppId);
+
+        var schemaAchievements = await schemaAchievementsTask ?? new List<SteamAchievementDto>();
+        if (schemaAchievements.Count == 0)
+        {
+            await globalRatesTask;
+            return;
+        }
+
+        var globalRates = await globalRatesTask;
+
+        foreach (var schemaAchievement in schemaAchievements)
+        {
+            var normalizedApiName = Normalize(schemaAchievement.Name);
+            game.Achievements.Add(new Achievement
+            {
+                Title = schemaAchievement.DisplayName ?? "",
+                Description = schemaAchievement.Description ?? "",
+                ApiName = schemaAchievement.Name ?? "",
+                GlobalUnlockRate = globalRates.TryGetValue(normalizedApiName, out var percent) ? percent : 0
+            });
+        }
+
+        await _context.SaveChangesAsync();
+    }
+
     [HttpGet]
     public async Task<IActionResult> Details(int id)
     {
@@ -30,6 +70,12 @@ public class GamesController : Controller
 
         if (game == null)
             return NotFound("Игра не найдена");
+
+        if (game.Achievements == null)
+            game.Achievements = new List<Achievement>();
+
+        if (!game.Achievements.Any() && game.SteamAppId > 0)
+            await EnsureGameAchievementsLoadedAsync(game);
 
         var identityUser = await _userManager.GetUserAsync(User);
         User? publicUser = null;
@@ -106,15 +152,19 @@ public class GamesController : Controller
             return RedirectToAction("Catalog", "Home");
         }
 
-        var gameData = await _steamService.GetGameDataAsync(appId.Value);
+        var gameDataTask = _steamService.GetGameDataAsync(appId.Value);
+        var achievementsTask = _steamService.GetAchievementsAsync(appId.Value);
+
+        await Task.WhenAll(gameDataTask, achievementsTask);
+
+        var gameData = await gameDataTask;
         if (gameData == null)
         {
             TempData["ErrorMessage"] = "Не удалось получить данные игры из Steam.";
             return RedirectToAction("Catalog", "Home");
         }
 
-        var achievements = await _steamService.GetAchievementsAsync(appId.Value)
-                           ?? new List<SteamAchievementDto>();
+        var achievements = await achievementsTask ?? new List<SteamAchievementDto>();
         
 
         var request = new GameRequest

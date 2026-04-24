@@ -1,18 +1,23 @@
-﻿@model WebApplication1.Models.UserAchievement
+@model WebApplication1.Models.AchievementCardViewModel
 @{
-    var rate = Model.Achievement.GlobalUnlockRate;
+    var rate = Model.GlobalUnlockRate;
     var rarityClass = rate < 1 ? "legendary"
                     : rate < 5 ? "epic"
+                    : rate < 10 ? "rare"
                     : "common";
+    var iconUrl = string.IsNullOrWhiteSpace(Model.IconUrl) ? Model.GameAvatarUrl : Model.IconUrl;
 }
 
-<div class="achievement-card @rarityClass">
-    <img src="@Model.Achievement.Game.AvatarUrl" class="achievement-icon" loading="lazy" />
+<div class="achievement-card @rarityClass" title="@(Model.UnlockTime.HasValue ? $"Получено: {Model.UnlockTime.Value:dd.MM.yyyy HH:mm}" : Model.Description)">
+    <img src="@iconUrl" class="achievement-icon" loading="lazy" />
     <div class="achievement-info">
-        <div class="achievement-name">@Model.Achievement.Title</div>
+        <div class="achievement-name">@Model.Title</div>
         <div class="achievement-game">
-            @Model.Achievement.Game.Name
-            • @if (rate > 0) {  @rate.ToString("0.##")  } %
+            @Model.GameName
+            @if (rate > 0)
+            {
+                <text> &bull; @rate.ToString("0.##")%</text>
+            }
         </div>
     </div>
 </div>

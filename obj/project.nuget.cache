@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "jaNytwd+wZ4=",
+  "dgSpecHash": "MWVFcXkiPgY=",
   "success": true,
-  "projectFilePath": "D:\\Колледж\\3 курс\\Практика 2 сим\\AchiveRush\\WebApplication1\\WebApplication1.csproj",
+  "projectFilePath": "D:\\Колледж\\3 курс\\Практика 2 сим\\AchiveRush\\AchiveRushCode\\WebApplication1.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\slive\\.nuget\\packages\\anglesharp\\1.1.2\\anglesharp.1.1.2.nupkg.sha512",
     "C:\\Users\\slive\\.nuget\\packages\\aspnet.security.openid\\9.0.0\\aspnet.security.openid.9.0.0.nupkg.sha512",
@@ -215,9 +215,9 @@
       "code": "NU1701",
       "level": "Warning",
       "message": "Пакет \"Microsoft.AspNet.Mvc 5.3.0\" был восстановлен с помощью \".NETFramework,Version=v4.6.1, .NETFramework,Version=v4.6.2, .NETFramework,Version=v4.7, .NETFramework,Version=v4.7.1, .NETFramework,Version=v4.7.2, .NETFramework,Version=v4.8, .NETFramework,Version=v4.8.1\", а не целевой платформы проекта \"net9.0\". Этот пакет может быть не полностью совместим с вашим проектом.",
-      "projectPath": "D:\\Колледж\\3 курс\\Практика 2 сим\\AchiveRush\\WebApplication1\\WebApplication1.csproj",
+      "projectPath": "D:\\Колледж\\3 курс\\Практика 2 сим\\AchiveRush\\AchiveRushCode\\WebApplication1.csproj",
       "warningLevel": 1,
-      "filePath": "D:\\Колледж\\3 курс\\Практика 2 сим\\AchiveRush\\WebApplication1\\WebApplication1.csproj",
+      "filePath": "D:\\Колледж\\3 курс\\Практика 2 сим\\AchiveRush\\AchiveRushCode\\WebApplication1.csproj",
       "libraryId": "Microsoft.AspNet.Mvc",
       "targetGraphs": [
         "net9.0"
@@ -227,9 +227,9 @@
       "code": "NU1701",
       "level": "Warning",
       "message": "Пакет \"Microsoft.AspNet.Razor 3.3.0\" был восстановлен с помощью \".NETFramework,Version=v4.6.1, .NETFramework,Version=v4.6.2, .NETFramework,Version=v4.7, .NETFramework,Version=v4.7.1, .NETFramework,Version=v4.7.2, .NETFramework,Version=v4.8, .NETFramework,Version=v4.8.1\", а не целевой платформы проекта \"net9.0\". Этот пакет может быть не полностью совместим с вашим проектом.",
-      "projectPath": "D:\\Колледж\\3 курс\\Практика 2 сим\\AchiveRush\\WebApplication1\\WebApplication1.csproj",
+      "projectPath": "D:\\Колледж\\3 курс\\Практика 2 сим\\AchiveRush\\AchiveRushCode\\WebApplication1.csproj",
       "warningLevel": 1,
-      "filePath": "D:\\Колледж\\3 курс\\Практика 2 сим\\AchiveRush\\WebApplication1\\WebApplication1.csproj",
+      "filePath": "D:\\Колледж\\3 курс\\Практика 2 сим\\AchiveRush\\AchiveRushCode\\WebApplication1.csproj",
       "libraryId": "Microsoft.AspNet.Razor",
       "targetGraphs": [
         "net9.0"
@@ -239,9 +239,9 @@
       "code": "NU1701",
       "level": "Warning",
       "message": "Пакет \"Microsoft.AspNet.WebApi.Core 5.3.0\" был восстановлен с помощью \".NETFramework,Version=v4.6.1, .NETFramework,Version=v4.6.2, .NETFramework,Version=v4.7, .NETFramework,Version=v4.7.1, .NETFramework,Version=v4.7.2, .NETFramework,Version=v4.8, .NETFramework,Version=v4.8.1\", а не целевой платформы проекта \"net9.0\". Этот пакет может быть не полностью совместим с вашим проектом.",
-      "projectPath": "D:\\Колледж\\3 курс\\Практика 2 сим\\AchiveRush\\WebApplication1\\WebApplication1.csproj",
+      "projectPath": "D:\\Колледж\\3 курс\\Практика 2 сим\\AchiveRush\\AchiveRushCode\\WebApplication1.csproj",
       "warningLevel": 1,
-      "filePath": "D:\\Колледж\\3 курс\\Практика 2 сим\\AchiveRush\\WebApplication1\\WebApplication1.csproj",
+      "filePath": "D:\\Колледж\\3 курс\\Практика 2 сим\\AchiveRush\\AchiveRushCode\\WebApplication1.csproj",
       "libraryId": "Microsoft.AspNet.WebApi.Core",
       "targetGraphs": [
         "net9.0"
@@ -251,9 +251,9 @@
       "code": "NU1701",
       "level": "Warning",
       "message": "Пакет \"Microsoft.AspNet.WebApi.WebHost 5.3.0\" был восстановлен с помощью \".NETFramework,Version=v4.6.1, .NETFramework,Version=v4.6.2, .NETFramework,Version=v4.7, .NETFramework,Version=v4.7.1, .NETFramework,Version=v4.7.2, .NETFramework,Version=v4.8, .NETFramework,Version=v4.8.1\", а не целевой платформы проекта \"net9.0\". Этот пакет может быть не полностью совместим с вашим проектом.",
-      "projectPath": "D:\\Колледж\\3 курс\\Практика 2 сим\\AchiveRush\\WebApplication1\\WebApplication1.csproj",
+      "projectPath": "D:\\Колледж\\3 курс\\Практика 2 сим\\AchiveRush\\AchiveRushCode\\WebApplication1.csproj",
       "warningLevel": 1,
-      "filePath": "D:\\Колледж\\3 курс\\Практика 2 сим\\AchiveRush\\WebApplication1\\WebApplication1.csproj",
+      "filePath": "D:\\Колледж\\3 курс\\Практика 2 сим\\AchiveRush\\AchiveRushCode\\WebApplication1.csproj",
       "libraryId": "Microsoft.AspNet.WebApi.WebHost",
       "targetGraphs": [
         "net9.0"
@@ -263,9 +263,9 @@
       "code": "NU1701",
       "level": "Warning",
       "message": "Пакет \"Microsoft.AspNet.WebPages 3.3.0\" был восстановлен с помощью \".NETFramework,Version=v4.6.1, .NETFramework,Version=v4.6.2, .NETFramework,Version=v4.7, .NETFramework,Version=v4.7.1, .NETFramework,Version=v4.7.2, .NETFramework,Version=v4.8, .NETFramework,Version=v4.8.1\", а не целевой платформы проекта \"net9.0\". Этот пакет может быть не полностью совместим с вашим проектом.",
-      "projectPath": "D:\\Колледж\\3 курс\\Практика 2 сим\\AchiveRush\\WebApplication1\\WebApplication1.csproj",
+      "projectPath": "D:\\Колледж\\3 курс\\Практика 2 сим\\AchiveRush\\AchiveRushCode\\WebApplication1.csproj",
       "warningLevel": 1,
-      "filePath": "D:\\Колледж\\3 курс\\Практика 2 сим\\AchiveRush\\WebApplication1\\WebApplication1.csproj",
+      "filePath": "D:\\Колледж\\3 курс\\Практика 2 сим\\AchiveRush\\AchiveRushCode\\WebApplication1.csproj",
       "libraryId": "Microsoft.AspNet.WebPages",
       "targetGraphs": [
         "net9.0"
@@ -275,9 +275,9 @@
       "code": "NU1701",
       "level": "Warning",
       "message": "Пакет \"Microsoft.Web.Infrastructure 1.0.0\" был восстановлен с помощью \".NETFramework,Version=v4.6.1, .NETFramework,Version=v4.6.2, .NETFramework,Version=v4.7, .NETFramework,Version=v4.7.1, .NETFramework,Version=v4.7.2, .NETFramework,Version=v4.8, .NETFramework,Version=v4.8.1\", а не целевой платформы проекта \"net9.0\". Этот пакет может быть не полностью совместим с вашим проектом.",
-      "projectPath": "D:\\Колледж\\3 курс\\Практика 2 сим\\AchiveRush\\WebApplication1\\WebApplication1.csproj",
+      "projectPath": "D:\\Колледж\\3 курс\\Практика 2 сим\\AchiveRush\\AchiveRushCode\\WebApplication1.csproj",
       "warningLevel": 1,
-      "filePath": "D:\\Колледж\\3 курс\\Практика 2 сим\\AchiveRush\\WebApplication1\\WebApplication1.csproj",
+      "filePath": "D:\\Колледж\\3 курс\\Практика 2 сим\\AchiveRush\\AchiveRushCode\\WebApplication1.csproj",
       "libraryId": "Microsoft.Web.Infrastructure",
       "targetGraphs": [
         "net9.0"

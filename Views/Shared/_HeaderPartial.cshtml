@@ -26,7 +26,7 @@
 
             var avatarUrl = !string.IsNullOrWhiteSpace(publicUser?.AvatarID)
             ? publicUser!.AvatarID
-            : "/images/default_avatar.png";
+            : (!string.IsNullOrWhiteSpace(identityUser?.AvatarUrl) ? identityUser!.AvatarUrl : "/images/default_avatar.png");
 
             var personaName = !string.IsNullOrWhiteSpace(publicUser?.SteamName)
             ? publicUser!.SteamName

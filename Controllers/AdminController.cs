@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using WebApplication1.DTO;
 using WebApplication1.Models;
@@ -26,9 +26,23 @@ namespace WebApplication1.Controllers
             return HttpContext.Session.GetString("AdminAccess") == "Granted";
         }
 
+        private static string Normalize(string? s)
+        {
+            if (string.IsNullOrWhiteSpace(s))
+                return "";
 
+            return s.Trim().ToLowerInvariant();
+        }
 
+        private async Task<List<SteamAchievementDto>> GetSchemaAchievementsWithRetryAsync(int appId)
+        {
+            var achievements = await _steamService.GetAchievementsAsync(appId) ?? new List<SteamAchievementDto>();
+            if (achievements.Count > 0)
+                return achievements;
 
+            await Task.Delay(400);
+            return await _steamService.GetAchievementsAsync(appId) ?? new List<SteamAchievementDto>();
+        }
 
         [HttpGet("/secret-admin-login")]
         public IActionResult Login()
@@ -38,10 +52,6 @@ namespace WebApplication1.Controllers
 
             return View();
         }
-
-
-
-
 
         [HttpPost("/secret-admin-login")]
         [ValidateAntiForgeryToken]
@@ -65,9 +75,6 @@ namespace WebApplication1.Controllers
             return RedirectToAction(nameof(Index));
         }
 
-       
-        
-        
         [HttpGet("/secret-admin")]
         public async Task<IActionResult> Index()
         {
@@ -80,9 +87,6 @@ namespace WebApplication1.Controllers
 
             return View(requests);
         }
-
-
-
 
         [HttpPost]
         [ValidateAntiForgeryToken]
@@ -108,38 +112,60 @@ namespace WebApplication1.Controllers
                 return RedirectToAction(nameof(Index));
             }
 
-            var gameData = await _steamService.GetGameDataAsync(request.SteamAppId);
+            var gameDataTask = _steamService.GetGameDataAsync(request.SteamAppId);
+            var schemaAchievementsTask = GetSchemaAchievementsWithRetryAsync(request.SteamAppId);
+            var globalRatesTask = _steamService.GetGlobalRates(request.SteamAppId);
+
+            await Task.WhenAll(gameDataTask, schemaAchievementsTask, globalRatesTask);
+
+            var gameData = await gameDataTask;
             if (gameData == null)
             {
                 TempData["AdminError"] = "Не удалось получить данные игры из Steam.";
                 return RedirectToAction(nameof(Index));
             }
 
-                var achievements = await _steamService.GetAchievementsAsync(request.SteamAppId)
-                               ?? new List<SteamAchievementDto>();
+            var schemaAchievements = await schemaAchievementsTask;
+            if (schemaAchievements.Count == 0)
+            {
+                TempData["AdminError"] = "Steam не вернул достижения для этой игры. Попробуй одобрить заявку еще раз позже.";
+                return RedirectToAction(nameof(Index));
+            }
 
             var game = new Game
             {
                 SteamAppId = request.SteamAppId,
                 Name = gameData.Name,
                 Description = gameData.ShortDescription,
-                AvatarUrl = gameData.HeaderImage
+                AvatarUrl = gameData.HeaderImage,
+                Achievements = new List<Achievement>()
             };
 
-            var globalRates = await _steamService.GetGlobalRates(game.SteamAppId);
+            var globalRates = await globalRatesTask;
 
-            foreach (var ach in achievements)
+            foreach (var schemaAchievement in schemaAchievements)
             {
-                var key = string.IsNullOrWhiteSpace(ach.Name) ? "" : ach.Name.Trim().ToLowerInvariant();
+                var normalizedApiName = Normalize(schemaAchievement.Name);
+
+                var existingAchievement = game.Achievements
+                    .FirstOrDefault(a => Normalize(a.ApiName) == normalizedApiName);
+
+                if (existingAchievement != null)
+                {
+                    if (globalRates.TryGetValue(normalizedApiName, out var existingPercent))
+                        existingAchievement.GlobalUnlockRate = existingPercent;
+
+                    existingAchievement.Title = schemaAchievement.DisplayName ?? "";
+                    existingAchievement.Description = schemaAchievement.Description ?? "";
+                    continue;
+                }
 
                 game.Achievements.Add(new Achievement
                 {
-                    Title = ach.DisplayName ?? "",
-                    Description = ach.Description ?? "",
-                    ApiName = ach.Name ?? "",
-                    GlobalUnlockRate = key != null && globalRates.TryGetValue(key, out var percent)
-                        ? percent
-                        : 0
+                    Title = schemaAchievement.DisplayName ?? "",
+                    Description = schemaAchievement.Description ?? "",
+                    ApiName = schemaAchievement.Name ?? "",
+                    GlobalUnlockRate = globalRates.TryGetValue(normalizedApiName, out var percent) ? percent : 0
                 });
             }
 
@@ -151,9 +177,6 @@ namespace WebApplication1.Controllers
             TempData["AdminSuccess"] = "Игра успешно добавлена в каталог.";
             return RedirectToAction(nameof(Index));
         }
-
-
-
 
         [HttpPost]
         [ValidateAntiForgeryToken]

@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using StackExchange.Redis;
 using System.Text.Json;
+using System.Globalization;
 
 namespace WebApplication1.Services
 {
@@ -28,7 +29,9 @@ namespace WebApplication1.Services
                 var cached = await _redis.StringGetAsync(key);
                 if (!cached.IsNullOrEmpty)
                 {
-                    return JsonSerializer.Deserialize<Dictionary<string, double>>(cached)!;
+                    var redisData = JsonSerializer.Deserialize<Dictionary<string, double>>(cached);
+                    if (redisData != null && redisData.Count > 0)
+                        return redisData;
                 }
             }
             catch
@@ -39,7 +42,7 @@ namespace WebApplication1.Services
             // 🔥 2. FALLBACK В ПАМЯТЬ
             if (_memoryCache.TryGetValue(appId, out var entry))
             {
-                if ((DateTime.UtcNow - entry.time).TotalHours < 24)
+                if ((DateTime.UtcNow - entry.time).TotalHours < 24 && entry.data.Count > 0)
                     return entry.data;
             }
 
@@ -49,11 +52,18 @@ namespace WebApplication1.Services
             // 🔥 4. СОХРАНЯЕМ В REDIS
             try
             {
-                await _redis.StringSetAsync(
-                    key,
-                    JsonSerializer.Serialize(data),
-                    TimeSpan.FromHours(24)
-                );
+                if (data.Count > 0)
+                {
+                    await _redis.StringSetAsync(
+                        key,
+                        JsonSerializer.Serialize(data),
+                        TimeSpan.FromHours(24)
+                    );
+                }
+                else
+                {
+                    await _redis.KeyDeleteAsync(key);
+                }
             }
             catch
             {
@@ -61,7 +71,10 @@ namespace WebApplication1.Services
             }
 
             // 🔥 5. СОХРАНЯЕМ В ПАМЯТЬ
-            _memoryCache[appId] = (DateTime.UtcNow, data);
+            if (data.Count > 0)
+                _memoryCache[appId] = (DateTime.UtcNow, data);
+            else
+                _memoryCache.Remove(appId);
 
             return data;
         }

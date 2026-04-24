@@ -241,7 +241,8 @@ namespace WebApplication1.Migrations
 
                     b.Property<string>("ApiName")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(256)
+                        .HasColumnType("nvarchar(256)");
 
                     b.Property<bool>("Completed")
                         .HasColumnType("bit");
@@ -263,6 +264,8 @@ namespace WebApplication1.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("GameId");
+
+                    b.HasIndex("GameId", "ApiName");
 
                     b.ToTable("Achievements");
                 });
@@ -291,6 +294,8 @@ namespace WebApplication1.Migrations
                         .HasColumnType("int");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("SteamAppId");
 
                     b.ToTable("Games");
                 });
@@ -356,7 +361,8 @@ namespace WebApplication1.Migrations
 
                     b.Property<string>("SteamId")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(64)
+                        .HasColumnType("nvarchar(64)");
 
                     b.Property<string>("SteamName")
                         .IsRequired()
@@ -366,6 +372,10 @@ namespace WebApplication1.Migrations
                         .HasColumnType("int");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("SteamId");
+
+                    b.HasIndex("TotalAchievements");
 
                     b.ToTable("Users");
                 });
@@ -398,6 +408,10 @@ namespace WebApplication1.Migrations
                     b.HasIndex("AchievementId");
 
                     b.HasIndex("UserId");
+
+                    b.HasIndex("UserId", "AchievementId");
+
+                    b.HasIndex("UserId", "Completed", "UnlockTime");
 
                     b.ToTable("UserAchievements");
                 });

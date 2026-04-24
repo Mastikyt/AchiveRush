@@ -20,9 +20,28 @@ namespace WebApplication1.Controllers
         public async Task<IActionResult> Catalog()
         {
             var games = await _context.Games
-                .Include(g => g.Achievements)
+                .AsNoTracking()
+                .OrderBy(g => g.Name)
+                .Select(g => new WebApplication1.Models.Game
+                {
+                    Id = g.Id,
+                    SteamAppId = g.SteamAppId,
+                    Name = g.Name,
+                    Description = g.Description,
+                    AvatarUrl = g.AvatarUrl
+                })
                 .ToListAsync();
 
+            var achievementCounts = await _context.Games
+                .AsNoTracking()
+                .Select(g => new
+                {
+                    g.Id,
+                    Count = g.Achievements.Count()
+                })
+                .ToDictionaryAsync(x => x.Id, x => x.Count);
+
+            ViewBag.AchievementCounts = achievementCounts;
             return View(games);
         }
 

@@ -9874,11 +9874,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "D:\\Колледж\\3 курс\\Практика 2 сим\\AchiveRush\\WebApplication1\\WebApplication1.csproj",
+      "projectUniqueName": "D:\\Колледж\\3 курс\\Практика 2 сим\\AchiveRush\\AchiveRushCode\\WebApplication1.csproj",
       "projectName": "WebApplication1",
-      "projectPath": "D:\\Колледж\\3 курс\\Практика 2 сим\\AchiveRush\\WebApplication1\\WebApplication1.csproj",
+      "projectPath": "D:\\Колледж\\3 курс\\Практика 2 сим\\AchiveRush\\AchiveRushCode\\WebApplication1.csproj",
       "packagesPath": "C:\\Users\\slive\\.nuget\\packages\\",
-      "outputPath": "D:\\Колледж\\3 курс\\Практика 2 сим\\AchiveRush\\WebApplication1\\obj\\",
+      "outputPath": "D:\\Колледж\\3 курс\\Практика 2 сим\\AchiveRush\\AchiveRushCode\\obj\\",
       "projectStyle": "PackageReference",
       "fallbackFolders": [
         "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
