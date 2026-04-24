@@ -1,0 +1,157 @@
+wwwroot\webfonts\fa-regular-400.woff
+wwwroot\webfonts\fa-brands-400.woff2
+wwwroot\webfonts\fa-brands-400.woff
+wwwroot\webfonts\fa-brands-400.ttf
+wwwroot\webfonts\fa-brands-400.svg
+wwwroot\webfonts\fa-brands-400.eot
+wwwroot\lib\jquery\LICENSE.txt
+wwwroot\lib\jquery\dist\jquery.slim.min.map
+wwwroot\lib\jquery\dist\jquery.slim.min.js
+wwwroot\lib\jquery\dist\jquery.slim.js
+wwwroot\lib\jquery\dist\jquery.min.map
+wwwroot\lib\jquery\dist\jquery.min.js
+wwwroot\lib\jquery\dist\jquery.js
+wwwroot\lib\jquery-validation\LICENSE.md
+wwwroot\lib\jquery-validation\dist\jquery.validate.min.js
+wwwroot\lib\jquery-validation\dist\jquery.validate.js
+wwwroot\lib\jquery-validation\dist\additional-methods.min.js
+wwwroot\lib\jquery-validation\dist\additional-methods.js
+wwwroot\lib\jquery-validation-unobtrusive\LICENSE.txt
+wwwroot\lib\jquery-validation-unobtrusive\dist\jquery.validate.unobtrusive.min.js
+wwwroot\lib\jquery-validation-unobtrusive\dist\jquery.validate.unobtrusive.js
+wwwroot\lib\bootstrap\LICENSE
+wwwroot\lib\bootstrap\dist\js\bootstrap.min.js.map
+wwwroot\lib\bootstrap\dist\js\bootstrap.min.js
+wwwroot\lib\bootstrap\dist\js\bootstrap.js.map
+wwwroot\lib\bootstrap\dist\js\bootstrap.js
+wwwroot\lib\bootstrap\dist\js\bootstrap.esm.min.js.map
+wwwroot\lib\bootstrap\dist\js\bootstrap.esm.min.js
+wwwroot\lib\bootstrap\dist\js\bootstrap.esm.js.map
+wwwroot\lib\bootstrap\dist\js\bootstrap.esm.js
+wwwroot\lib\bootstrap\dist\js\bootstrap.bundle.min.js.map
+wwwroot\lib\bootstrap\dist\js\bootstrap.bundle.min.js
+wwwroot\lib\bootstrap\dist\js\bootstrap.bundle.js.map
+wwwroot\lib\bootstrap\dist\js\bootstrap.bundle.js
+wwwroot\lib\bootstrap\dist\css\bootstrap.rtl.min.css.map
+wwwroot\lib\bootstrap\dist\css\bootstrap.rtl.min.css
+wwwroot\lib\bootstrap\dist\css\bootstrap.rtl.css.map
+wwwroot\lib\bootstrap\dist\css\bootstrap.rtl.css
+wwwroot\lib\bootstrap\dist\css\bootstrap.min.css.map
+wwwroot\lib\bootstrap\dist\css\bootstrap.min.css
+wwwroot\lib\bootstrap\dist\css\bootstrap.css.map
+wwwroot\lib\bootstrap\dist\css\bootstrap.css
+wwwroot\lib\bootstrap\dist\css\bootstrap-utilities.rtl.min.css.map
+wwwroot\lib\bootstrap\dist\css\bootstrap-utilities.rtl.min.css
+wwwroot\lib\bootstrap\dist\css\bootstrap-utilities.rtl.css.map
+wwwroot\lib\bootstrap\dist\css\bootstrap-utilities.rtl.css
+wwwroot\lib\bootstrap\dist\css\bootstrap-utilities.min.css.map
+wwwroot\lib\bootstrap\dist\css\bootstrap-utilities.min.css
+wwwroot\lib\bootstrap\dist\css\bootstrap-utilities.css.map
+wwwroot\lib\bootstrap\dist\css\bootstrap-utilities.css
+wwwroot\lib\bootstrap\dist\css\bootstrap-reboot.rtl.min.css.map
+wwwroot\lib\bootstrap\dist\css\bootstrap-reboot.rtl.min.css
+wwwroot\lib\bootstrap\dist\css\bootstrap-reboot.rtl.css.map
+wwwroot\lib\bootstrap\dist\css\bootstrap-reboot.rtl.css
+wwwroot\lib\bootstrap\dist\css\bootstrap-reboot.min.css.map
+wwwroot\lib\bootstrap\dist\css\bootstrap-reboot.min.css
+wwwroot\lib\bootstrap\dist\css\bootstrap-reboot.css.map
+wwwroot\lib\bootstrap\dist\css\bootstrap-reboot.css
+wwwroot\lib\bootstrap\dist\css\bootstrap-grid.rtl.min.css.map
+wwwroot\lib\bootstrap\dist\css\bootstrap-grid.rtl.min.css
+wwwroot\lib\bootstrap\dist\css\bootstrap-grid.rtl.css.map
+wwwroot\webfonts\fa-solid-900.ttf
+wwwroot\webfonts\fa-solid-900.svg
+wwwroot\webfonts\fa-solid-900.woff
+wwwroot\webfonts\fa-solid-900.eot
+wwwroot\lib\bootstrap\dist\css\bootstrap-grid.rtl.css
+wwwroot\lib\bootstrap\dist\css\bootstrap-grid.min.css.map
+wwwroot\lib\bootstrap\dist\css\bootstrap-grid.min.css
+wwwroot\lib\bootstrap\dist\css\bootstrap-grid.css.map
+wwwroot\lib\bootstrap\dist\css\bootstrap-grid.css
+wwwroot\css\catalog.css
+wwwroot\css\challanges.css
+wwwroot\img\standart.jpg
+wwwroot\favicon.ico
+wwwroot\css\leaderboard.css
+wwwroot\css\noscript.css
+wwwroot\css\game-details.css
+wwwroot\js\catalog.js
+wwwroot\css\indexPage.css
+wwwroot\css\profile.css
+wwwroot\webfonts\fa-regular-400.woff2
+wwwroot\webfonts\fa-regular-400.svg
+wwwroot\webfonts\fa-regular-400.ttf
+wwwroot\webfonts\fa-regular-400.eot
+wwwroot\webfonts\fa-solid-900.woff2
+wwwroot\img\steam.png
+D:\Колледж\3 курс\Практика 2 сим\AchiveRush\WebApplication1\WebApplication1\wwwroot\webfonts\fa-brands-400.svg
+D:\Колледж\3 курс\Практика 2 сим\AchiveRush\WebApplication1\WebApplication1\wwwroot\lib\jquery\LICENSE.txt
+D:\Колледж\3 курс\Практика 2 сим\AchiveRush\WebApplication1\WebApplication1\wwwroot\lib\jquery\dist\jquery.slim.min.map
+D:\Колледж\3 курс\Практика 2 сим\AchiveRush\WebApplication1\WebApplication1\wwwroot\lib\jquery\dist\jquery.slim.min.js
+D:\Колледж\3 курс\Практика 2 сим\AchiveRush\WebApplication1\WebApplication1\wwwroot\lib\jquery\dist\jquery.slim.js
+D:\Колледж\3 курс\Практика 2 сим\AchiveRush\WebApplication1\WebApplication1\wwwroot\lib\jquery\dist\jquery.min.map
+D:\Колледж\3 курс\Практика 2 сим\AchiveRush\WebApplication1\WebApplication1\wwwroot\lib\jquery\dist\jquery.min.js
+D:\Колледж\3 курс\Практика 2 сим\AchiveRush\WebApplication1\WebApplication1\wwwroot\lib\jquery\dist\jquery.js
+D:\Колледж\3 курс\Практика 2 сим\AchiveRush\WebApplication1\WebApplication1\wwwroot\lib\jquery-validation\LICENSE.md
+D:\Колледж\3 курс\Практика 2 сим\AchiveRush\WebApplication1\WebApplication1\wwwroot\lib\jquery-validation\dist\jquery.validate.min.js
+D:\Колледж\3 курс\Практика 2 сим\AchiveRush\WebApplication1\WebApplication1\wwwroot\lib\jquery-validation\dist\jquery.validate.js
+D:\Колледж\3 курс\Практика 2 сим\AchiveRush\WebApplication1\WebApplication1\wwwroot\lib\jquery-validation\dist\additional-methods.min.js
+D:\Колледж\3 курс\Практика 2 сим\AchiveRush\WebApplication1\WebApplication1\wwwroot\lib\jquery-validation\dist\additional-methods.js
+D:\Колледж\3 курс\Практика 2 сим\AchiveRush\WebApplication1\WebApplication1\wwwroot\lib\jquery-validation-unobtrusive\LICENSE.txt
+D:\Колледж\3 курс\Практика 2 сим\AchiveRush\WebApplication1\WebApplication1\wwwroot\lib\jquery-validation-unobtrusive\dist\jquery.validate.unobtrusive.min.js
+D:\Колледж\3 курс\Практика 2 сим\AchiveRush\WebApplication1\WebApplication1\wwwroot\lib\jquery-validation-unobtrusive\dist\jquery.validate.unobtrusive.js
+D:\Колледж\3 курс\Практика 2 сим\AchiveRush\WebApplication1\WebApplication1\wwwroot\lib\bootstrap\dist\js\bootstrap.min.js.map
+D:\Колледж\3 курс\Практика 2 сим\AchiveRush\WebApplication1\WebApplication1\wwwroot\lib\bootstrap\dist\js\bootstrap.min.js
+D:\Колледж\3 курс\Практика 2 сим\AchiveRush\WebApplication1\WebApplication1\wwwroot\lib\bootstrap\dist\js\bootstrap.js.map
+D:\Колледж\3 курс\Практика 2 сим\AchiveRush\WebApplication1\WebApplication1\wwwroot\lib\bootstrap\dist\js\bootstrap.js
+D:\Колледж\3 курс\Практика 2 сим\AchiveRush\WebApplication1\WebApplication1\wwwroot\lib\bootstrap\dist\js\bootstrap.esm.min.js.map
+D:\Колледж\3 курс\Практика 2 сим\AchiveRush\WebApplication1\WebApplication1\wwwroot\lib\bootstrap\dist\js\bootstrap.esm.min.js
+D:\Колледж\3 курс\Практика 2 сим\AchiveRush\WebApplication1\WebApplication1\wwwroot\lib\bootstrap\dist\js\bootstrap.esm.js.map
+D:\Колледж\3 курс\Практика 2 сим\AchiveRush\WebApplication1\WebApplication1\wwwroot\lib\bootstrap\dist\js\bootstrap.esm.js
+D:\Колледж\3 курс\Практика 2 сим\AchiveRush\WebApplication1\WebApplication1\wwwroot\lib\bootstrap\dist\js\bootstrap.bundle.min.js.map
+D:\Колледж\3 курс\Практика 2 сим\AchiveRush\WebApplication1\WebApplication1\wwwroot\lib\bootstrap\dist\js\bootstrap.bundle.min.js
+D:\Колледж\3 курс\Практика 2 сим\AchiveRush\WebApplication1\WebApplication1\wwwroot\lib\bootstrap\dist\js\bootstrap.bundle.js.map
+D:\Колледж\3 курс\Практика 2 сим\AchiveRush\WebApplication1\WebApplication1\wwwroot\lib\bootstrap\dist\js\bootstrap.bundle.js
+D:\Колледж\3 курс\Практика 2 сим\AchiveRush\WebApplication1\WebApplication1\wwwroot\lib\bootstrap\dist\css\bootstrap.rtl.min.css.map
+D:\Колледж\3 курс\Практика 2 сим\AchiveRush\WebApplication1\WebApplication1\wwwroot\lib\bootstrap\dist\css\bootstrap.rtl.min.css
+D:\Колледж\3 курс\Практика 2 сим\AchiveRush\WebApplication1\WebApplication1\wwwroot\lib\bootstrap\dist\css\bootstrap.rtl.css.map
+D:\Колледж\3 курс\Практика 2 сим\AchiveRush\WebApplication1\WebApplication1\wwwroot\lib\bootstrap\dist\css\bootstrap.rtl.css
+D:\Колледж\3 курс\Практика 2 сим\AchiveRush\WebApplication1\WebApplication1\wwwroot\lib\bootstrap\dist\css\bootstrap.min.css.map
+D:\Колледж\3 курс\Практика 2 сим\AchiveRush\WebApplication1\WebApplication1\wwwroot\lib\bootstrap\dist\css\bootstrap.min.css
+D:\Колледж\3 курс\Практика 2 сим\AchiveRush\WebApplication1\WebApplication1\wwwroot\lib\bootstrap\dist\css\bootstrap.css.map
+D:\Колледж\3 курс\Практика 2 сим\AchiveRush\WebApplication1\WebApplication1\wwwroot\lib\bootstrap\dist\css\bootstrap.css
+D:\Колледж\3 курс\Практика 2 сим\AchiveRush\WebApplication1\WebApplication1\wwwroot\lib\bootstrap\dist\css\bootstrap-utilities.rtl.min.css.map
+D:\Колледж\3 курс\Практика 2 сим\AchiveRush\WebApplication1\WebApplication1\wwwroot\lib\bootstrap\dist\css\bootstrap-utilities.rtl.min.css
+D:\Колледж\3 курс\Практика 2 сим\AchiveRush\WebApplication1\WebApplication1\wwwroot\lib\bootstrap\dist\css\bootstrap-utilities.rtl.css.map
+D:\Колледж\3 курс\Практика 2 сим\AchiveRush\WebApplication1\WebApplication1\wwwroot\lib\bootstrap\dist\css\bootstrap-utilities.rtl.css
+D:\Колледж\3 курс\Практика 2 сим\AchiveRush\WebApplication1\WebApplication1\wwwroot\lib\bootstrap\dist\css\bootstrap-utilities.min.css.map
+D:\Колледж\3 курс\Практика 2 сим\AchiveRush\WebApplication1\WebApplication1\wwwroot\lib\bootstrap\dist\css\bootstrap-utilities.min.css
+D:\Колледж\3 курс\Практика 2 сим\AchiveRush\WebApplication1\WebApplication1\wwwroot\lib\bootstrap\dist\css\bootstrap-utilities.css.map
+D:\Колледж\3 курс\Практика 2 сим\AchiveRush\WebApplication1\WebApplication1\wwwroot\lib\bootstrap\dist\css\bootstrap-utilities.css
+D:\Колледж\3 курс\Практика 2 сим\AchiveRush\WebApplication1\WebApplication1\wwwroot\lib\bootstrap\dist\css\bootstrap-reboot.rtl.min.css.map
+D:\Колледж\3 курс\Практика 2 сим\AchiveRush\WebApplication1\WebApplication1\wwwroot\lib\bootstrap\dist\css\bootstrap-reboot.rtl.min.css
+D:\Колледж\3 курс\Практика 2 сим\AchiveRush\WebApplication1\WebApplication1\wwwroot\lib\bootstrap\dist\css\bootstrap-reboot.rtl.css.map
+D:\Колледж\3 курс\Практика 2 сим\AchiveRush\WebApplication1\WebApplication1\wwwroot\lib\bootstrap\dist\css\bootstrap-reboot.rtl.css
+D:\Колледж\3 курс\Практика 2 сим\AchiveRush\WebApplication1\WebApplication1\wwwroot\lib\bootstrap\dist\css\bootstrap-reboot.min.css.map
+D:\Колледж\3 курс\Практика 2 сим\AchiveRush\WebApplication1\WebApplication1\wwwroot\lib\bootstrap\dist\css\bootstrap-reboot.min.css
+D:\Колледж\3 курс\Практика 2 сим\AchiveRush\WebApplication1\WebApplication1\wwwroot\lib\bootstrap\dist\css\bootstrap-reboot.css.map
+D:\Колледж\3 курс\Практика 2 сим\AchiveRush\WebApplication1\WebApplication1\wwwroot\lib\bootstrap\dist\css\bootstrap-reboot.css
+D:\Колледж\3 курс\Практика 2 сим\AchiveRush\WebApplication1\WebApplication1\wwwroot\lib\bootstrap\dist\css\bootstrap-grid.rtl.min.css.map
+D:\Колледж\3 курс\Практика 2 сим\AchiveRush\WebApplication1\WebApplication1\wwwroot\lib\bootstrap\dist\css\bootstrap-grid.rtl.min.css
+D:\Колледж\3 курс\Практика 2 сим\AchiveRush\WebApplication1\WebApplication1\wwwroot\lib\bootstrap\dist\css\bootstrap-grid.rtl.css.map
+D:\Колледж\3 курс\Практика 2 сим\AchiveRush\WebApplication1\WebApplication1\wwwroot\webfonts\fa-solid-900.svg
+D:\Колледж\3 курс\Практика 2 сим\AchiveRush\WebApplication1\WebApplication1\wwwroot\lib\bootstrap\dist\css\bootstrap-grid.rtl.css
+D:\Колледж\3 курс\Практика 2 сим\AchiveRush\WebApplication1\WebApplication1\wwwroot\lib\bootstrap\dist\css\bootstrap-grid.min.css.map
+D:\Колледж\3 курс\Практика 2 сим\AchiveRush\WebApplication1\WebApplication1\wwwroot\lib\bootstrap\dist\css\bootstrap-grid.min.css
+D:\Колледж\3 курс\Практика 2 сим\AchiveRush\WebApplication1\WebApplication1\wwwroot\lib\bootstrap\dist\css\bootstrap-grid.css.map
+D:\Колледж\3 курс\Практика 2 сим\AchiveRush\WebApplication1\WebApplication1\wwwroot\lib\bootstrap\dist\css\bootstrap-grid.css
+D:\Колледж\3 курс\Практика 2 сим\AchiveRush\WebApplication1\WebApplication1\wwwroot\css\catalog.css
+D:\Колледж\3 курс\Практика 2 сим\AchiveRush\WebApplication1\WebApplication1\wwwroot\css\challanges.css
+D:\Колледж\3 курс\Практика 2 сим\AchiveRush\WebApplication1\WebApplication1\wwwroot\favicon.ico
+D:\Колледж\3 курс\Практика 2 сим\AchiveRush\WebApplication1\WebApplication1\wwwroot\css\leaderboard.css
+D:\Колледж\3 курс\Практика 2 сим\AchiveRush\WebApplication1\WebApplication1\wwwroot\css\noscript.css
+D:\Колледж\3 курс\Практика 2 сим\AchiveRush\WebApplication1\WebApplication1\wwwroot\css\game-details.css
+D:\Колледж\3 курс\Практика 2 сим\AchiveRush\WebApplication1\WebApplication1\wwwroot\js\catalog.js
+D:\Колледж\3 курс\Практика 2 сим\AchiveRush\WebApplication1\WebApplication1\wwwroot\css\indexPage.css
+D:\Колледж\3 курс\Практика 2 сим\AchiveRush\WebApplication1\WebApplication1\wwwroot\css\profile.css
+D:\Колледж\3 курс\Практика 2 сим\AchiveRush\WebApplication1\WebApplication1\wwwroot\webfonts\fa-regular-400.svg

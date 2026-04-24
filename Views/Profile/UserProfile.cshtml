@@ -1,0 +1,182 @@
+@model WebApplication1.Models.User
+@{
+    ViewData["Title"] = $"{Model.SteamName} - Профиль";
+    var isOwner = ViewBag.IsOwner == true;
+    string avatarUrl;
+
+    if (!string.IsNullOrWhiteSpace(Model.AvatarID))
+    {
+        if (Model.AvatarID.StartsWith("http", StringComparison.OrdinalIgnoreCase))
+        {
+            avatarUrl = Model.AvatarID;
+        }
+        else if (Model.AvatarID.Length >= 2)
+        {
+            avatarUrl = $"https://steamcdn-a.akamaihd.net/steamcommunity/public/images/avatars/{Model.AvatarID.Substring(0, 2)}/{Model.AvatarID}_full.jpg";
+        }
+        else
+        {
+            avatarUrl = "/images/default_avatar.png";
+        }
+    }
+    else
+    {
+        avatarUrl = "/images/default_avatar.png";
+    }
+
+    var recentAchievements = (IEnumerable<WebApplication1.Models.AchievementCardViewModel>)ViewBag.RecentAchievements;
+    var rareAchievements = (IEnumerable<WebApplication1.Models.AchievementCardViewModel>)ViewBag.RareAchievements;
+    var pagedAchievements = (IEnumerable<WebApplication1.Models.AchievementCardViewModel>)ViewBag.PagedAchievements;
+    var currentPage = (int)(ViewBag.CurrentPage ?? 1);
+    var totalPages = (int)(ViewBag.TotalPages ?? 1);
+    var pageSize = (int)(ViewBag.PageSize ?? 24);
+    var pagerStart = Math.Max(1, currentPage - 2);
+    var pagerEnd = Math.Min(totalPages, currentPage + 2);
+
+    if (currentPage <= 4)
+    {
+        pagerEnd = Math.Min(totalPages, 7);
+    }
+
+    if (currentPage >= totalPages - 3)
+    {
+        pagerStart = Math.Max(1, totalPages - 6);
+    }
+}
+
+<section class="profile-page">
+    <div class="profile-card">
+        <div class="profile-main">
+            <img src="@avatarUrl" class="profile-avatar" />
+
+            <div class="profile-content">
+                <div class="profile-top">
+                    <div>
+                        <h1 class="profile-name">@Model.SteamName</h1>
+                        @if (TempData["ProfileSyncSuccess"] is string syncMessage)
+                        {
+                            <div class="profile-sync-status">@syncMessage</div>
+                        }
+                        @if (TempData["ProfileSyncError"] is string syncError)
+                        {
+                            <div class="profile-sync-status error">@syncError</div>
+                        }
+                    </div>
+
+                    @if (isOwner)
+                    {
+                        <div class="profile-actions">
+                            <form asp-action="TogglePrivacy" method="post">
+                                @Html.AntiForgeryToken()
+                                <button class="profile-sync-btn" type="submit">
+                                    @(Model.IsProfilePublic ? "Сделать приватным" : "Сделать публичным")
+                                </button>
+                            </form>
+
+                            <form asp-action="Sync" method="post">
+                                @Html.AntiForgeryToken()
+                                <button class="profile-sync-btn" type="submit">Синхронизировать ачивки</button>
+                            </form>
+                        </div>
+                    }
+                </div>
+
+                <div class="profile-stats">
+                    <div class="profile-stat"><div class="profile-stat-value">#@ViewBag.Rank</div><div class="profile-stat-label">Место</div></div>
+                    <div class="profile-stat"><div class="profile-stat-value" id="profile-total-achievements">@ViewBag.TotalAchievements</div><div class="profile-stat-label">Ачивок</div></div>
+                    <div class="profile-stat"><div class="profile-stat-value">@ViewBag.GamesCount</div><div class="profile-stat-label">Игр</div></div>
+                </div>
+
+                <div class="rarity-summary">
+                    <div class="rarity-chip legendary">Легендарные: @ViewBag.LegendaryCount</div>
+                    <div class="rarity-chip epic">Эпические: @ViewBag.EpicCount</div>
+                    <div class="rarity-chip rare">Редкие: @ViewBag.RareCount</div>
+                    <div class="rarity-chip common">Обычные: @ViewBag.CommonCount</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <h2 class="profile-section-title">Редкие достижения</h2>
+    @if (rareAchievements.Any())
+    {
+        <div class="achievements-grid">
+            @foreach (var ua in rareAchievements)
+            {
+                <partial name="_AchievementCard" model="ua" />
+            }
+        </div>
+    }
+    else
+    {
+        <div class="no-achievements">Пока нет редких достижений.</div>
+    }
+
+    <h2 class="profile-section-title">Последние достижения</h2>
+    @if (recentAchievements.Any())
+    {
+        <div class="achievements-grid">
+            @foreach (var ua in recentAchievements)
+            {
+                <partial name="_AchievementCard" model="ua" />
+            }
+        </div>
+    }
+    else
+    {
+        <div class="no-achievements">Пока нет полученных достижений.</div>
+    }
+
+    <h2 class="profile-section-title">Все достижения</h2>
+    @if (pagedAchievements.Any())
+    {
+        <div class="achievements-grid">
+            @foreach (var ua in pagedAchievements)
+            {
+                <partial name="_AchievementCard" model="ua" />
+            }
+        </div>
+
+        @if (totalPages > 1)
+        {
+            <div class="pagination">
+                @if (currentPage > 1)
+                {
+                    <a asp-action="UserProfile" asp-route-steamId="@Model.SteamId" asp-route-page="@(currentPage - 1)" asp-route-pageSize="@pageSize" class="page-btn" aria-label="Предыдущая страница">&laquo;</a>
+                }
+
+                @if (pagerStart > 1)
+                {
+                    <a asp-action="UserProfile" asp-route-steamId="@Model.SteamId" asp-route-page="1" asp-route-pageSize="@pageSize" class="page-btn">1</a>
+                    @if (pagerStart > 2)
+                    {
+                        <span class="page-ellipsis">...</span>
+                    }
+                }
+
+                @for (int i = pagerStart; i <= pagerEnd; i++)
+                {
+                    <a asp-action="UserProfile" asp-route-steamId="@Model.SteamId" asp-route-page="@i" asp-route-pageSize="@pageSize" class="page-btn @(i == currentPage ? "active" : "")">@i</a>
+                }
+
+                @if (pagerEnd < totalPages)
+                {
+                    @if (pagerEnd < totalPages - 1)
+                    {
+                        <span class="page-ellipsis">...</span>
+                    }
+                    <a asp-action="UserProfile" asp-route-steamId="@Model.SteamId" asp-route-page="@totalPages" asp-route-pageSize="@pageSize" class="page-btn">@totalPages</a>
+                }
+
+                @if (currentPage < totalPages)
+                {
+                    <a asp-action="UserProfile" asp-route-steamId="@Model.SteamId" asp-route-page="@(currentPage + 1)" asp-route-pageSize="@pageSize" class="page-btn" aria-label="Следующая страница">&raquo;</a>
+                }
+            </div>
+        }
+    }
+    else
+    {
+        <div class="no-achievements">Достижения еще не синхронизированы.</div>
+    }
+</section>

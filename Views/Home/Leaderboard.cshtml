@@ -1,0 +1,45 @@
+@model List<WebApplication1.Models.User>
+
+@{
+    ViewData["Title"] = "Таблица лидеров";
+}
+
+<section class="leaderboard-page">
+    <div class="leaderboard-container">
+        <div class="leaderboard-header">
+            <div>Место</div>
+            <div>Пользователь</div>
+            <div>Ачивки</div>
+        </div>
+
+        @if (Model != null && Model.Any())
+        {
+            @for (int i = 0; i < Model.Count; i++)
+            {
+                var user = Model[i];
+                var avatar = string.IsNullOrWhiteSpace(user.AvatarID)
+                ? "/images/default_avatar.png"
+                : user.AvatarID;
+
+                <a class="leaderboard-row"
+                   asp-controller="Profile"
+                   asp-action="UserProfile"
+                   asp-route-steamId="@user.SteamId">
+
+                    <div class="leaderboard-place">#@(i + 1)</div>
+
+                    <div class="leaderboard-user">
+                        <img src="@avatar" alt="@user.SteamName" class="leaderboard-avatar" />
+                        <span class="leaderboard-name">@user.SteamName</span>
+                    </div>
+
+                    <div class="leaderboard-achievements">@user.TotalAchievements</div>
+                </a>
+            }
+        }
+        else
+        {
+            <div class="leaderboard-empty">Пока нет пользователей</div>
+        }
+    </div>
+</section>

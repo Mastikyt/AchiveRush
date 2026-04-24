@@ -1,0 +1,311 @@
+{
+  "Version": 1,
+  "WorkspaceRootPath": "D:\\\u041A\u043E\u043B\u043B\u0435\u0434\u0436\\3 \u043A\u0443\u0440\u0441\\\u041F\u0440\u0430\u043A\u0442\u0438\u043A\u0430 2 \u0441\u0438\u043C\\AchiveRush\\WebApplication1\\",
+  "Documents": [
+    {
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|D:\\\u041A\u043E\u043B\u043B\u0435\u0434\u0436\\3 \u043A\u0443\u0440\u0441\\\u041F\u0440\u0430\u043A\u0442\u0438\u043A\u0430 2 \u0441\u0438\u043C\\AchiveRush\\WebApplication1\\WebApplication1\\Views\\Profile\\UserProfile.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}",
+      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:WebApplication1\\Views\\Profile\\UserProfile.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|D:\\\u041A\u043E\u043B\u043B\u0435\u0434\u0436\\3 \u043A\u0443\u0440\u0441\\\u041F\u0440\u0430\u043A\u0442\u0438\u043A\u0430 2 \u0441\u0438\u043C\\AchiveRush\\WebApplication1\\WebApplication1\\Services\\SteamUserManager.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:WebApplication1\\Services\\SteamUserManager.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|D:\\\u041A\u043E\u043B\u043B\u0435\u0434\u0436\\3 \u043A\u0443\u0440\u0441\\\u041F\u0440\u0430\u043A\u0442\u0438\u043A\u0430 2 \u0441\u0438\u043C\\AchiveRush\\WebApplication1\\WebApplication1\\DTO\\SteamProfileResponse.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:WebApplication1\\DTO\\SteamProfileResponse.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|D:\\\u041A\u043E\u043B\u043B\u0435\u0434\u0436\\3 \u043A\u0443\u0440\u0441\\\u041F\u0440\u0430\u043A\u0442\u0438\u043A\u0430 2 \u0441\u0438\u043C\\AchiveRush\\WebApplication1\\WebApplication1\\DTO\\SteamSchemaResponse.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:WebApplication1\\DTO\\SteamSchemaResponse.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|D:\\\u041A\u043E\u043B\u043B\u0435\u0434\u0436\\3 \u043A\u0443\u0440\u0441\\\u041F\u0440\u0430\u043A\u0442\u0438\u043A\u0430 2 \u0441\u0438\u043C\\AchiveRush\\WebApplication1\\WebApplication1\\DTO\\SteamGameDto.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:WebApplication1\\DTO\\SteamGameDto.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|D:\\\u041A\u043E\u043B\u043B\u0435\u0434\u0436\\3 \u043A\u0443\u0440\u0441\\\u041F\u0440\u0430\u043A\u0442\u0438\u043A\u0430 2 \u0441\u0438\u043C\\AchiveRush\\WebApplication1\\WebApplication1\\DTO\\SteamPlayerAchievement.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:WebApplication1\\DTO\\SteamPlayerAchievement.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|D:\\\u041A\u043E\u043B\u043B\u0435\u0434\u0436\\3 \u043A\u0443\u0440\u0441\\\u041F\u0440\u0430\u043A\u0442\u0438\u043A\u0430 2 \u0441\u0438\u043C\\AchiveRush\\WebApplication1\\WebApplication1\\DTO\\SteamAchievementDto.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:WebApplication1\\DTO\\SteamAchievementDto.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|D:\\\u041A\u043E\u043B\u043B\u0435\u0434\u0436\\3 \u043A\u0443\u0440\u0441\\\u041F\u0440\u0430\u043A\u0442\u0438\u043A\u0430 2 \u0441\u0438\u043C\\AchiveRush\\WebApplication1\\WebApplication1\\Migrations\\20260410131822_PLEASEWORK.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:WebApplication1\\Migrations\\20260410131822_PLEASEWORK.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|D:\\\u041A\u043E\u043B\u043B\u0435\u0434\u0436\\3 \u043A\u0443\u0440\u0441\\\u041F\u0440\u0430\u043A\u0442\u0438\u043A\u0430 2 \u0441\u0438\u043C\\AchiveRush\\WebApplication1\\WebApplication1\\Program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:WebApplication1\\Program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|D:\\\u041A\u043E\u043B\u043B\u0435\u0434\u0436\\3 \u043A\u0443\u0440\u0441\\\u041F\u0440\u0430\u043A\u0442\u0438\u043A\u0430 2 \u0441\u0438\u043C\\AchiveRush\\WebApplication1\\WebApplication1\\Services\\SteamService.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:WebApplication1\\Services\\SteamService.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|D:\\\u041A\u043E\u043B\u043B\u0435\u0434\u0436\\3 \u043A\u0443\u0440\u0441\\\u041F\u0440\u0430\u043A\u0442\u0438\u043A\u0430 2 \u0441\u0438\u043C\\AchiveRush\\WebApplication1\\WebApplication1\\Services\\HostedService.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:WebApplication1\\Services\\HostedService.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|D:\\\u041A\u043E\u043B\u043B\u0435\u0434\u0436\\3 \u043A\u0443\u0440\u0441\\\u041F\u0440\u0430\u043A\u0442\u0438\u043A\u0430 2 \u0441\u0438\u043C\\AchiveRush\\WebApplication1\\WebApplication1\\Services\\CacheService.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:WebApplication1\\Services\\CacheService.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|D:\\\u041A\u043E\u043B\u043B\u0435\u0434\u0436\\3 \u043A\u0443\u0440\u0441\\\u041F\u0440\u0430\u043A\u0442\u0438\u043A\u0430 2 \u0441\u0438\u043C\\AchiveRush\\WebApplication1\\WebApplication1\\Controllers\\AdminController.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:WebApplication1\\Controllers\\AdminController.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|D:\\\u041A\u043E\u043B\u043B\u0435\u0434\u0436\\3 \u043A\u0443\u0440\u0441\\\u041F\u0440\u0430\u043A\u0442\u0438\u043A\u0430 2 \u0441\u0438\u043C\\AchiveRush\\WebApplication1\\WebApplication1\\Controllers\\ProfileController.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:WebApplication1\\Controllers\\ProfileController.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|D:\\\u041A\u043E\u043B\u043B\u0435\u0434\u0436\\3 \u043A\u0443\u0440\u0441\\\u041F\u0440\u0430\u043A\u0442\u0438\u043A\u0430 2 \u0441\u0438\u043C\\AchiveRush\\WebApplication1\\WebApplication1\\Models\\UserAchievement.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:WebApplication1\\Models\\UserAchievement.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|D:\\\u041A\u043E\u043B\u043B\u0435\u0434\u0436\\3 \u043A\u0443\u0440\u0441\\\u041F\u0440\u0430\u043A\u0442\u0438\u043A\u0430 2 \u0441\u0438\u043C\\AchiveRush\\WebApplication1\\WebApplication1\\Controllers\\GamesController.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:WebApplication1\\Controllers\\GamesController.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|D:\\\u041A\u043E\u043B\u043B\u0435\u0434\u0436\\3 \u043A\u0443\u0440\u0441\\\u041F\u0440\u0430\u043A\u0442\u0438\u043A\u0430 2 \u0441\u0438\u043C\\AchiveRush\\WebApplication1\\WebApplication1\\Controllers\\AccountController.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:WebApplication1\\Controllers\\AccountController.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|D:\\\u041A\u043E\u043B\u043B\u0435\u0434\u0436\\3 \u043A\u0443\u0440\u0441\\\u041F\u0440\u0430\u043A\u0442\u0438\u043A\u0430 2 \u0441\u0438\u043C\\AchiveRush\\WebApplication1\\WebApplication1\\Models\\User.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:WebApplication1\\Models\\User.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    }
+  ],
+  "DocumentGroupContainers": [
+    {
+      "Orientation": 0,
+      "VerticalTabListWidth": 256,
+      "DocumentGroups": [
+        {
+          "DockedWidth": 200,
+          "SelectedChildIndex": 1,
+          "Children": [
+            {
+              "$type": "Bookmark",
+              "Name": "ST:0:0:{aa2115a1-9712-457b-9047-dbb71ca2cdd2}"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 0,
+              "Title": "UserProfile.cshtml",
+              "DocumentMoniker": "D:\\\u041A\u043E\u043B\u043B\u0435\u0434\u0436\\3 \u043A\u0443\u0440\u0441\\\u041F\u0440\u0430\u043A\u0442\u0438\u043A\u0430 2 \u0441\u0438\u043C\\AchiveRush\\WebApplication1\\WebApplication1\\Views\\Profile\\UserProfile.cshtml",
+              "RelativeDocumentMoniker": "WebApplication1\\Views\\Profile\\UserProfile.cshtml",
+              "ToolTip": "D:\\\u041A\u043E\u043B\u043B\u0435\u0434\u0436\\3 \u043A\u0443\u0440\u0441\\\u041F\u0440\u0430\u043A\u0442\u0438\u043A\u0430 2 \u0441\u0438\u043C\\AchiveRush\\WebApplication1\\WebApplication1\\Views\\Profile\\UserProfile.cshtml",
+              "RelativeToolTip": "WebApplication1\\Views\\Profile\\UserProfile.cshtml",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
+              "WhenOpened": "2026-04-10T13:26:27.961Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 1,
+              "Title": "SteamUserManager.cs",
+              "DocumentMoniker": "D:\\\u041A\u043E\u043B\u043B\u0435\u0434\u0436\\3 \u043A\u0443\u0440\u0441\\\u041F\u0440\u0430\u043A\u0442\u0438\u043A\u0430 2 \u0441\u0438\u043C\\AchiveRush\\WebApplication1\\WebApplication1\\Services\\SteamUserManager.cs",
+              "RelativeDocumentMoniker": "WebApplication1\\Services\\SteamUserManager.cs",
+              "ToolTip": "D:\\\u041A\u043E\u043B\u043B\u0435\u0434\u0436\\3 \u043A\u0443\u0440\u0441\\\u041F\u0440\u0430\u043A\u0442\u0438\u043A\u0430 2 \u0441\u0438\u043C\\AchiveRush\\WebApplication1\\WebApplication1\\Services\\SteamUserManager.cs",
+              "RelativeToolTip": "WebApplication1\\Services\\SteamUserManager.cs",
+              "ViewState": "AgIAAAkAAAAAAAAAAAAYwCsAAAABAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-04-10T13:26:19.129Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 2,
+              "Title": "SteamProfileResponse.cs",
+              "DocumentMoniker": "D:\\\u041A\u043E\u043B\u043B\u0435\u0434\u0436\\3 \u043A\u0443\u0440\u0441\\\u041F\u0440\u0430\u043A\u0442\u0438\u043A\u0430 2 \u0441\u0438\u043C\\AchiveRush\\WebApplication1\\WebApplication1\\DTO\\SteamProfileResponse.cs",
+              "RelativeDocumentMoniker": "WebApplication1\\DTO\\SteamProfileResponse.cs",
+              "ToolTip": "D:\\\u041A\u043E\u043B\u043B\u0435\u0434\u0436\\3 \u043A\u0443\u0440\u0441\\\u041F\u0440\u0430\u043A\u0442\u0438\u043A\u0430 2 \u0441\u0438\u043C\\AchiveRush\\WebApplication1\\WebApplication1\\DTO\\SteamProfileResponse.cs",
+              "RelativeToolTip": "WebApplication1\\DTO\\SteamProfileResponse.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-04-10T13:25:50.447Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 3,
+              "Title": "SteamSchemaResponse.cs",
+              "DocumentMoniker": "D:\\\u041A\u043E\u043B\u043B\u0435\u0434\u0436\\3 \u043A\u0443\u0440\u0441\\\u041F\u0440\u0430\u043A\u0442\u0438\u043A\u0430 2 \u0441\u0438\u043C\\AchiveRush\\WebApplication1\\WebApplication1\\DTO\\SteamSchemaResponse.cs",
+              "RelativeDocumentMoniker": "WebApplication1\\DTO\\SteamSchemaResponse.cs",
+              "ToolTip": "D:\\\u041A\u043E\u043B\u043B\u0435\u0434\u0436\\3 \u043A\u0443\u0440\u0441\\\u041F\u0440\u0430\u043A\u0442\u0438\u043A\u0430 2 \u0441\u0438\u043C\\AchiveRush\\WebApplication1\\WebApplication1\\DTO\\SteamSchemaResponse.cs",
+              "RelativeToolTip": "WebApplication1\\DTO\\SteamSchemaResponse.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-04-10T13:25:42.892Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 4,
+              "Title": "SteamGameDto.cs",
+              "DocumentMoniker": "D:\\\u041A\u043E\u043B\u043B\u0435\u0434\u0436\\3 \u043A\u0443\u0440\u0441\\\u041F\u0440\u0430\u043A\u0442\u0438\u043A\u0430 2 \u0441\u0438\u043C\\AchiveRush\\WebApplication1\\WebApplication1\\DTO\\SteamGameDto.cs",
+              "RelativeDocumentMoniker": "WebApplication1\\DTO\\SteamGameDto.cs",
+              "ToolTip": "D:\\\u041A\u043E\u043B\u043B\u0435\u0434\u0436\\3 \u043A\u0443\u0440\u0441\\\u041F\u0440\u0430\u043A\u0442\u0438\u043A\u0430 2 \u0441\u0438\u043C\\AchiveRush\\WebApplication1\\WebApplication1\\DTO\\SteamGameDto.cs",
+              "RelativeToolTip": "WebApplication1\\DTO\\SteamGameDto.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAgAAAA6AAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-04-10T13:25:41.909Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 5,
+              "Title": "SteamPlayerAchievement.cs",
+              "DocumentMoniker": "D:\\\u041A\u043E\u043B\u043B\u0435\u0434\u0436\\3 \u043A\u0443\u0440\u0441\\\u041F\u0440\u0430\u043A\u0442\u0438\u043A\u0430 2 \u0441\u0438\u043C\\AchiveRush\\WebApplication1\\WebApplication1\\DTO\\SteamPlayerAchievement.cs",
+              "RelativeDocumentMoniker": "WebApplication1\\DTO\\SteamPlayerAchievement.cs",
+              "ToolTip": "D:\\\u041A\u043E\u043B\u043B\u0435\u0434\u0436\\3 \u043A\u0443\u0440\u0441\\\u041F\u0440\u0430\u043A\u0442\u0438\u043A\u0430 2 \u0441\u0438\u043C\\AchiveRush\\WebApplication1\\WebApplication1\\DTO\\SteamPlayerAchievement.cs",
+              "RelativeToolTip": "WebApplication1\\DTO\\SteamPlayerAchievement.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-04-10T13:25:41.182Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 6,
+              "Title": "SteamAchievementDto.cs",
+              "DocumentMoniker": "D:\\\u041A\u043E\u043B\u043B\u0435\u0434\u0436\\3 \u043A\u0443\u0440\u0441\\\u041F\u0440\u0430\u043A\u0442\u0438\u043A\u0430 2 \u0441\u0438\u043C\\AchiveRush\\WebApplication1\\WebApplication1\\DTO\\SteamAchievementDto.cs",
+              "RelativeDocumentMoniker": "WebApplication1\\DTO\\SteamAchievementDto.cs",
+              "ToolTip": "D:\\\u041A\u043E\u043B\u043B\u0435\u0434\u0436\\3 \u043A\u0443\u0440\u0441\\\u041F\u0440\u0430\u043A\u0442\u0438\u043A\u0430 2 \u0441\u0438\u043C\\AchiveRush\\WebApplication1\\WebApplication1\\DTO\\SteamAchievementDto.cs",
+              "RelativeToolTip": "WebApplication1\\DTO\\SteamAchievementDto.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAA8AAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-04-10T13:25:39.217Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 7,
+              "Title": "20260410131822_PLEASEWORK.cs",
+              "DocumentMoniker": "D:\\\u041A\u043E\u043B\u043B\u0435\u0434\u0436\\3 \u043A\u0443\u0440\u0441\\\u041F\u0440\u0430\u043A\u0442\u0438\u043A\u0430 2 \u0441\u0438\u043C\\AchiveRush\\WebApplication1\\WebApplication1\\Migrations\\20260410131822_PLEASEWORK.cs",
+              "RelativeDocumentMoniker": "WebApplication1\\Migrations\\20260410131822_PLEASEWORK.cs",
+              "ToolTip": "D:\\\u041A\u043E\u043B\u043B\u0435\u0434\u0436\\3 \u043A\u0443\u0440\u0441\\\u041F\u0440\u0430\u043A\u0442\u0438\u043A\u0430 2 \u0441\u0438\u043C\\AchiveRush\\WebApplication1\\WebApplication1\\Migrations\\20260410131822_PLEASEWORK.cs",
+              "RelativeToolTip": "WebApplication1\\Migrations\\20260410131822_PLEASEWORK.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAABIAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-04-10T13:18:23.31Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 8,
+              "Title": "Program.cs",
+              "DocumentMoniker": "D:\\\u041A\u043E\u043B\u043B\u0435\u0434\u0436\\3 \u043A\u0443\u0440\u0441\\\u041F\u0440\u0430\u043A\u0442\u0438\u043A\u0430 2 \u0441\u0438\u043C\\AchiveRush\\WebApplication1\\WebApplication1\\Program.cs",
+              "RelativeDocumentMoniker": "WebApplication1\\Program.cs",
+              "ToolTip": "D:\\\u041A\u043E\u043B\u043B\u0435\u0434\u0436\\3 \u043A\u0443\u0440\u0441\\\u041F\u0440\u0430\u043A\u0442\u0438\u043A\u0430 2 \u0441\u0438\u043C\\AchiveRush\\WebApplication1\\WebApplication1\\Program.cs",
+              "RelativeToolTip": "WebApplication1\\Program.cs",
+              "ViewState": "AgIAACAAAAAAAAAAAAAmwD4AAAA6AAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-04-10T11:11:20.134Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 9,
+              "Title": "SteamService.cs",
+              "DocumentMoniker": "D:\\\u041A\u043E\u043B\u043B\u0435\u0434\u0436\\3 \u043A\u0443\u0440\u0441\\\u041F\u0440\u0430\u043A\u0442\u0438\u043A\u0430 2 \u0441\u0438\u043C\\AchiveRush\\WebApplication1\\WebApplication1\\Services\\SteamService.cs",
+              "RelativeDocumentMoniker": "WebApplication1\\Services\\SteamService.cs",
+              "ToolTip": "D:\\\u041A\u043E\u043B\u043B\u0435\u0434\u0436\\3 \u043A\u0443\u0440\u0441\\\u041F\u0440\u0430\u043A\u0442\u0438\u043A\u0430 2 \u0441\u0438\u043C\\AchiveRush\\WebApplication1\\WebApplication1\\Services\\SteamService.cs",
+              "RelativeToolTip": "WebApplication1\\Services\\SteamService.cs",
+              "ViewState": "AgIAALgAAAAAAAAAAAA2wOgAAAABAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-04-10T10:41:05.43Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 10,
+              "Title": "HostedService.cs",
+              "DocumentMoniker": "D:\\\u041A\u043E\u043B\u043B\u0435\u0434\u0436\\3 \u043A\u0443\u0440\u0441\\\u041F\u0440\u0430\u043A\u0442\u0438\u043A\u0430 2 \u0441\u0438\u043C\\AchiveRush\\WebApplication1\\WebApplication1\\Services\\HostedService.cs",
+              "RelativeDocumentMoniker": "WebApplication1\\Services\\HostedService.cs",
+              "ToolTip": "D:\\\u041A\u043E\u043B\u043B\u0435\u0434\u0436\\3 \u043A\u0443\u0440\u0441\\\u041F\u0440\u0430\u043A\u0442\u0438\u043A\u0430 2 \u0441\u0438\u043C\\AchiveRush\\WebApplication1\\WebApplication1\\Services\\HostedService.cs",
+              "RelativeToolTip": "WebApplication1\\Services\\HostedService.cs",
+              "ViewState": "AgIAABIAAAAAAAAAAAAowBsAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-04-10T10:13:49.177Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 11,
+              "Title": "CacheService.cs",
+              "DocumentMoniker": "D:\\\u041A\u043E\u043B\u043B\u0435\u0434\u0436\\3 \u043A\u0443\u0440\u0441\\\u041F\u0440\u0430\u043A\u0442\u0438\u043A\u0430 2 \u0441\u0438\u043C\\AchiveRush\\WebApplication1\\WebApplication1\\Services\\CacheService.cs",
+              "RelativeDocumentMoniker": "WebApplication1\\Services\\CacheService.cs",
+              "ToolTip": "D:\\\u041A\u043E\u043B\u043B\u0435\u0434\u0436\\3 \u043A\u0443\u0440\u0441\\\u041F\u0440\u0430\u043A\u0442\u0438\u043A\u0430 2 \u0441\u0438\u043C\\AchiveRush\\WebApplication1\\WebApplication1\\Services\\CacheService.cs",
+              "RelativeToolTip": "WebApplication1\\Services\\CacheService.cs",
+              "ViewState": "AgIAACMAAAAAAAAAAAAYwEUAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-04-10T10:12:57.29Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 12,
+              "Title": "AdminController.cs",
+              "DocumentMoniker": "D:\\\u041A\u043E\u043B\u043B\u0435\u0434\u0436\\3 \u043A\u0443\u0440\u0441\\\u041F\u0440\u0430\u043A\u0442\u0438\u043A\u0430 2 \u0441\u0438\u043C\\AchiveRush\\WebApplication1\\WebApplication1\\Controllers\\AdminController.cs",
+              "RelativeDocumentMoniker": "WebApplication1\\Controllers\\AdminController.cs",
+              "ToolTip": "D:\\\u041A\u043E\u043B\u043B\u0435\u0434\u0436\\3 \u043A\u0443\u0440\u0441\\\u041F\u0440\u0430\u043A\u0442\u0438\u043A\u0430 2 \u0441\u0438\u043C\\AchiveRush\\WebApplication1\\WebApplication1\\Controllers\\AdminController.cs",
+              "RelativeToolTip": "WebApplication1\\Controllers\\AdminController.cs",
+              "ViewState": "AgIAAJYAAAAAAAAAAAAuwLcAAAABAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-03-27T12:20:18.868Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 13,
+              "Title": "ProfileController.cs",
+              "DocumentMoniker": "D:\\\u041A\u043E\u043B\u043B\u0435\u0434\u0436\\3 \u043A\u0443\u0440\u0441\\\u041F\u0440\u0430\u043A\u0442\u0438\u043A\u0430 2 \u0441\u0438\u043C\\AchiveRush\\WebApplication1\\WebApplication1\\Controllers\\ProfileController.cs",
+              "RelativeDocumentMoniker": "WebApplication1\\Controllers\\ProfileController.cs",
+              "ToolTip": "D:\\\u041A\u043E\u043B\u043B\u0435\u0434\u0436\\3 \u043A\u0443\u0440\u0441\\\u041F\u0440\u0430\u043A\u0442\u0438\u043A\u0430 2 \u0441\u0438\u043C\\AchiveRush\\WebApplication1\\WebApplication1\\Controllers\\ProfileController.cs",
+              "RelativeToolTip": "WebApplication1\\Controllers\\ProfileController.cs",
+              "ViewState": "AgIAAFUAAAAAAAAAAAAmwGwAAAAmAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-03-06T12:16:21.17Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 14,
+              "Title": "UserAchievement.cs",
+              "DocumentMoniker": "D:\\\u041A\u043E\u043B\u043B\u0435\u0434\u0436\\3 \u043A\u0443\u0440\u0441\\\u041F\u0440\u0430\u043A\u0442\u0438\u043A\u0430 2 \u0441\u0438\u043C\\AchiveRush\\WebApplication1\\WebApplication1\\Models\\UserAchievement.cs",
+              "RelativeDocumentMoniker": "WebApplication1\\Models\\UserAchievement.cs",
+              "ToolTip": "D:\\\u041A\u043E\u043B\u043B\u0435\u0434\u0436\\3 \u043A\u0443\u0440\u0441\\\u041F\u0440\u0430\u043A\u0442\u0438\u043A\u0430 2 \u0441\u0438\u043C\\AchiveRush\\WebApplication1\\WebApplication1\\Models\\UserAchievement.cs",
+              "RelativeToolTip": "WebApplication1\\Models\\UserAchievement.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAABUAAAABAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-03-06T12:12:34.105Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 15,
+              "Title": "GamesController.cs",
+              "DocumentMoniker": "D:\\\u041A\u043E\u043B\u043B\u0435\u0434\u0436\\3 \u043A\u0443\u0440\u0441\\\u041F\u0440\u0430\u043A\u0442\u0438\u043A\u0430 2 \u0441\u0438\u043C\\AchiveRush\\WebApplication1\\WebApplication1\\Controllers\\GamesController.cs",
+              "RelativeDocumentMoniker": "WebApplication1\\Controllers\\GamesController.cs",
+              "ToolTip": "D:\\\u041A\u043E\u043B\u043B\u0435\u0434\u0436\\3 \u043A\u0443\u0440\u0441\\\u041F\u0440\u0430\u043A\u0442\u0438\u043A\u0430 2 \u0441\u0438\u043C\\AchiveRush\\WebApplication1\\WebApplication1\\Controllers\\GamesController.cs",
+              "RelativeToolTip": "WebApplication1\\Controllers\\GamesController.cs",
+              "ViewState": "AgIAAHAAAAAAAAAAAAAAwJEAAAABAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-02-27T13:04:20.912Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 16,
+              "Title": "AccountController.cs",
+              "DocumentMoniker": "D:\\\u041A\u043E\u043B\u043B\u0435\u0434\u0436\\3 \u043A\u0443\u0440\u0441\\\u041F\u0440\u0430\u043A\u0442\u0438\u043A\u0430 2 \u0441\u0438\u043C\\AchiveRush\\WebApplication1\\WebApplication1\\Controllers\\AccountController.cs",
+              "RelativeDocumentMoniker": "WebApplication1\\Controllers\\AccountController.cs",
+              "ToolTip": "D:\\\u041A\u043E\u043B\u043B\u0435\u0434\u0436\\3 \u043A\u0443\u0440\u0441\\\u041F\u0440\u0430\u043A\u0442\u0438\u043A\u0430 2 \u0441\u0438\u043C\\AchiveRush\\WebApplication1\\WebApplication1\\Controllers\\AccountController.cs",
+              "RelativeToolTip": "WebApplication1\\Controllers\\AccountController.cs",
+              "ViewState": "AgIAAFMAAAAAAAAAAAAuwGYAAAAFAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-03-13T14:25:27.205Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 17,
+              "Title": "User.cs",
+              "DocumentMoniker": "D:\\\u041A\u043E\u043B\u043B\u0435\u0434\u0436\\3 \u043A\u0443\u0440\u0441\\\u041F\u0440\u0430\u043A\u0442\u0438\u043A\u0430 2 \u0441\u0438\u043C\\AchiveRush\\WebApplication1\\WebApplication1\\Models\\User.cs",
+              "RelativeDocumentMoniker": "WebApplication1\\Models\\User.cs",
+              "ToolTip": "D:\\\u041A\u043E\u043B\u043B\u0435\u0434\u0436\\3 \u043A\u0443\u0440\u0441\\\u041F\u0440\u0430\u043A\u0442\u0438\u043A\u0430 2 \u0441\u0438\u043C\\AchiveRush\\WebApplication1\\WebApplication1\\Models\\User.cs",
+              "RelativeToolTip": "WebApplication1\\Models\\User.cs",
+              "ViewState": "AgIAAA0AAAAAAAAAAAAqwCcAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-02-26T22:06:38.275Z"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,33 @@
+﻿@model WebApplication1.Views.Shared._HeaderPartialModel
+@{
+}
+@inject IConfiguration config
+@{
+    AppConfig? appConfig = config.GetSection("Project").Get<AppConfig>();
+}
+@using Microsoft.AspNetCore.Identity
+@inject UserManager<ApplicationUser> UserManager
+@inject SignInManager<ApplicationUser> SignInManager
+
+@{
+    ViewData["Title"] = "Achive Rush";
+}
+
+<div class="main-content">
+    <h1 class="main-title">В погоне за ачивками!</h1>
+    <p class="subtitle">Соревнуйся с друзьями! Получай награды за достижения в любимых играх!</p>
+
+    @if (SignInManager.IsSignedIn(User))
+    {
+        <a asp-controller="Home" asp-action="Catalog" class="start-btn">
+            Начать!
+        </a>
+    }
+    else
+    {
+        <a asp-controller="Account" asp-action="Login" class="start-btn">
+            Зайти через Steam!
+        </a>
+    }
+
+</div>

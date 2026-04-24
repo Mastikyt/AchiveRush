@@ -1,0 +1,141 @@
+﻿@{
+    ViewData["Title"] = "Вход в админку";
+}
+
+<div class="admin-login-page">
+    <div class="admin-login-card">
+        <div class="admin-login-badge">AchiveRush Admin</div>
+
+        <h1>Секретный вход</h1>
+        <p class="admin-login-subtitle">
+            Только для администратора.
+        </p>
+
+        @if (ViewBag.Error != null)
+        {
+            <div class="admin-alert admin-alert-error">
+                @ViewBag.Error
+            </div>
+        }
+
+        <form method="post" asp-controller="Admin" asp-action="Login" class="admin-login-form">
+            @Html.AntiForgeryToken()
+
+            <label for="password">Пароль</label>
+            <input id="password" name="password" type="password" placeholder="Введите пароль" required />
+
+            <button type="submit">Войти</button>
+        </form>
+    </div>
+</div>
+
+<style>
+    .admin-login-page {
+        min-height: 78vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 40px 20px;
+        background: radial-gradient(circle at top left, rgba(212,175,55,0.08), transparent 35%), radial-gradient(circle at bottom right, rgba(212,175,55,0.06), transparent 35%), linear-gradient(135deg, #0f0d0a, #15120d 55%, #0b0907);
+    }
+
+    .admin-login-card {
+        width: 100%;
+        max-width: 460px;
+        background: linear-gradient(180deg, rgba(33,27,20,0.98), rgba(24,20,14,0.98));
+        border: 1px solid rgba(212,175,55,0.2);
+        border-radius: 24px;
+        padding: 36px;
+        box-shadow: 0 20px 70px rgba(0,0,0,0.35);
+        color: #fef3d6;
+        backdrop-filter: blur(10px);
+    }
+
+    .admin-login-badge {
+        display: inline-block;
+        margin-bottom: 18px;
+        padding: 8px 14px;
+        border-radius: 999px;
+        background: rgba(212,175,55,0.12);
+        color: #e6c87a;
+        font-size: 0.88rem;
+        font-weight: 600;
+        border: 1px solid rgba(212,175,55,0.18);
+    }
+
+    .admin-login-card h1 {
+        margin: 0 0 10px;
+        font-size: 2rem;
+        font-weight: 800;
+        color: #fef3d6;
+    }
+
+    .admin-login-subtitle {
+        margin: 0 0 24px;
+        color: #dcbc6a;
+        line-height: 1.55;
+    }
+
+    .admin-login-form {
+        display: flex;
+        flex-direction: column;
+        gap: 14px;
+    }
+
+        .admin-login-form label {
+            font-weight: 600;
+            color: #f3d58e;
+        }
+
+        .admin-login-form input {
+            padding: 14px 16px;
+            border-radius: 14px;
+            border: 1px solid rgba(212,175,55,0.18);
+            background: #0f0d0a;
+            color: #f3d58e;
+            outline: none;
+            transition: 0.2s ease;
+        }
+
+            .admin-login-form input::placeholder {
+                color: rgba(230, 200, 122, 0.55);
+            }
+
+            .admin-login-form input:focus {
+                border-color: #d4af37;
+                box-shadow: 0 0 0 4px rgba(212,175,55,0.08);
+            }
+
+        .admin-login-form button {
+            margin-top: 8px;
+            border: 1px solid rgba(212,175,55,0.35);
+            border-radius: 14px;
+            padding: 14px 16px;
+            font-weight: 700;
+            font-size: 1rem;
+            color: #f3d58e;
+            background: linear-gradient(135deg, #3b2f1a, #221b12);
+            cursor: pointer;
+            transition: transform 0.15s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+            box-shadow: 0 12px 30px rgba(0,0,0,0.2);
+        }
+
+            .admin-login-form button:hover {
+                transform: translateY(-1px);
+                border-color: #d4af37;
+                background: linear-gradient(135deg, #4a3b20, #2c2216);
+            }
+
+    .admin-alert {
+        padding: 12px 14px;
+        border-radius: 14px;
+        margin-bottom: 18px;
+        font-weight: 500;
+    }
+
+    .admin-alert-error {
+        background: rgba(185,40,40,0.12);
+        border: 1px solid rgba(248,113,113,0.2);
+        color: #fecaca;
+    }
+</style>

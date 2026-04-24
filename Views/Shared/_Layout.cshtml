@@ -1,0 +1,15 @@
+﻿<!DOCTYPE HTML>
+<html>
+<head>
+	@await Html.PartialAsync("_MetaPartial", new WebApplication1.Views.Shared._MetaPartialModel())
+	@await Html.PartialAsync("_CssPartial")
+	<noscript><link rel="stylesheet" href="~/css/noscript.css" /></noscript>
+</head>
+<body>
+	@await Html.PartialAsync("_HeaderPartial")
+			@RenderBody()
+	@await Html.PartialAsync("_FooterPartial")
+	@await Html.PartialAsync("_ScriptsPartial")
+
+</body>
+</html>

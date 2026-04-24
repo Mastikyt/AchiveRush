@@ -1,0 +1,35 @@
+﻿@inject IConfiguration config
+@using WebApplication1.infrastructure
+@{
+    AppConfig? appConfig = config.GetSection("Project").Get<AppConfig>();
+}
+
+<footer class="footer">
+    <div class="footer-content">
+
+        <div class="footer-left">
+            <div class="footer-logo">AchiveRush</div>
+            <p class="footer-tagline">
+                Соревнуйся с друзьями! Получай награды за достижения в любимых играх!
+            </p>
+        </div>
+
+        <div class="footer-contacts">
+            <h4>Контакты</h4>
+            <a href="mailto:support@achiverush.com">
+                support@achiverush.com
+            </a>
+        </div>
+
+    </div>
+
+    <div class="footer-bottom">
+        <a asp-controller="Admin"
+           asp-action="Login"
+           class="footer-secret-link"
+           aria-label="Admin login">
+            ©
+        </a>
+        2026 AchiveRush. Все права защищены.
+    </div>
+</footer>

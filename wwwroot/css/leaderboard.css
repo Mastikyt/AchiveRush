@@ -1,0 +1,95 @@
+.leaderboard-page {
+    max-width: 1180px;
+    margin: 50px auto 80px;
+    padding: 0 24px;
+}
+
+.leaderboard-container {
+    background: #1c1812;
+    border: 1px solid rgba(212, 175, 55, 0.3);
+    border-radius: 28px;
+    padding: 24px;
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.4);
+}
+
+.leaderboard-header,
+.leaderboard-row {
+    display: grid;
+    grid-template-columns: 140px 1fr 180px;
+    align-items: center;
+    gap: 20px;
+}
+
+.leaderboard-header {
+    padding: 16px 20px;
+    color: #e6c87a;
+    font-size: 18px;
+    font-weight: 700;
+    border-bottom: 1px solid rgba(212, 175, 55, 0.25);
+    margin-bottom: 12px;
+}
+
+a.leaderboard-row,
+a.leaderboard-row:visited,
+a.leaderboard-row:hover,
+a.leaderboard-row:active {
+    padding: 18px 20px;
+    margin-bottom: 12px;
+    border-radius: 20px;
+    text-decoration: none;
+    color: #fef3d6;
+    background: rgba(212, 175, 55, 0.03);
+    transition: transform 0.15s ease, background 0.15s ease;
+    display: grid;
+    border: 1px solid rgba(212, 175, 55, 0.08);
+}
+
+    a.leaderboard-row:hover {
+        transform: translateY(-2px);
+        background: rgba(212, 175, 55, 0.08);
+        border-color: rgba(212, 175, 55, 0.25);
+    }
+
+.leaderboard-place {
+    font-size: 26px;
+    font-weight: 800;
+    color: #d4af37;
+}
+
+.leaderboard-achievements {
+    font-size: 24px;
+    font-weight: 800;
+    color: #d4af37;
+    text-align: right;
+}
+
+.leaderboard-user {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    min-width: 0;
+}
+
+.leaderboard-avatar {
+    width: 72px !important;
+    height: 72px !important;
+    object-fit: cover;
+    border-radius: 18px;
+    flex-shrink: 0;
+    border: 1px solid rgba(212, 175, 55, 0.35);
+    display: block;
+}
+
+.leaderboard-name {
+    font-size: 24px;
+    font-weight: 700;
+    color: #fef3d6;
+    word-break: break-word;
+}
+
+.leaderboard-empty {
+    padding: 30px 20px;
+    text-align: center;
+    color: #e6c87a;
+    font-size: 18px;
+}

@@ -1,0 +1,115 @@
+﻿@model List<WebApplication1.Models.Game>
+
+@{
+    ViewData["Title"] = "Каталог игр";
+    var achievementCounts = ViewBag.AchievementCounts as IDictionary<int, int> ?? new Dictionary<int, int>();
+}
+
+
+<main class="layout">
+
+    <aside class="sidebar">
+        <div class="sidebar-box">
+            <h2>Фильтры</h2>
+
+            <input type="text" id="filterName" placeholder="Поиск по названию" />
+            <input type="number" id="filterAchievements" placeholder="Мин. количество достижений" min="0" />
+
+            <div class="sidebar-actions">
+                <button id="applyFilters">Применить</button>
+                <button id="resetFilters" class="secondary-btn">Сбросить</button>
+            </div>
+        </div>
+    </aside>
+
+    <section class="catalog-wrapper">
+
+        @if (TempData["SuccessMessage"] != null)
+        {
+            <div class="catalog-alert success-alert">
+                @TempData["SuccessMessage"]
+            </div>
+        }
+
+        @if (TempData["ErrorMessage"] != null)
+        {
+            <div class="catalog-alert error-alert">
+                @TempData["ErrorMessage"]
+            </div>
+        }
+
+        <section class="catalog">
+            @foreach (var game in Model)
+            {
+                <a asp-controller="Games"
+                   asp-action="Details"
+                   asp-route-id="@game.Id"
+                   class="card game-card-link">
+
+                    <div class="card game-card"
+                         data-name="@(game.Name ?? "")"
+                         data-achievements="@(achievementCounts.TryGetValue(game.Id, out var cnt) ? cnt : 0)">
+
+                        <div class="game-image-wrap">
+                            <img src="@game.AvatarUrl" alt="@game.Name" class="game-image" />
+                        </div>
+
+                        <div class="game-content">
+                            <h3>@game.Name</h3>
+                            <p class="game-description">
+                                @(string.IsNullOrWhiteSpace(game.Description)
+                                                            ? "Описание пока отсутствует."
+                                                            : game.Description)
+                        </p>
+                        <span class="achievements-count">
+                            🏆 @(achievementCounts.TryGetValue(game.Id, out var count) ? count : 0) достижений
+                        </span>
+                    </div>
+                </div>
+            </a>
+            }
+
+            <div class="card add-game-card" id="openAddGame">
+                <div class="add-game-inner">
+                    <div class="add-game-plus">+</div>
+                    <div class="add-game-title">Отправить заявку</div>
+                    <div class="add-game-subtitle">
+                        Предложить новую игру для добавления в каталог
+                    </div>
+                </div>
+            </div>
+        </section>
+    </section>
+</main>
+
+<div id="addGameModal" class="add-game-modal hidden">
+    <div class="modal-overlay" id="closeModalOverlay"></div>
+
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3>Заявка на добавление игры</h3>
+            <button type="button" class="modal-close" id="cancelModalTop">×</button>
+        </div>
+
+        <p class="modal-description">
+            Вставь ссылку на игру в Steam. Игра не добавится сразу в каталог, а сначала уйдёт на проверку администратору.
+        </p>
+
+        <form id="addGameForm" asp-controller="Games" asp-action="AddFromSteam" method="post">
+            @Html.AntiForgeryToken()
+
+            <input type="text"
+                   id="steamUrl"
+                   name="steamUrl"
+                   placeholder="https://store.steampowered.com/app/12345"
+                   required />
+
+            <div class="modal-buttons">
+                <button type="submit" class="primary-btn">Отправить заявку</button>
+                <button type="button" id="cancelModal" class="secondary-btn">Отмена</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script src="~/js/catalog.js"></script>
