@@ -51,6 +51,7 @@ namespace WebApplication1.Controllers
                 .Where(u => !string.IsNullOrEmpty(u.SteamId))
                 .OrderByDescending(u => u.TotalAchievements)
                 .ThenBy(u => u.SteamName)
+                .Take(50)
                 .ToListAsync();
 
             return View(users);
@@ -58,7 +59,7 @@ namespace WebApplication1.Controllers
 
         public IActionResult Challenges()
         {
-            return View();
+            return RedirectToAction("Index", "Challenges");
         }
     }
 }

@@ -395,7 +395,6 @@ D:\Колледж\3 курс\Практика 2 сим\AchiveRush\AchiveRushCode
 D:\Колледж\3 курс\Практика 2 сим\AchiveRush\AchiveRushCode\bin\Debug\net9.0\appsettings.production.json
 D:\Колледж\3 курс\Практика 2 сим\AchiveRush\AchiveRushCode\bin\Debug\net9.0\WebApplication1.staticwebassets.runtime.json
 D:\Колледж\3 курс\Практика 2 сим\AchiveRush\AchiveRushCode\bin\Debug\net9.0\WebApplication1.staticwebassets.endpoints.json
-D:\Колледж\3 курс\Практика 2 сим\AchiveRush\AchiveRushCode\bin\Debug\net9.0\WebApplication1.exe
 D:\Колледж\3 курс\Практика 2 сим\AchiveRush\AchiveRushCode\bin\Debug\net9.0\WebApplication1.deps.json
 D:\Колледж\3 курс\Практика 2 сим\AchiveRush\AchiveRushCode\bin\Debug\net9.0\WebApplication1.runtimeconfig.json
 D:\Колледж\3 курс\Практика 2 сим\AchiveRush\AchiveRushCode\bin\Debug\net9.0\WebApplication1.dll
@@ -700,10 +699,6 @@ D:\Колледж\3 курс\Практика 2 сим\AchiveRush\AchiveRushCode
 D:\Колледж\3 курс\Практика 2 сим\AchiveRush\AchiveRushCode\obj\Debug\net9.0\rjsmrazor.dswa.cache.json
 D:\Колледж\3 курс\Практика 2 сим\AchiveRush\AchiveRushCode\obj\Debug\net9.0\rjsmcshtml.dswa.cache.json
 D:\Колледж\3 курс\Практика 2 сим\AchiveRush\AchiveRushCode\obj\Debug\net9.0\scopedcss\bundle\WebApplication1.styles.css
-D:\Колледж\3 курс\Практика 2 сим\AchiveRush\AchiveRushCode\obj\Debug\net9.0\compressed\bjawcl37ot-1mihmslc9a.gz
-D:\Колледж\3 курс\Практика 2 сим\AchiveRush\AchiveRushCode\obj\Debug\net9.0\compressed\q6ue3n984r-ovpf2i8m2z.gz
-D:\Колледж\3 курс\Практика 2 сим\AchiveRush\AchiveRushCode\obj\Debug\net9.0\compressed\75361owjkp-qnkj8twjkp.gz
-D:\Колледж\3 курс\Практика 2 сим\AchiveRush\AchiveRushCode\obj\Debug\net9.0\compressed\n9yz6tfhrk-4zsial896m.gz
 D:\Колледж\3 курс\Практика 2 сим\AchiveRush\AchiveRushCode\obj\Debug\net9.0\compressed\o2qz90byuf-me4740nxej.gz
 D:\Колледж\3 курс\Практика 2 сим\AchiveRush\AchiveRushCode\obj\Debug\net9.0\compressed\dvc4nnvqj1-etxzm7ovac.gz
 D:\Колледж\3 курс\Практика 2 сим\AchiveRush\AchiveRushCode\obj\Debug\net9.0\compressed\ixpe6lrf0h-61n19gt1b8.gz
@@ -737,7 +732,6 @@ D:\Колледж\3 курс\Практика 2 сим\AchiveRush\AchiveRushCode
 D:\Колледж\3 курс\Практика 2 сим\AchiveRush\AchiveRushCode\obj\Debug\net9.0\compressed\8q27mebpdv-46ein0sx1k.gz
 D:\Колледж\3 курс\Практика 2 сим\AchiveRush\AchiveRushCode\obj\Debug\net9.0\compressed\1dbtq5xxx4-v0zj4ognzu.gz
 D:\Колледж\3 курс\Практика 2 сим\AchiveRush\AchiveRushCode\obj\Debug\net9.0\compressed\ikqbg9q10o-37tfw0ft22.gz
-D:\Колледж\3 курс\Практика 2 сим\AchiveRush\AchiveRushCode\obj\Debug\net9.0\compressed\jat30n7i32-hrwsygsryq.gz
 D:\Колледж\3 курс\Практика 2 сим\AchiveRush\AchiveRushCode\obj\Debug\net9.0\compressed\cywyta7z3y-pk9g2wxc8p.gz
 D:\Колледж\3 курс\Практика 2 сим\AchiveRush\AchiveRushCode\obj\Debug\net9.0\compressed\zxs9ktsksh-ft3s53vfgj.gz
 D:\Колледж\3 курс\Практика 2 сим\AchiveRush\AchiveRushCode\obj\Debug\net9.0\compressed\ee17hrt33b-6cfz1n2cew.gz
@@ -780,4 +774,11 @@ D:\Колледж\3 курс\Практика 2 сим\AchiveRush\AchiveRushCode
 D:\Колледж\3 курс\Практика 2 сим\AchiveRush\AchiveRushCode\obj\Debug\net9.0\WebApplication1.pdb
 D:\Колледж\3 курс\Практика 2 сим\AchiveRush\AchiveRushCode\obj\Debug\net9.0\WebApplication1.genruntimeconfig.cache
 D:\Колледж\3 курс\Практика 2 сим\AchiveRush\AchiveRushCode\obj\Debug\net9.0\ref\WebApplication1.dll
-D:\Колледж\3 курс\Практика 2 сим\AchiveRush\AchiveRushCode\obj\Debug\net9.0\compressed\74gvudrpty-lzvco1zrbc.gz
+D:\Колледж\3 курс\Практика 2 сим\AchiveRush\AchiveRushCode\obj\Debug\net9.0\compressed\jat30n7i32-jiidmtczwq.gz
+D:\Колледж\3 курс\Практика 2 сим\AchiveRush\AchiveRushCode\bin\Debug\net9.0\AdminUsers.json
+D:\Колледж\3 курс\Практика 2 сим\AchiveRush\AchiveRushCode\obj\Debug\net9.0\compressed\75361owjkp-p07hvmgofd.gz
+D:\Колледж\3 курс\Практика 2 сим\AchiveRush\AchiveRushCode\bin\Debug\net9.0\WebApplication1.exe
+D:\Колледж\3 курс\Практика 2 сим\AchiveRush\AchiveRushCode\obj\Debug\net9.0\compressed\bjawcl37ot-dn9p9nio4r.gz
+D:\Колледж\3 курс\Практика 2 сим\AchiveRush\AchiveRushCode\obj\Debug\net9.0\compressed\q6ue3n984r-lf1scoi7ym.gz
+D:\Колледж\3 курс\Практика 2 сим\AchiveRush\AchiveRushCode\obj\Debug\net9.0\compressed\n9yz6tfhrk-12675iphb6.gz
+D:\Колледж\3 курс\Практика 2 сим\AchiveRush\AchiveRushCode\obj\Debug\net9.0\compressed\74gvudrpty-ld8lf1udzz.gz

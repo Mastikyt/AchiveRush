@@ -16,9 +16,23 @@ public class User
 
     public int TotalAchievements { get; set; }
 
+    public int QuestExperience { get; set; }
+
+    public int LastNotifiedLevel { get; set; }
+
+    public int? LastKnownLeaderboardRank { get; set; }
+
     public DateTime? LastSync { get; set; }
 
     public ICollection<UserAchievement> UserAchievements { get; set; } = new List<UserAchievement>();
+
+    public ICollection<Challenge> CreatedChallenges { get; set; } = new List<Challenge>();
+
+    public ICollection<ChallengeParticipant> ChallengeParticipations { get; set; } = new List<ChallengeParticipant>();
+
+    public ICollection<DailyQuestAssignment> DailyQuestAssignments { get; set; } = new List<DailyQuestAssignment>();
+
+    public ICollection<Notification> Notifications { get; set; } = new List<Notification>();
 
     public bool IsProfilePublic { get; set; } = true;
 }

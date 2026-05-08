@@ -28,6 +28,18 @@
 
         public string ApiName { get; set; } = "";
 
+        public string? IconUrl { get; set; }
+
+        public string ObtainMethod { get; set; } = "";
+
+        public bool IsCustom { get; set; }
+
+        public int? CreatedByUserId { get; set; }
+
+        public User? CreatedByUser { get; set; }
+
+        public DateTime? CreatedAt { get; set; }
+
         public int GameId { get; set; }
 
         public Game Game { get; set; }

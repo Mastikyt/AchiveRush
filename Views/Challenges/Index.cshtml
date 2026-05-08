@@ -1,0 +1,234 @@
+@model WebApplication1.Models.ChallengesIndexViewModel
+@using WebApplication1.Models
+
+@{
+    ViewData["Title"] = "Челленджи";
+    var returnUrl = $"{Context.Request.Path}{Context.Request.QueryString}";
+
+    string DifficultyLabel(string value) => value switch
+    {
+        ChallengeDifficulties.Easy => "Легко",
+        ChallengeDifficulties.Normal => "Нормально",
+        ChallengeDifficulties.Hard => "Сложно",
+        ChallengeDifficulties.Legendary => "Легендарно",
+        _ => value
+    };
+
+    string CategoryLabel(string value) => value switch
+    {
+        ChallengeCategories.Completion => "Закрытие",
+        ChallengeCategories.Speedrun => "Спидран",
+        ChallengeCategories.Collection => "Коллекция",
+        ChallengeCategories.RareHunt => "Редкости",
+        ChallengeCategories.Skill => "Скилл",
+        ChallengeCategories.Coop => "Кооператив",
+        ChallengeCategories.Hardcore => "Хардкор",
+        ChallengeCategories.Discovery => "Исследование",
+        ChallengeCategories.Creative => "Креатив",
+        ChallengeCategories.Community => "Сообщество",
+        _ => value
+    };
+
+    string TypeLabel(string value) => value switch
+    {
+        ChallengeTypes.Completion => "100% игры",
+        ChallengeTypes.AchievementHunt => "Охота за достижениями",
+        ChallengeTypes.RareAchievementHunt => "Редкие достижения",
+        ChallengeTypes.TimeTrial => "На время",
+        ChallengeTypes.Marathon => "Марафон",
+        ChallengeTypes.NoDeath => "Без смертей",
+        ChallengeTypes.TeamRun => "Командный забег",
+        ChallengeTypes.CreativeProof => "Креативное доказательство",
+        _ => value
+    };
+
+    string VerificationLabel(ChallengeListItemViewModel challenge)
+    {
+        if (challenge.VerificationType == ChallengeVerificationTypes.Manual)
+            return "Ручная проверка";
+
+        return challenge.AutoGoalType switch
+        {
+            ChallengeAutoGoalTypes.EarnAchievementsInGame => $"{challenge.TargetValue} достиж.",
+            ChallengeAutoGoalTypes.EarnRareAchievementsInGame => $"{challenge.TargetValue} редк.",
+            _ => "Авто: 100%"
+        };
+    }
+}
+
+<main class="challenges-page">
+    <section class="challenges-hero">
+        <div>
+            <span class="section-kicker">Испытания сообщества</span>
+            <h1>Челленджи</h1>
+            <p>Выбирай забеги по игре, типу и сложности. Ежедневный квест теперь живет в шапке рядом с уведомлениями.</p>
+        </div>
+    </section>
+
+    <nav class="challenge-tabs" aria-label="Разделы челленджей">
+        <a class="active" asp-controller="Challenges" asp-action="Index">Каталог</a>
+        <a asp-controller="Challenges" asp-action="Create">Создать челлендж</a>
+    </nav>
+
+    @if (TempData["ChallengesSuccess"] is string successMessage)
+    {
+        <div class="challenge-flash success">@successMessage</div>
+    }
+
+    @if (TempData["ChallengesError"] is string errorMessage)
+    {
+        <div class="challenge-flash error">@errorMessage</div>
+    }
+
+    <section class="challenge-filter-panel">
+        <form asp-controller="Challenges" asp-action="Index" method="get" class="challenge-filter-form">
+            <label class="challenge-search-field">
+                <span>Поиск</span>
+                <input type="search" name="q" value="@Model.SearchQuery" placeholder="Название, игра или описание" />
+            </label>
+
+            <label>
+                <span>Категория</span>
+                <select name="category">
+                    <option value="">Все категории</option>
+                    @foreach (var category in ChallengeCategories.All)
+                    {
+                        <option value="@category" selected="@(Model.SelectedCategory == category ? "selected" : null)">@CategoryLabel(category)</option>
+                    }
+                </select>
+            </label>
+
+            <label>
+                <span>Тип</span>
+                <select name="type">
+                    <option value="">Все типы</option>
+                    @foreach (var type in ChallengeTypes.All)
+                    {
+                        <option value="@type" selected="@(Model.SelectedType == type ? "selected" : null)">@TypeLabel(type)</option>
+                    }
+                </select>
+            </label>
+
+            <label>
+                <span>Сложность</span>
+                <select name="difficulty">
+                    <option value="">Любая</option>
+                    @foreach (var difficulty in ChallengeDifficulties.All)
+                    {
+                        <option value="@difficulty" selected="@(Model.SelectedDifficulty == difficulty ? "selected" : null)">@DifficultyLabel(difficulty)</option>
+                    }
+                </select>
+            </label>
+
+            <div class="challenge-filter-actions">
+                <button type="submit" class="challenge-btn primary">Найти</button>
+                <a class="challenge-btn secondary" asp-controller="Challenges" asp-action="Index">Сбросить</a>
+            </div>
+        </form>
+    </section>
+
+    <section class="challenges-list-section">
+        <div class="challenge-section-head">
+            <div>
+                <span class="section-kicker">Активные</span>
+                <h2>Одобренные челленджи</h2>
+            </div>
+            <a class="challenge-btn secondary" asp-controller="Challenges" asp-action="Create">Предложить свой</a>
+        </div>
+
+        @if (!Model.Challenges.Any())
+        {
+            <div class="challenge-empty">По этим фильтрам челленджей пока нет.</div>
+        }
+        else
+        {
+            <div class="challenges-grid">
+                @foreach (var challenge in Model.Challenges)
+                {
+                    var isManual = challenge.VerificationType == ChallengeVerificationTypes.Manual;
+                    var slotsLeft = Math.Max(0, challenge.ParticipantLimit - challenge.ParticipantsCount);
+
+                    <article class="challenge-card">
+                        <a class="challenge-cover-link" asp-controller="Challenges" asp-action="Details" asp-route-id="@challenge.Id">
+                            @if (!string.IsNullOrWhiteSpace(challenge.CoverImageUrl))
+                            {
+                                <img src="@challenge.CoverImageUrl" alt="@challenge.Title" class="challenge-cover" loading="lazy" />
+                            }
+                            else
+                            {
+                                <div class="challenge-cover-fallback">@CategoryLabel(challenge.Category)</div>
+                            }
+                        </a>
+
+                        <div class="challenge-card-body">
+                            <div class="challenge-card-top">
+                                <div>
+                                    <a class="challenge-card-title" asp-controller="Challenges" asp-action="Details" asp-route-id="@challenge.Id">@challenge.Title</a>
+                                    <p>@challenge.Description</p>
+                                </div>
+                                <div class="difficulty-pill @challenge.Difficulty.ToLowerInvariant()">@DifficultyLabel(challenge.Difficulty)</div>
+                            </div>
+
+                            <div class="challenge-tags">
+                                <span>@CategoryLabel(challenge.Category)</span>
+                                <span>@TypeLabel(challenge.ChallengeType)</span>
+                                <span>@VerificationLabel(challenge)</span>
+                                @if (!string.IsNullOrWhiteSpace(challenge.GameName))
+                                {
+                                    <span>@challenge.GameName</span>
+                                }
+                            </div>
+
+                            <div class="challenge-meta-grid">
+                                <div><span>Награда</span><strong>@challenge.RewardExperience XP</strong></div>
+                                <div><span>Участники</span><strong>@challenge.ParticipantsCount / @challenge.ParticipantLimit</strong></div>
+                                <div><span>Свободно</span><strong>@slotsLeft</strong></div>
+                                <div><span>Выполнено</span><strong>@challenge.CompletedCount</strong></div>
+                            </div>
+
+                            <div class="challenge-actions">
+                                <a class="challenge-btn secondary" asp-controller="Challenges" asp-action="Details" asp-route-id="@challenge.Id">Подробнее</a>
+
+                                @if (challenge.UserCanJoin)
+                                {
+                                    <form asp-controller="Challenges" asp-action="Join" method="post">
+                                        @Html.AntiForgeryToken()
+                                        <input type="hidden" name="id" value="@challenge.Id" />
+                                        <input type="hidden" name="returnUrl" value="@returnUrl" />
+                                        <button type="submit" class="challenge-btn primary">Участвовать</button>
+                                    </form>
+                                }
+                                else if (challenge.UserCompleted)
+                                {
+                                    <span class="challenge-state completed">Выполнено</span>
+                                }
+                                else if (challenge.UserParticipantStatus == ChallengeParticipantStatuses.Joined && !isManual)
+                                {
+                                    <form asp-controller="Challenges" asp-action="Check" method="post">
+                                        @Html.AntiForgeryToken()
+                                        <input type="hidden" name="id" value="@challenge.Id" />
+                                        <input type="hidden" name="returnUrl" value="@returnUrl" />
+                                        <button type="submit" class="challenge-btn primary">Проверить</button>
+                                    </form>
+                                }
+                                else if (challenge.UserParticipantStatus == ChallengeParticipantStatuses.Joined)
+                                {
+                                    <span class="challenge-state">Участвуешь</span>
+                                }
+                            </div>
+
+                            @if (challenge.UserHasPendingSubmission)
+                            {
+                                <div class="challenge-proof-rule">Доказательство ожидает проверки.</div>
+                            }
+                            else if (challenge.PendingSubmissions.Any())
+                            {
+                                <a class="challenge-proof-rule link-rule" asp-controller="Challenges" asp-action="Details" asp-route-id="@challenge.Id">Есть заявки на подтверждение</a>
+                            }
+                        </div>
+                    </article>
+                }
+            </div>
+        }
+    </section>
+</main>

@@ -6,23 +6,42 @@
 }
 
 
-<main class="layout">
+<main class="catalog-page">
+    <section class="catalog-toolbar">
+        <div class="catalog-toolbar-head">
+            <div>
+                <span>Каталог</span>
+                <h1>Игры</h1>
+            </div>
 
-    <aside class="sidebar">
-        <div class="sidebar-box">
-            <h2>Фильтры</h2>
+            @if (User?.Identity?.IsAuthenticated == true)
+            {
+                <form asp-controller="Games" asp-action="AddOwnedLibrary" method="post" class="library-request-form">
+                    @Html.AntiForgeryToken()
+                    <button type="submit" class="library-request-btn">Запросить игры из моей библиотеки Steam</button>
+                </form>
+            }
+        </div>
 
-            <input type="text" id="filterName" placeholder="Поиск по названию" />
-            <input type="number" id="filterAchievements" placeholder="Мин. количество достижений" min="0" />
+        <div class="catalog-filter-bar">
+            <label>
+                <span>Название</span>
+                <input type="search" id="filterName" placeholder="Поиск по названию" />
+            </label>
 
-            <div class="sidebar-actions">
-                <button id="applyFilters">Применить</button>
-                <button id="resetFilters" class="secondary-btn">Сбросить</button>
+            <label>
+                <span>Достижения</span>
+                <input type="number" id="filterAchievements" placeholder="Минимум" min="0" />
+            </label>
+
+            <div class="catalog-filter-actions">
+                <button id="applyFilters" type="button">Применить</button>
+                <button id="resetFilters" type="button" class="secondary-btn">Сбросить</button>
             </div>
         </div>
-    </aside>
+    </section>
 
-    <section class="catalog-wrapper">
+    <section class="catalog-wrapper" id="catalog-feedback">
 
         @if (TempData["SuccessMessage"] != null)
         {
@@ -41,10 +60,12 @@
         <section class="catalog">
             @foreach (var game in Model)
             {
+                var description = System.Net.WebUtility.HtmlDecode(game.Description ?? "");
+
                 <a asp-controller="Games"
                    asp-action="Details"
                    asp-route-id="@game.Id"
-                   class="card game-card-link">
+                   class="game-card-link">
 
                     <div class="card game-card"
                          data-name="@(game.Name ?? "")"
@@ -57,9 +78,9 @@
                         <div class="game-content">
                             <h3>@game.Name</h3>
                             <p class="game-description">
-                                @(string.IsNullOrWhiteSpace(game.Description)
+                                @(string.IsNullOrWhiteSpace(description)
                                                             ? "Описание пока отсутствует."
-                                                            : game.Description)
+                                                            : description)
                         </p>
                         <span class="achievements-count">
                             🏆 @(achievementCounts.TryGetValue(game.Id, out var count) ? count : 0) достижений

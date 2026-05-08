@@ -1,8 +1,9 @@
-using AspNet.Security.OpenId.Steam;
+﻿using AspNet.Security.OpenId.Steam;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using StackExchange.Redis;
+using WebApplication1.Infrastructure;
 using WebApplication1.infrastructure;
 using WebApplication1.Services;
 
@@ -59,10 +60,23 @@ public class Program
         builder.Services.AddScoped<SteamService>();
         builder.Services.AddScoped<SteamUserManager>();
         builder.Services.AddScoped<CacheService>();
+        builder.Services.AddScoped<AdminAccessService>();
+        builder.Services.AddScoped<QuestProgressService>();
+        builder.Services.AddScoped<NotificationService>();
+        builder.Services.AddScoped<AchievementSyncService>();
         builder.Services.AddSingleton<IConnectionMultiplexer>(
             ConnectionMultiplexer.Connect("localhost:6379,abortConnect=false")
         );
         var app = builder.Build();
+
+        using (var scope = app.Services.CreateScope())
+        {
+            var db = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+            await DatabaseSchemaGuard.EnsureAsync(db);
+            await db.Database.MigrateAsync();
+        }
+
+        app.UseStatusCodePagesWithReExecute("/error/{0}");
 
         app.UseStaticFiles();
 

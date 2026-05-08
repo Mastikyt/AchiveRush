@@ -1,4 +1,4 @@
-using Microsoft.AspNetCore.Identity;
+﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using WebApplication1.DTO;
@@ -13,18 +13,26 @@ namespace WebApplication1.Controllers
         private readonly SteamService _steamService;
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly CacheService _cacheService;
-        private const int SteamSyncConcurrency = 6;
+        private readonly QuestProgressService _questProgressService;
+        private readonly NotificationService _notificationService;
+        private readonly AchievementSyncService _achievementSyncService;
 
         public ProfileController(
             ApplicationDbContext db,
             SteamService steamService,
             UserManager<ApplicationUser> userManager,
-            CacheService cacheService)
+            CacheService cacheService,
+            QuestProgressService questProgressService,
+            NotificationService notificationService,
+            AchievementSyncService achievementSyncService)
         {
             _db = db;
             _steamService = steamService;
             _userManager = userManager;
             _cacheService = cacheService;
+            _questProgressService = questProgressService;
+            _notificationService = notificationService;
+            _achievementSyncService = achievementSyncService;
         }
 
         private static string Normalize(string? s)
@@ -35,6 +43,18 @@ namespace WebApplication1.Controllers
             return s.Trim().ToLowerInvariant();
         }
 
+        private static IQueryable<UserAchievement> ApplyRarityFilter(IQueryable<UserAchievement> query, string rarity)
+        {
+            return rarity switch
+            {
+                "legendary" => query.Where(x => x.Achievement.GlobalUnlockRate < 1),
+                "epic" => query.Where(x => x.Achievement.GlobalUnlockRate >= 1 && x.Achievement.GlobalUnlockRate < 5),
+                "rare" => query.Where(x => x.Achievement.GlobalUnlockRate >= 5 && x.Achievement.GlobalUnlockRate < 10),
+                "common" => query.Where(x => x.Achievement.GlobalUnlockRate >= 10),
+                _ => query
+            };
+        }
+
         private static IQueryable<AchievementCardViewModel> ToAchievementCards(IQueryable<UserAchievement> query)
         {
             return query.Select(x => new AchievementCardViewModel
@@ -43,8 +63,11 @@ namespace WebApplication1.Controllers
                 Title = x.Achievement.Title,
                 Description = x.Achievement.Description,
                 GameName = x.Achievement.Game.Name,
+                GameId = x.Achievement.GameId,
                 GameAvatarUrl = x.Achievement.Game.AvatarUrl,
-                IconUrl = x.IconUrl,
+                IconUrl = !string.IsNullOrWhiteSpace(x.Achievement.IconUrl)
+                    ? x.Achievement.IconUrl
+                    : x.IconUrl,
                 UnlockTime = x.UnlockTime,
                 GlobalUnlockRate = x.Achievement.GlobalUnlockRate
             });
@@ -60,20 +83,20 @@ namespace WebApplication1.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> UserProfile(string steamId, int page = 1, int pageSize = 24)
+        public async Task<IActionResult> UserProfile(string steamId, int page = 1, int pageSize = 24, string rarity = "all")
         {
             if (string.IsNullOrWhiteSpace(steamId))
-                return NotFound();
+                return View("~/Views/Shared/NotFound.cshtml", "Профиль не найден.");
 
             var user = await _db.Users.AsNoTracking().FirstOrDefaultAsync(u => u.SteamId == steamId);
             if (user == null)
-                return NotFound("Профиль пользователя не найден");
+                return View("~/Views/Shared/NotFound.cshtml", "Профиль пользователя не найден.");
 
             var identityUser = await _userManager.GetUserAsync(User);
             var isOwner = identityUser?.SteamId == user.SteamId;
 
             if (!user.IsProfilePublic && !isOwner)
-                return Forbid();
+                return View("~/Views/Shared/NotFound.cshtml", "Профиль не найден или закрыт настройками приватности.");
 
             var profileAvatarUrl = !string.IsNullOrWhiteSpace(user.AvatarID)
                 ? user.AvatarID
@@ -86,57 +109,77 @@ namespace WebApplication1.Controllers
                 .AsNoTracking()
                 .Where(x => x.UserId == user.Id && x.Completed);
 
-            var stats = await completedBaseQuery
-                .GroupBy(_ => 1)
+            var selectedRarity = Normalize(rarity);
+            if (selectedRarity is not ("legendary" or "epic" or "rare" or "common"))
+                selectedRarity = "all";
+
+            var filteredBaseQuery = ApplyRarityFilter(completedBaseQuery, selectedRarity);
+
+            var profileStats = await completedBaseQuery
+                .GroupBy(x => 1)
                 .Select(g => new
                 {
-                    TotalAchievements = g.Count(),
+                    TotalCount = g.Count(),
                     GamesCount = g.Select(x => x.Achievement.GameId).Distinct().Count(),
-                    LegendaryCount = g.Count(x => x.Achievement.GlobalUnlockRate > 0 && x.Achievement.GlobalUnlockRate < 1),
+                    LegendaryCount = g.Count(x => x.Achievement.GlobalUnlockRate < 1),
                     EpicCount = g.Count(x => x.Achievement.GlobalUnlockRate >= 1 && x.Achievement.GlobalUnlockRate < 5),
                     RareCount = g.Count(x => x.Achievement.GlobalUnlockRate >= 5 && x.Achievement.GlobalUnlockRate < 10),
-                    CommonCount = g.Count(x => x.Achievement.GlobalUnlockRate >= 10 || x.Achievement.GlobalUnlockRate <= 0)
+                    CommonCount = g.Count(x => x.Achievement.GlobalUnlockRate >= 10)
                 })
                 .FirstOrDefaultAsync();
 
-            var totalAchievements = stats?.TotalAchievements ?? 0;
+            var totalAchievements = profileStats?.TotalCount ?? 0;
+            var filteredAchievements = selectedRarity == "all"
+                ? totalAchievements
+                : await filteredBaseQuery.CountAsync();
 
-            var recentAchievements = await ToAchievementCards(completedBaseQuery
-                .OrderByDescending(x => x.UnlockTime)
-                .ThenByDescending(x => x.Id)
-                .Take(6))
-                .ToListAsync();
+            var achievementLevelInfo = AchievementLevelService.Calculate(
+                profileStats?.LegendaryCount ?? 0,
+                profileStats?.EpicCount ?? 0,
+                profileStats?.RareCount ?? 0,
+                profileStats?.CommonCount ?? 0);
+            var levelInfo = AchievementLevelService.Calculate(achievementLevelInfo.TotalXp + user.QuestExperience);
 
-            var rareAchievements = await ToAchievementCards(completedBaseQuery
-                .Where(x => x.Achievement.GlobalUnlockRate > 0 && x.Achievement.GlobalUnlockRate < 10)
-                .OrderBy(x => x.Achievement.GlobalUnlockRate)
-                .ThenBy(x => x.Achievement.Title)
-                .Take(6))
-                .ToListAsync();
-
-            var totalPages = Math.Max(1, (int)Math.Ceiling(totalAchievements / (double)safePageSize));
+            var totalPages = Math.Max(1, (int)Math.Ceiling(filteredAchievements / (double)safePageSize));
             var currentPage = Math.Min(safePage, totalPages);
 
-            var pagedAchievements = await ToAchievementCards(completedBaseQuery
-                .OrderBy(x => x.Achievement.GlobalUnlockRate <= 0 ? 9999 : x.Achievement.GlobalUnlockRate)
-                .ThenByDescending(x => x.UnlockTime)
-                .ThenBy(x => x.Achievement.Title)
+            var recentAchievements = await ToAchievementCards(completedBaseQuery
+                .OrderByDescending(x => x.UnlockTime ?? DateTime.MinValue)
+                .ThenByDescending(x => x.Id)
+                .Take(8))
+                .ToListAsync();
+
+            var pagedAchievements = await ToAchievementCards(filteredBaseQuery
+                .OrderByDescending(x => x.UnlockTime ?? DateTime.MinValue)
+                .ThenByDescending(x => x.Id)
                 .Skip((currentPage - 1) * safePageSize)
                 .Take(safePageSize))
                 .ToListAsync();
 
             ViewBag.RecentAchievements = recentAchievements;
-            ViewBag.RareAchievements = rareAchievements;
+            ViewBag.RareAchievements = currentPage == 1
+                ? pagedAchievements
+                    .Where(x => x.GlobalUnlockRate > 0 && x.GlobalUnlockRate < 10)
+                    .Take(6)
+                    .ToList()
+                : new List<AchievementCardViewModel>();
             ViewBag.PagedAchievements = pagedAchievements;
             ViewBag.CurrentPage = currentPage;
             ViewBag.TotalPages = totalPages;
             ViewBag.PageSize = safePageSize;
             ViewBag.TotalAchievements = totalAchievements;
-            ViewBag.GamesCount = stats?.GamesCount ?? 0;
-            ViewBag.LegendaryCount = stats?.LegendaryCount ?? 0;
-            ViewBag.EpicCount = stats?.EpicCount ?? 0;
-            ViewBag.RareCount = stats?.RareCount ?? 0;
-            ViewBag.CommonCount = stats?.CommonCount ?? 0;
+            ViewBag.FilteredAchievements = filteredAchievements;
+            ViewBag.CurrentRarityFilter = selectedRarity;
+            ViewBag.GamesCount = profileStats?.GamesCount ?? 0;
+            ViewBag.LegendaryCount = profileStats?.LegendaryCount ?? 0;
+            ViewBag.EpicCount = profileStats?.EpicCount ?? 0;
+            ViewBag.RareCount = profileStats?.RareCount ?? 0;
+            ViewBag.CommonCount = profileStats?.CommonCount ?? 0;
+            ViewBag.LevelInfo = levelInfo;
+            ViewBag.ProfileLevel = levelInfo.Level;
+            ViewBag.ProfileXp = levelInfo.TotalXp;
+            ViewBag.AchievementXp = achievementLevelInfo.TotalXp;
+            ViewBag.QuestXp = user.QuestExperience;
 
             var rank = await _db.Users.AsNoTracking().CountAsync(u => u.TotalAchievements > user.TotalAchievements);
             ViewBag.Rank = rank + 1;
@@ -178,7 +221,11 @@ namespace WebApplication1.Controllers
 
             try
             {
-                await SyncAchievementsForUserAsync(user.Id, true);
+                await _achievementSyncService.SyncAchievementsForUserAsync(user.Id, true);
+                await _questProgressService.EvaluateDailyQuestAsync(user.Id);
+                await _questProgressService.EvaluateAutomaticChallengesForUserAsync(user.Id);
+                await _notificationService.EvaluateProfileMilestonesAsync(user.Id);
+                await _db.SaveChangesAsync();
                 TempData["ProfileSyncSuccess"] = "Синхронизация завершена.";
             }
             catch (Exception ex)
@@ -189,138 +236,5 @@ namespace WebApplication1.Controllers
             return RedirectToAction(nameof(UserProfile), new { steamId = user.SteamId });
         }
 
-        private async Task SyncAchievementsForUserAsync(int userId, bool force = false)
-        {
-            var user = await _db.Users.FirstOrDefaultAsync(u => u.Id == userId);
-            if (user == null)
-                return;
-
-            if (!force && user.LastSync.HasValue && (DateTime.UtcNow - user.LastSync.Value).TotalMinutes < 10)
-                return;
-
-            var localGames = await _db.Games
-                .AsNoTracking()
-                .Where(g => g.SteamAppId > 0 && g.Achievements.Any())
-                .Select(g => new SyncGame
-                {
-                    SteamAppId = g.SteamAppId,
-                    Achievements = g.Achievements
-                        .Select(a => new SyncAchievement
-                        {
-                            Id = a.Id,
-                            ApiName = a.ApiName
-                        })
-                        .ToList()
-                })
-                .ToListAsync();
-
-            if (localGames.Count == 0)
-            {
-                user.TotalAchievements = 0;
-                user.LastSync = DateTime.UtcNow;
-                await _db.SaveChangesAsync();
-                return;
-            }
-
-            var ownedGames = await _steamService.GetOwnedGames(user.SteamId);
-            var ownedAppIds = ownedGames.Select(g => g.AppId).ToHashSet();
-            if (ownedAppIds.Count > 0)
-                localGames = localGames.Where(g => ownedAppIds.Contains(g.SteamAppId)).ToList();
-
-            var allAchievementIds = localGames
-                .SelectMany(g => g.Achievements)
-                .Select(a => a.Id)
-                .Distinct()
-                .ToList();
-
-            var existingUserAchievements = await _db.UserAchievements
-                .Where(x => x.UserId == userId && allAchievementIds.Contains(x.AchievementId))
-                .ToDictionaryAsync(x => x.AchievementId);
-
-            var now = DateTime.UtcNow;
-            using var semaphore = new SemaphoreSlim(SteamSyncConcurrency);
-
-            var syncResults = await Task.WhenAll(localGames.Select(async game =>
-            {
-                await semaphore.WaitAsync();
-                try
-                {
-                    return new SyncGameResult
-                    {
-                        Game = game,
-                        PlayerAchievements = await _steamService.GetPlayerAchievements(user.SteamId, game.SteamAppId)
-                    };
-                }
-                catch
-                {
-                    return null;
-                }
-                finally
-                {
-                    semaphore.Release();
-                }
-            }));
-
-            foreach (var result in syncResults)
-            {
-                if (result?.PlayerAchievements == null || result.PlayerAchievements.Count == 0)
-                    continue;
-
-                var completedMap = result.PlayerAchievements
-                    .Where(x => !string.IsNullOrWhiteSpace(x.ApiName))
-                    .GroupBy(x => Normalize(x.ApiName))
-                    .ToDictionary(g => g.Key, g => g.Any(x => x.Achieved));
-
-                foreach (var achievement in result.Game.Achievements)
-                {
-                    var normalizedApiName = Normalize(achievement.ApiName);
-                    var completed = completedMap.TryGetValue(normalizedApiName, out var done) && done;
-
-                    if (existingUserAchievements.TryGetValue(achievement.Id, out var existing))
-                    {
-                        existing.Completed = completed;
-
-                        if (completed && existing.UnlockTime == null)
-                            existing.UnlockTime = now;
-                    }
-                    else
-                    {
-                        _db.UserAchievements.Add(new UserAchievement
-                        {
-                            UserId = userId,
-                            AchievementId = achievement.Id,
-                            Completed = completed,
-                            UnlockTime = completed ? now : null
-                        });
-                    }
-                }
-            }
-
-            await _db.SaveChangesAsync();
-
-            user.TotalAchievements = await _db.UserAchievements
-                .CountAsync(x => x.UserId == userId && x.Completed);
-
-            user.LastSync = now;
-            await _db.SaveChangesAsync();
-        }
-
-        private sealed class SyncGame
-        {
-            public int SteamAppId { get; set; }
-            public List<SyncAchievement> Achievements { get; set; } = new();
-        }
-
-        private sealed class SyncAchievement
-        {
-            public int Id { get; set; }
-            public string ApiName { get; set; } = "";
-        }
-
-        private sealed class SyncGameResult
-        {
-            public SyncGame Game { get; set; } = null!;
-            public List<SteamPlayerAchievement> PlayerAchievements { get; set; } = new();
-        }
     }
 }

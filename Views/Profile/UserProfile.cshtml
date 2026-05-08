@@ -1,10 +1,11 @@
 @model WebApplication1.Models.User
+@using System.Globalization
 @{
     ViewData["Title"] = $"{Model.SteamName} - Профиль";
     var isOwner = ViewBag.IsOwner == true;
-    string avatarUrl;
+    string avatarUrl = ViewBag.ProfileAvatarUrl as string ?? "";
 
-    if (!string.IsNullOrWhiteSpace(Model.AvatarID))
+    if (string.IsNullOrWhiteSpace(avatarUrl) && !string.IsNullOrWhiteSpace(Model.AvatarID))
     {
         if (Model.AvatarID.StartsWith("http", StringComparison.OrdinalIgnoreCase))
         {
@@ -19,7 +20,7 @@
             avatarUrl = "/images/default_avatar.png";
         }
     }
-    else
+    else if (string.IsNullOrWhiteSpace(avatarUrl))
     {
         avatarUrl = "/images/default_avatar.png";
     }
@@ -30,6 +31,13 @@
     var currentPage = (int)(ViewBag.CurrentPage ?? 1);
     var totalPages = (int)(ViewBag.TotalPages ?? 1);
     var pageSize = (int)(ViewBag.PageSize ?? 24);
+    var currentRarityFilter = (string)(ViewBag.CurrentRarityFilter ?? "all");
+    var filteredAchievements = (int)(ViewBag.FilteredAchievements ?? ViewBag.TotalAchievements ?? 0);
+    var levelInfo = ViewBag.LevelInfo as WebApplication1.Models.AchievementLevelInfo;
+    var levelProgress = levelInfo?.ProgressPercent.ToString("0.##", CultureInfo.InvariantCulture) ?? "0";
+    var steamProfileUrl = string.IsNullOrWhiteSpace(Model.SteamId)
+        ? ""
+        : $"https://steamcommunity.com/profiles/{Uri.EscapeDataString(Model.SteamId)}";
     var pagerStart = Math.Max(1, currentPage - 2);
     var pagerEnd = Math.Min(totalPages, currentPage + 2);
 
@@ -63,9 +71,21 @@
                         }
                     </div>
 
-                    @if (isOwner)
+                    @if (isOwner || !string.IsNullOrWhiteSpace(steamProfileUrl))
                     {
                         <div class="profile-actions">
+                            @if (!string.IsNullOrWhiteSpace(steamProfileUrl))
+                            {
+                                <a class="profile-sync-btn profile-steam-link"
+                                   href="@steamProfileUrl"
+                                   target="_blank"
+                                   rel="noopener noreferrer">
+                                    Steam
+                                </a>
+                            }
+
+                            @if (isOwner)
+                            {
                             <form asp-action="TogglePrivacy" method="post">
                                 @Html.AntiForgeryToken()
                                 <button class="profile-sync-btn" type="submit">
@@ -77,6 +97,7 @@
                                 @Html.AntiForgeryToken()
                                 <button class="profile-sync-btn" type="submit">Синхронизировать ачивки</button>
                             </form>
+                            }
                         </div>
                     }
                 </div>
@@ -85,7 +106,23 @@
                     <div class="profile-stat"><div class="profile-stat-value">#@ViewBag.Rank</div><div class="profile-stat-label">Место</div></div>
                     <div class="profile-stat"><div class="profile-stat-value" id="profile-total-achievements">@ViewBag.TotalAchievements</div><div class="profile-stat-label">Ачивок</div></div>
                     <div class="profile-stat"><div class="profile-stat-value">@ViewBag.GamesCount</div><div class="profile-stat-label">Игр</div></div>
+                    <div class="profile-stat"><div class="profile-stat-value">LVL @ViewBag.ProfileLevel</div><div class="profile-stat-label">@ViewBag.ProfileXp XP</div></div>
                 </div>
+
+                @if (levelInfo != null)
+                {
+                    <div class="profile-level">
+                        <div class="profile-level-head">
+                            <span>Уровень @levelInfo.Level</span>
+                            <span>@levelInfo.CurrentLevelXp / @levelInfo.RequiredXp XP</span>
+                        </div>
+                        <div class="profile-level-bar" aria-label="Прогресс уровня">
+                            <div class="profile-level-fill" style="width:@levelProgress%"></div>
+                        </div>
+                        <div class="profile-level-next">До следующего уровня: @levelInfo.RemainingXp XP</div>
+                        <div class="profile-level-next">Ачивки: @ViewBag.AchievementXp XP · квесты и челленджи: @ViewBag.QuestXp XP</div>
+                    </div>
+                }
 
                 <div class="rarity-summary">
                     <div class="rarity-chip legendary">Легендарные: @ViewBag.LegendaryCount</div>
@@ -96,21 +133,6 @@
             </div>
         </div>
     </div>
-
-    <h2 class="profile-section-title">Редкие достижения</h2>
-    @if (rareAchievements.Any())
-    {
-        <div class="achievements-grid">
-            @foreach (var ua in rareAchievements)
-            {
-                <partial name="_AchievementCard" model="ua" />
-            }
-        </div>
-    }
-    else
-    {
-        <div class="no-achievements">Пока нет редких достижений.</div>
-    }
 
     <h2 class="profile-section-title">Последние достижения</h2>
     @if (recentAchievements.Any())
@@ -127,7 +149,20 @@
         <div class="no-achievements">Пока нет полученных достижений.</div>
     }
 
-    <h2 class="profile-section-title">Все достижения</h2>
+    <div class="profile-section-head">
+        <div>
+            <h2 class="profile-section-title">Все достижения</h2>
+            <div class="profile-section-subtitle">Показано: @filteredAchievements</div>
+        </div>
+
+        <div class="profile-rarity-filter">
+            <a asp-action="UserProfile" asp-route-steamId="@Model.SteamId" asp-route-rarity="all" asp-route-page="1" asp-route-pageSize="@pageSize" class="rarity-filter-btn @(currentRarityFilter == "all" ? "active" : "")">Все</a>
+            <a asp-action="UserProfile" asp-route-steamId="@Model.SteamId" asp-route-rarity="legendary" asp-route-page="1" asp-route-pageSize="@pageSize" class="rarity-filter-btn legendary @(currentRarityFilter == "legendary" ? "active" : "")">Легендарные</a>
+            <a asp-action="UserProfile" asp-route-steamId="@Model.SteamId" asp-route-rarity="epic" asp-route-page="1" asp-route-pageSize="@pageSize" class="rarity-filter-btn epic @(currentRarityFilter == "epic" ? "active" : "")">Эпические</a>
+            <a asp-action="UserProfile" asp-route-steamId="@Model.SteamId" asp-route-rarity="rare" asp-route-page="1" asp-route-pageSize="@pageSize" class="rarity-filter-btn rare @(currentRarityFilter == "rare" ? "active" : "")">Редкие</a>
+            <a asp-action="UserProfile" asp-route-steamId="@Model.SteamId" asp-route-rarity="common" asp-route-page="1" asp-route-pageSize="@pageSize" class="rarity-filter-btn common @(currentRarityFilter == "common" ? "active" : "")">Обычные</a>
+        </div>
+    </div>
     @if (pagedAchievements.Any())
     {
         <div class="achievements-grid">
@@ -142,12 +177,12 @@
             <div class="pagination">
                 @if (currentPage > 1)
                 {
-                    <a asp-action="UserProfile" asp-route-steamId="@Model.SteamId" asp-route-page="@(currentPage - 1)" asp-route-pageSize="@pageSize" class="page-btn" aria-label="Предыдущая страница">&laquo;</a>
+                    <a asp-action="UserProfile" asp-route-steamId="@Model.SteamId" asp-route-page="@(currentPage - 1)" asp-route-pageSize="@pageSize" asp-route-rarity="@currentRarityFilter" class="page-btn" aria-label="Предыдущая страница">&laquo;</a>
                 }
 
                 @if (pagerStart > 1)
                 {
-                    <a asp-action="UserProfile" asp-route-steamId="@Model.SteamId" asp-route-page="1" asp-route-pageSize="@pageSize" class="page-btn">1</a>
+                    <a asp-action="UserProfile" asp-route-steamId="@Model.SteamId" asp-route-page="1" asp-route-pageSize="@pageSize" asp-route-rarity="@currentRarityFilter" class="page-btn">1</a>
                     @if (pagerStart > 2)
                     {
                         <span class="page-ellipsis">...</span>
@@ -156,7 +191,7 @@
 
                 @for (int i = pagerStart; i <= pagerEnd; i++)
                 {
-                    <a asp-action="UserProfile" asp-route-steamId="@Model.SteamId" asp-route-page="@i" asp-route-pageSize="@pageSize" class="page-btn @(i == currentPage ? "active" : "")">@i</a>
+                    <a asp-action="UserProfile" asp-route-steamId="@Model.SteamId" asp-route-page="@i" asp-route-pageSize="@pageSize" asp-route-rarity="@currentRarityFilter" class="page-btn @(i == currentPage ? "active" : "")">@i</a>
                 }
 
                 @if (pagerEnd < totalPages)
@@ -165,12 +200,12 @@
                     {
                         <span class="page-ellipsis">...</span>
                     }
-                    <a asp-action="UserProfile" asp-route-steamId="@Model.SteamId" asp-route-page="@totalPages" asp-route-pageSize="@pageSize" class="page-btn">@totalPages</a>
+                    <a asp-action="UserProfile" asp-route-steamId="@Model.SteamId" asp-route-page="@totalPages" asp-route-pageSize="@pageSize" asp-route-rarity="@currentRarityFilter" class="page-btn">@totalPages</a>
                 }
 
                 @if (currentPage < totalPages)
                 {
-                    <a asp-action="UserProfile" asp-route-steamId="@Model.SteamId" asp-route-page="@(currentPage + 1)" asp-route-pageSize="@pageSize" class="page-btn" aria-label="Следующая страница">&raquo;</a>
+                    <a asp-action="UserProfile" asp-route-steamId="@Model.SteamId" asp-route-page="@(currentPage + 1)" asp-route-pageSize="@pageSize" asp-route-rarity="@currentRarityFilter" class="page-btn" aria-label="Следующая страница">&raquo;</a>
                 }
             </div>
         }

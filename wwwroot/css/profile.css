@@ -60,7 +60,7 @@
 
 .profile-stats {
     display: grid;
-    grid-template-columns: repeat(3, minmax(160px, 1fr));
+    grid-template-columns: repeat(4, minmax(130px, 1fr));
     gap: 18px;
 }
 
@@ -85,6 +85,9 @@
 }
 
 .profile-sync-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
     border: 1px solid rgba(212, 175, 55, 0.4);
     border-radius: 14px;
     padding: 14px 18px;
@@ -93,6 +96,10 @@
     background: linear-gradient(135deg, #2a241a, #1e1912);
     cursor: pointer;
     transition: all 0.3s ease;
+}
+
+.profile-steam-link {
+    text-decoration: none;
 }
 
 .profile-sync-btn:hover {
@@ -115,6 +122,43 @@
     background: rgba(176, 58, 58, 0.14);
     border-color: rgba(235, 113, 113, 0.28);
     color: #ffe0e0;
+}
+
+.profile-level {
+    border: 1px solid rgba(212, 175, 55, 0.18);
+    border-radius: 18px;
+    padding: 16px;
+    background: rgba(212, 175, 55, 0.05);
+}
+
+.profile-level-head {
+    display: flex;
+    justify-content: space-between;
+    gap: 14px;
+    color: #fef3d6;
+    font-weight: 800;
+    margin-bottom: 10px;
+}
+
+.profile-level-bar {
+    height: 12px;
+    border-radius: 999px;
+    overflow: hidden;
+    background: rgba(15, 13, 10, 0.72);
+    border: 1px solid rgba(212, 175, 55, 0.16);
+}
+
+.profile-level-fill {
+    height: 100%;
+    border-radius: inherit;
+    background: linear-gradient(90deg, #d4af37, #f5d77b);
+    box-shadow: 0 0 16px rgba(212, 175, 55, 0.32);
+}
+
+.profile-level-next {
+    margin-top: 8px;
+    color: #dcbc6a;
+    font-size: 13px;
 }
 
 .rarity-summary {
@@ -144,6 +188,60 @@
     font-size: 24px;
     font-weight: 700;
 }
+
+.profile-section-head {
+    max-width: 1180px;
+    margin: 30px auto 12px;
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 18px;
+    flex-wrap: wrap;
+}
+
+.profile-section-head .profile-section-title {
+    margin: 0;
+}
+
+.profile-section-subtitle {
+    margin-top: 6px;
+    color: #dcbc6a;
+    font-size: 14px;
+}
+
+.profile-rarity-filter {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+}
+
+.rarity-filter-btn {
+    display: inline-flex;
+    align-items: center;
+    min-height: 38px;
+    padding: 8px 12px;
+    border-radius: 999px;
+    border: 1px solid rgba(212, 175, 55, 0.2);
+    background: rgba(212, 175, 55, 0.06);
+    color: #fef3d6;
+    font-weight: 800;
+    font-size: 13px;
+    text-decoration: none;
+    transition: 0.2s ease;
+}
+
+.rarity-filter-btn:hover,
+.rarity-filter-btn.active {
+    transform: translateY(-1px);
+    border-color: #d4af37;
+    background: rgba(212, 175, 55, 0.14);
+}
+
+.rarity-filter-btn.legendary.active { color: #ffd700; border-color: #ffd700; }
+.rarity-filter-btn.epic.active { color: #c084fc; border-color: #a855f7; }
+.rarity-filter-btn.rare.active { color: #7dd3fc; border-color: #38bdf8; }
+.rarity-filter-btn.common.active { color: #e5e5e5; border-color: rgba(255,255,255,0.24); }
 
 .achievements-grid {
     max-width: 1180px;
@@ -291,6 +389,10 @@
     }
 
     .profile-actions {
+        justify-content: flex-start;
+    }
+
+    .profile-rarity-filter {
         justify-content: flex-start;
     }
 }

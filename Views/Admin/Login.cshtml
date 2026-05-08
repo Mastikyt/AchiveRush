@@ -8,7 +8,7 @@
 
         <h1>Секретный вход</h1>
         <p class="admin-login-subtitle">
-            Только для администратора.
+            Только для администраторов из списка и с паролем.
         </p>
 
         @if (ViewBag.Error != null)
@@ -18,14 +18,32 @@
             </div>
         }
 
-        <form method="post" asp-controller="Admin" asp-action="Login" class="admin-login-form">
-            @Html.AntiForgeryToken()
+        @if (ViewBag.IsSteamSignedIn != true)
+        {
+            <a class="admin-steam-link"
+               asp-controller="Account"
+               asp-action="Login"
+               asp-route-returnUrl="/secret-admin-login">
+                Войти через Steam
+            </a>
+        }
+        else if (ViewBag.IsAllowedAdminUser != true)
+        {
+            <div class="admin-alert admin-alert-error">
+                Этот Steam-аккаунт не являестя администратором.
+            </div>
+        }
+        else
+        {
+            <form method="post" asp-controller="Admin" asp-action="Login" class="admin-login-form">
+                @Html.AntiForgeryToken()
 
-            <label for="password">Пароль</label>
-            <input id="password" name="password" type="password" placeholder="Введите пароль" required />
+                <label for="password">Пароль</label>
+                <input id="password" name="password" type="password" placeholder="Введите пароль" required />
 
-            <button type="submit">Войти</button>
-        </form>
+                <button type="submit">Войти</button>
+            </form>
+        }
     </div>
 </div>
 
@@ -106,7 +124,8 @@
                 box-shadow: 0 0 0 4px rgba(212,175,55,0.08);
             }
 
-        .admin-login-form button {
+        .admin-login-form button,
+        .admin-steam-link {
             margin-top: 8px;
             border: 1px solid rgba(212,175,55,0.35);
             border-radius: 14px;
@@ -120,7 +139,14 @@
             box-shadow: 0 12px 30px rgba(0,0,0,0.2);
         }
 
-            .admin-login-form button:hover {
+        .admin-steam-link {
+            display: block;
+            text-align: center;
+            text-decoration: none;
+        }
+
+            .admin-login-form button:hover,
+            .admin-steam-link:hover {
                 transform: translateY(-1px);
                 border-color: #d4af37;
                 background: linear-gradient(135deg, #4a3b20, #2c2216);
