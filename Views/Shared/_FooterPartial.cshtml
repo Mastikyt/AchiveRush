@@ -1,4 +1,4 @@
-﻿@inject IConfiguration config
+@inject IConfiguration config
 @using WebApplication1.infrastructure
 @{
     AppConfig? appConfig = config.GetSection("Project").Get<AppConfig>();
@@ -21,15 +21,22 @@
             </a>
         </div>
 
+        <div class="footer-theme">
+            <button type="button" class="theme-switcher" data-theme-toggle aria-label="Сменить тему">
+                <span class="theme-switcher-track" aria-hidden="true">
+                    <span class="theme-switcher-icon theme-switcher-icon-sun">☀</span>
+                    <span class="theme-switcher-icon theme-switcher-icon-moon">☾</span>
+                    <span class="theme-switcher-thumb" data-theme-toggle-icon>☾</span>
+                </span>
+            </button>
+        </div>
+
     </div>
 
     <div class="footer-bottom">
-        <a asp-controller="Admin"
-           asp-action="Login"
-           class="footer-secret-link"
-           aria-label="Admin login">
-            ©
-        </a>
-        2026 AchiveRush. Все права защищены.
+        © 2026 AchiveRush. Все права защищены.
     </div>
 </footer>
+
+
+

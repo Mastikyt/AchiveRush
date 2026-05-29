@@ -5,6 +5,14 @@
     min-height: 60vh;
 }
 
+.profile-page a,
+.profile-page a:visited,
+.profile-page a:hover,
+.profile-page a:active {
+    color: inherit;
+    text-decoration: none;
+}
+
 .profile-card {
     background: linear-gradient(145deg, #1c1812, #16130e);
     border: 1px solid rgba(212, 175, 55, 0.3);
@@ -60,7 +68,7 @@
 
 .profile-stats {
     display: grid;
-    grid-template-columns: repeat(3, minmax(160px, 1fr));
+    grid-template-columns: repeat(4, minmax(130px, 1fr));
     gap: 18px;
 }
 
@@ -85,6 +93,9 @@
 }
 
 .profile-sync-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
     border: 1px solid rgba(212, 175, 55, 0.4);
     border-radius: 14px;
     padding: 14px 18px;
@@ -93,6 +104,11 @@
     background: linear-gradient(135deg, #2a241a, #1e1912);
     cursor: pointer;
     transition: all 0.3s ease;
+    text-decoration: none;
+}
+
+.profile-steam-link {
+    text-decoration: none;
 }
 
 .profile-sync-btn:hover {
@@ -117,6 +133,43 @@
     color: #ffe0e0;
 }
 
+.profile-level {
+    border: 1px solid rgba(212, 175, 55, 0.18);
+    border-radius: 18px;
+    padding: 16px;
+    background: rgba(212, 175, 55, 0.05);
+}
+
+.profile-level-head {
+    display: flex;
+    justify-content: space-between;
+    gap: 14px;
+    color: #fef3d6;
+    font-weight: 800;
+    margin-bottom: 10px;
+}
+
+.profile-level-bar {
+    height: 12px;
+    border-radius: 999px;
+    overflow: hidden;
+    background: rgba(15, 13, 10, 0.72);
+    border: 1px solid rgba(212, 175, 55, 0.16);
+}
+
+.profile-level-fill {
+    height: 100%;
+    border-radius: inherit;
+    background: linear-gradient(90deg, #d4af37, #f5d77b);
+    box-shadow: 0 0 16px rgba(212, 175, 55, 0.32);
+}
+
+.profile-level-next {
+    margin-top: 8px;
+    color: #dcbc6a;
+    font-size: 13px;
+}
+
 .rarity-summary {
     display: flex;
     flex-wrap: wrap;
@@ -137,6 +190,240 @@
 .rarity-chip.rare { border-color: #7dd3fc; color: #7dd3fc; }
 .rarity-chip.common { border-color: rgba(255,255,255,0.16); color: #e5e5e5; }
 
+.achievement-timeline-panel {
+    max-width: 1180px;
+    margin: 24px auto 0;
+    padding: 24px;
+    border-radius: 24px;
+    border: 1px solid rgba(212, 175, 55, 0.28);
+    background: linear-gradient(145deg, #1c1812, #15120e);
+    box-shadow: 0 18px 42px rgba(0, 0, 0, 0.3);
+    opacity: 0;
+    transform: translateY(18px);
+    animation: timeline-panel-in 0.62s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+}
+
+.achievement-timeline-panel.is-visible {
+    animation: timeline-panel-in 0.62s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+}
+
+.achievement-timeline-head {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 18px;
+    margin-bottom: 18px;
+}
+
+.achievement-timeline-head h2 {
+    margin: 0 0 6px;
+    color: #fef3d6;
+    font-size: 24px;
+    line-height: 1.2;
+}
+
+.achievement-timeline-head p {
+    margin: 0;
+    color: #dcbc6a;
+    line-height: 1.45;
+}
+
+.achievement-timeline-tabs {
+    display: inline-flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    justify-content: flex-end;
+}
+
+.achievement-timeline-tab {
+    min-height: 38px;
+    border: 1px solid rgba(212, 175, 55, 0.22);
+    border-radius: 999px;
+    padding: 8px 14px;
+    background: rgba(212, 175, 55, 0.06);
+    color: #fef3d6;
+    font-weight: 800;
+    cursor: pointer;
+    transition: 0.2s ease;
+}
+
+.achievement-timeline-tab:hover,
+.achievement-timeline-tab.active {
+    transform: translateY(-1px);
+    border-color: #d4af37;
+    background: rgba(212, 175, 55, 0.14);
+}
+
+.achievement-timeline-chart {
+    display: none;
+    overflow-x: auto;
+}
+
+.achievement-timeline-chart.active {
+    display: block;
+}
+
+.achievement-timeline-meta {
+    display: flex;
+    justify-content: space-between;
+    gap: 14px;
+    align-items: center;
+    margin-bottom: 14px;
+    color: #dcbc6a;
+    font-size: 14px;
+    font-weight: 800;
+}
+
+.achievement-timeline-meta strong {
+    color: #d4af37;
+    font-size: 28px;
+    line-height: 1;
+}
+
+.achievement-graph-scroll {
+    overflow-x: auto;
+    padding-bottom: 4px;
+    scrollbar-color: rgba(212, 175, 55, 0.5) rgba(255, 255, 255, 0.05);
+    scrollbar-width: thin;
+}
+
+.achievement-graph {
+    display: block;
+    width: 100%;
+    min-width: 720px;
+    height: auto;
+}
+
+.achievement-graph-grid {
+    stroke: rgba(212, 175, 55, 0.14);
+    stroke-width: 1;
+}
+
+.achievement-graph-axis,
+.achievement-graph-label {
+    fill: #e6c87a;
+    font-size: 13px;
+    font-weight: 800;
+}
+
+.achievement-graph-label {
+    text-anchor: middle;
+}
+
+.achievement-graph-label.compact-hidden {
+    display: none;
+}
+
+.achievement-graph-area {
+    fill: url(#achievement-area-gradient-decade);
+    opacity: 0;
+    animation: graph-area-in 0.7s ease 0.18s forwards;
+}
+
+.achievement-timeline-chart[data-timeline-chart="year"] .achievement-graph-area {
+    fill: url(#achievement-area-gradient-year);
+}
+
+.achievement-timeline-chart[data-timeline-chart="month"] .achievement-graph-area {
+    fill: url(#achievement-area-gradient-month);
+}
+
+.achievement-graph-line {
+    fill: none;
+    stroke: url(#achievement-line-gradient-decade);
+    stroke-width: 5;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    filter: drop-shadow(0 0 8px rgba(212, 175, 55, 0.28));
+    stroke-dasharray: 1;
+    stroke-dashoffset: 1;
+    animation: graph-line-draw 1s cubic-bezier(0.2, 0.8, 0.2, 1) 0.08s forwards;
+}
+
+.achievement-timeline-chart[data-timeline-chart="year"] .achievement-graph-line {
+    stroke: url(#achievement-line-gradient-year);
+}
+
+.achievement-timeline-chart[data-timeline-chart="month"] .achievement-graph-line {
+    stroke: url(#achievement-line-gradient-month);
+}
+
+.achievement-graph-point {
+    outline: none;
+}
+
+.achievement-graph-point circle {
+    fill: #12100c;
+    stroke: #f5d77b;
+    stroke-width: 4;
+    opacity: 0;
+    transform-box: fill-box;
+    transform-origin: center;
+    transform: scale(0.25);
+    animation: graph-point-in 0.38s ease var(--point-delay, 220ms) forwards;
+}
+
+.achievement-graph-point:focus circle,
+.achievement-graph-point:hover circle {
+    fill: #f5d77b;
+    stroke: #34d399;
+}
+
+.achievement-timeline-chart.is-replaying .achievement-graph-area,
+.achievement-timeline-chart.is-replaying .achievement-graph-line,
+.achievement-timeline-chart.is-replaying .achievement-graph-point circle {
+    animation-name: none;
+}
+
+.achievement-timeline-chart.active.is-replaying .achievement-graph-area {
+    animation: graph-area-in 0.7s ease 0.18s forwards;
+}
+
+.achievement-timeline-chart.active.is-replaying .achievement-graph-line {
+    animation: graph-line-draw 1s cubic-bezier(0.2, 0.8, 0.2, 1) 0.08s forwards;
+}
+
+.achievement-timeline-chart.active.is-replaying .achievement-graph-point circle {
+    animation: graph-point-in 0.38s ease var(--point-delay, 220ms) forwards;
+}
+
+@keyframes timeline-panel-in {
+    from {
+        opacity: 0;
+        transform: translateY(18px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes graph-line-draw {
+    to {
+        stroke-dashoffset: 0;
+    }
+}
+
+@keyframes graph-area-in {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes graph-point-in {
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
 .profile-section-title {
     margin: 30px auto 12px;
     max-width: 1180px;
@@ -144,6 +431,60 @@
     font-size: 24px;
     font-weight: 700;
 }
+
+.profile-section-head {
+    max-width: 1180px;
+    margin: 30px auto 12px;
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 18px;
+    flex-wrap: wrap;
+}
+
+.profile-section-head .profile-section-title {
+    margin: 0;
+}
+
+.profile-section-subtitle {
+    margin-top: 6px;
+    color: #dcbc6a;
+    font-size: 14px;
+}
+
+.profile-rarity-filter {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+}
+
+.rarity-filter-btn {
+    display: inline-flex;
+    align-items: center;
+    min-height: 38px;
+    padding: 8px 12px;
+    border-radius: 999px;
+    border: 1px solid rgba(212, 175, 55, 0.2);
+    background: rgba(212, 175, 55, 0.06);
+    color: #fef3d6;
+    font-weight: 800;
+    font-size: 13px;
+    text-decoration: none;
+    transition: 0.2s ease;
+}
+
+.rarity-filter-btn:hover,
+.rarity-filter-btn.active {
+    transform: translateY(-1px);
+    border-color: #d4af37;
+    background: rgba(212, 175, 55, 0.14);
+}
+
+.rarity-filter-btn.legendary.active { color: #ffd700; border-color: #ffd700; }
+.rarity-filter-btn.epic.active { color: #c084fc; border-color: #a855f7; }
+.rarity-filter-btn.rare.active { color: #7dd3fc; border-color: #38bdf8; }
+.rarity-filter-btn.common.active { color: #e5e5e5; border-color: rgba(255,255,255,0.24); }
 
 .achievements-grid {
     max-width: 1180px;
@@ -163,6 +504,15 @@
     border: 1px solid rgba(212, 175, 55, 0.2);
     transition: 0.25s;
     position: relative;
+    color: #fef3d6;
+    text-decoration: none;
+}
+
+.achievement-card:visited,
+.achievement-card:hover,
+.achievement-card:active {
+    color: #fef3d6;
+    text-decoration: none;
 }
 
 .achievement-card:hover {
@@ -188,12 +538,14 @@
 .achievement-name {
     color: #fef3d6;
     font-weight: 700;
+    text-decoration: none;
 }
 
 .achievement-game {
     color: #d4af37;
     font-size: 13px;
     opacity: 0.85;
+    text-decoration: none;
 }
 
 .achievement-card.legendary {
@@ -293,4 +645,60 @@
     .profile-actions {
         justify-content: flex-start;
     }
+
+    .profile-rarity-filter {
+        justify-content: flex-start;
+    }
+
+    .achievement-timeline-head {
+        flex-direction: column;
+    }
+
+    .achievement-timeline-tabs {
+        justify-content: flex-start;
+    }
+}
+
+@media (max-width: 640px) {
+    .achievement-timeline-panel {
+        padding: 16px;
+        border-radius: 20px;
+    }
+
+    .achievement-chart-bars {
+        --chart-height: 150px;
+        grid-template-columns: repeat(var(--bar-count), minmax(30px, 1fr));
+        min-width: calc(var(--bar-count) * 38px);
+    }
+
+    .achievement-timeline-head h2 {
+        font-size: 21px;
+    }
+}
+
+.profile-achievements-panel {
+    position: relative;
+    min-height: 180px;
+}
+
+.profile-achievements-panel.is-loading {
+    pointer-events: none;
+}
+
+.profile-achievements-panel.is-loading::after {
+    content: "Загружаем достижения...";
+    position: absolute;
+    inset: 76px 0 auto 0;
+    max-width: 1180px;
+    margin: 0 auto;
+    padding: 16px 20px;
+    border-radius: 16px;
+    text-align: center;
+    color: #fef3d6;
+    font-weight: 800;
+    background: rgba(21, 18, 14, 0.86);
+    border: 1px solid rgba(212, 175, 55, 0.28);
+    box-shadow: 0 16px 34px rgba(0, 0, 0, 0.28);
+    backdrop-filter: blur(8px);
+    z-index: 4;
 }

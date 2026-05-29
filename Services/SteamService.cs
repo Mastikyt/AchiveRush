@@ -1,4 +1,5 @@
-using System.Net.Http.Json;
+﻿using System.Net.Http.Json;
+using System.Net;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.Globalization;
@@ -10,7 +11,8 @@ public class SteamService
     private readonly IConfiguration _config;
     private readonly HttpClient _client;
     private const string SteamLanguage = "russian";
-    private const string SteamCountry = "ru";
+    private const string SteamCountry = "kz";
+    private static readonly string[] SteamStoreCountries = { SteamCountry, "gb" };
 
     private static string Normalize(string? s)
     {
@@ -20,11 +22,70 @@ public class SteamService
         return s.Trim().ToLowerInvariant();
     }
 
+    public static string CleanText(string? value)
+    {
+        if (string.IsNullOrWhiteSpace(value))
+            return "";
+
+        return WebUtility.HtmlDecode(value).Trim();
+    }
+
+    private static string? GetStringProperty(JsonElement element, params string[] names)
+    {
+        foreach (var name in names)
+        {
+            if (!element.TryGetProperty(name, out var value))
+                continue;
+
+            if (value.ValueKind == JsonValueKind.String)
+                return value.GetString();
+
+            if (value.ValueKind is JsonValueKind.Number or JsonValueKind.True or JsonValueKind.False)
+                return value.ToString();
+        }
+
+        return null;
+    }
+
+    private static bool ReadSteamBoolean(JsonElement element)
+    {
+        if (element.ValueKind == JsonValueKind.True)
+            return true;
+
+        if (element.ValueKind == JsonValueKind.False)
+            return false;
+
+        if (element.ValueKind == JsonValueKind.Number && element.TryGetInt32(out var number))
+            return number == 1;
+
+        if (element.ValueKind == JsonValueKind.String)
+        {
+            var value = element.GetString()?.Trim();
+            return value == "1" || string.Equals(value, "true", StringComparison.OrdinalIgnoreCase);
+        }
+
+        return false;
+    }
+
+    private static long ReadSteamUnixTime(JsonElement element)
+    {
+        if (element.ValueKind == JsonValueKind.Number && element.TryGetInt64(out var number))
+            return number;
+
+        if (element.ValueKind == JsonValueKind.String &&
+            long.TryParse(element.GetString(), NumberStyles.Integer, CultureInfo.InvariantCulture, out var value))
+        {
+            return value;
+        }
+
+        return 0;
+    }
+
     public SteamService(IConfiguration config, IHttpClientFactory factory)
     {
         _config = config;
         _client = factory.CreateClient();
-        _client.Timeout = TimeSpan.FromSeconds(20);
+        _client.Timeout = TimeSpan.FromSeconds(8);
         _client.DefaultRequestHeaders.Add("User-Agent", "Mozilla/5.0");
     }
 
@@ -45,23 +106,45 @@ public class SteamService
 
     public async Task<SteamGameDto?> GetGameDataAsync(int appId)
     {
+        foreach (var country in SteamStoreCountries)
+        {
+            var gameData = await GetGameDataAsync(appId, country);
+            if (gameData != null)
+                return gameData;
+        }
+
+        return null;
+    }
+
+    private async Task<SteamGameDto?> GetGameDataAsync(int appId, string country)
+    {
         try
         {
-            var url = $"https://store.steampowered.com/api/appdetails?appids={appId}&l={SteamLanguage}&cc={SteamCountry}";
-            var response = await _client.GetStringAsync(url);
+            var url = $"https://store.steampowered.com/api/appdetails?appids={appId}&l={SteamLanguage}&cc={country}";
+            using var httpResponse = await _client.GetAsync(url);
+            if (!httpResponse.IsSuccessStatusCode)
+                return null;
+
+            var response = await httpResponse.Content.ReadAsStringAsync();
             using var json = JsonDocument.Parse(response);
 
             if (!json.RootElement.TryGetProperty(appId.ToString(), out var appElement))
                 return null;
+
+            if (appElement.TryGetProperty("success", out var success) &&
+                success.ValueKind == JsonValueKind.False)
+            {
+                return null;
+            }
 
             if (!appElement.TryGetProperty("data", out var data))
                 return null;
 
             return new SteamGameDto
             {
-                Name = data.TryGetProperty("name", out var name) ? name.GetString() ?? "" : "",
+                Name = CleanText(data.TryGetProperty("name", out var name) ? name.GetString() : null),
                 HeaderImage = data.TryGetProperty("header_image", out var image) ? image.GetString() ?? "" : "",
-                ShortDescription = data.TryGetProperty("short_description", out var desc) ? desc.GetString() ?? "" : ""
+                ShortDescription = CleanText(data.TryGetProperty("short_description", out var desc) ? desc.GetString() : null)
             };
         }
         catch
@@ -72,10 +155,22 @@ public class SteamService
 
     public async Task<List<SteamAchievementDto>> GetAchievementsAsync(int appId)
     {
+        foreach (var country in SteamStoreCountries)
+        {
+            var achievements = await GetAchievementsAsync(appId, country);
+            if (achievements.Count > 0)
+                return achievements;
+        }
+
+        return new List<SteamAchievementDto>();
+    }
+
+    private async Task<List<SteamAchievementDto>> GetAchievementsAsync(int appId, string country)
+    {
         try
         {
             var key = _config["Steam:ApiKey"];
-            var url = $"https://api.steampowered.com/ISteamUserStats/GetSchemaForGame/v2/?key={key}&appid={appId}&l={SteamLanguage}";
+            var url = $"https://api.steampowered.com/ISteamUserStats/GetSchemaForGame/v2/?key={key}&appid={appId}&l={SteamLanguage}&language={SteamLanguage}&cc={country}";
 
             using var httpResponse = await _client.GetAsync(url);
             if (!httpResponse.IsSuccessStatusCode)
@@ -92,8 +187,8 @@ public class SteamService
                 .Select(a => new SteamAchievementDto
                 {
                     Name = a.name ?? "",
-                    DisplayName = a.displayName ?? a.name ?? "",
-                    Description = a.description ?? "",
+                    DisplayName = CleanText(a.displayName ?? a.name),
+                    Description = CleanText(a.description),
                     Icon = a.icon
                 })
                 .ToList();
@@ -106,10 +201,22 @@ public class SteamService
 
     public async Task<List<SteamPlayerAchievement>> GetPlayerAchievements(string steamId, int appId)
     {
+        foreach (var country in SteamStoreCountries)
+        {
+            var achievements = await GetPlayerAchievements(steamId, appId, country);
+            if (achievements.Count > 0)
+                return achievements;
+        }
+
+        return new List<SteamPlayerAchievement>();
+    }
+
+    private async Task<List<SteamPlayerAchievement>> GetPlayerAchievements(string steamId, int appId, string country)
+    {
         try
         {
             var key = _config["Steam:ApiKey"];
-            var url = $"https://api.steampowered.com/ISteamUserStats/GetPlayerAchievements/v1/?key={key}&steamid={steamId}&appid={appId}&l={SteamLanguage}";
+            var url = $"https://api.steampowered.com/ISteamUserStats/GetPlayerAchievements/v1/?key={key}&steamid={steamId}&appid={appId}&l={SteamLanguage}&language={SteamLanguage}&cc={country}";
 
             using var httpResponse = await _client.GetAsync(url);
             if (!httpResponse.IsSuccessStatusCode)
@@ -123,19 +230,17 @@ public class SteamService
             if (!json.RootElement.TryGetProperty("playerstats", out var playerStats))
                 return list;
 
-            if (!playerStats.TryGetProperty("success", out var successElement))
-                return list;
-
-            var success = successElement.ValueKind switch
+            if (playerStats.TryGetProperty("success", out var successElement))
             {
-                JsonValueKind.True => true,
-                JsonValueKind.False => false,
-                JsonValueKind.Number => successElement.GetInt32() == 1,
-                _ => false
-            };
+                if (!ReadSteamBoolean(successElement))
+                    return list;
+            }
 
-            if (!success)
+            if (playerStats.TryGetProperty("error", out var errorElement) &&
+                !string.IsNullOrWhiteSpace(errorElement.GetString()))
+            {
                 return list;
+            }
 
             if (!playerStats.TryGetProperty("achievements", out var achievementsElement) ||
                 achievementsElement.ValueKind != JsonValueKind.Array)
@@ -143,9 +248,7 @@ public class SteamService
 
             foreach (var ach in achievementsElement.EnumerateArray())
             {
-                var apiName = ach.TryGetProperty("apiname", out var apiNameEl)
-                    ? apiNameEl.GetString()
-                    : null;
+                var apiName = GetStringProperty(ach, "apiname", "name");
 
                 if (string.IsNullOrWhiteSpace(apiName))
                     continue;
@@ -153,15 +256,22 @@ public class SteamService
                 var achieved = false;
                 if (ach.TryGetProperty("achieved", out var achievedEl))
                 {
-                    achieved = achievedEl.ValueKind == JsonValueKind.Number
-                        ? achievedEl.GetInt32() == 1
-                        : achievedEl.ValueKind == JsonValueKind.True;
+                    achieved = ReadSteamBoolean(achievedEl);
+                }
+
+                DateTime? unlockTime = null;
+                if (achieved && ach.TryGetProperty("unlocktime", out var unlockTimeEl))
+                {
+                    var unix = ReadSteamUnixTime(unlockTimeEl);
+                    if (unix > 0)
+                        unlockTime = DateTimeOffset.FromUnixTimeSeconds(unix).UtcDateTime;
                 }
 
                 list.Add(new SteamPlayerAchievement
                 {
                     ApiName = apiName,
-                    Achieved = achieved
+                    Achieved = achieved,
+                    UnlockTime = unlockTime
                 });
             }
 
@@ -225,7 +335,7 @@ public class SteamService
         try
         {
             var key = _config["Steam:ApiKey"];
-            var url = $"https://api.steampowered.com/IPlayerService/GetOwnedGames/v1/?key={key}&steamid={steamId}&include_appinfo=1&include_played_free_games=1&l={SteamLanguage}";
+            var url = $"https://api.steampowered.com/IPlayerService/GetOwnedGames/v1/?key={key}&steamid={steamId}&include_appinfo=1&include_played_free_games=1&l={SteamLanguage}&language={SteamLanguage}";
             var response = await _client.GetFromJsonAsync<SteamOwnedGamesResponse>(url);
             return response?.Response?.Games ?? new List<SteamOwnedGame>();
         }
@@ -272,8 +382,13 @@ public class SteamPlayerResponse
 
 public class Player
 {
+    [JsonPropertyName("steamid")]
     public string? Steamid { get; set; }
+
+    [JsonPropertyName("personaname")]
     public string? Personaname { get; set; }
+
+    [JsonPropertyName("avatarfull")]
     public string? Avatarfull { get; set; }
 }
 
@@ -293,6 +408,9 @@ public class SteamOwnedGame
 {
     [JsonPropertyName("appid")]
     public int AppId { get; set; }
+
+    [JsonPropertyName("name")]
+    public string Name { get; set; } = "";
 
     [JsonPropertyName("playtime_forever")]
     public int PlaytimeForever { get; set; }

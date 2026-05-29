@@ -1,7 +1,27 @@
-﻿<!DOCTYPE HTML>
+<!DOCTYPE HTML>
 <html>
 <head>
 	@await Html.PartialAsync("_MetaPartial", new WebApplication1.Views.Shared._MetaPartialModel())
+	<script>
+		(() => {
+			const root = document.documentElement;
+			const storageKey = 'achiverush-theme';
+
+			const normalizeTheme = (theme) => theme === 'light' || theme === 'dark' ? theme : null;
+			const readSavedTheme = () => {
+				try {
+					return normalizeTheme(localStorage.getItem(storageKey));
+				} catch {
+					return null;
+				}
+			};
+			const getSystemTheme = () => window.matchMedia?.('(prefers-color-scheme: light)').matches ? 'light' : 'dark';
+			const savedTheme = readSavedTheme();
+
+			root.dataset.theme = savedTheme || getSystemTheme();
+			root.dataset.themeSource = savedTheme ? 'manual' : 'system';
+		})();
+	</script>
 	@await Html.PartialAsync("_CssPartial")
 	<noscript><link rel="stylesheet" href="~/css/noscript.css" /></noscript>
 </head>

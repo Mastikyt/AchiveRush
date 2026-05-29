@@ -7,5 +7,7 @@ namespace WebApplication1.DTO
         public string ApiName { get; set; }
 
         public bool Achieved { get; set; }
+
+        public DateTime? UnlockTime { get; set; }
     }
 }

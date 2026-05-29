@@ -1,0 +1,405 @@
+/* Theme tokens (extended) */
+:root {
+    --ar-header-bg: rgba(18, 16, 12, 0.92);
+    --ar-footer-bg: rgba(18, 16, 12, 0.85);
+    --ar-panel-bg: rgba(10, 8, 5, 0.98);
+    --ar-panel-soft: rgba(212, 175, 55, 0.07);
+    --ar-control-bg: rgba(212, 175, 55, 0.12);
+    --ar-user-bg: #1e1a14;
+    --ar-input-bg: #0f0d0a;
+    --ar-gradient-panel: linear-gradient(180deg, rgba(33, 27, 20, 0.97), rgba(18, 16, 12, 0.97));
+    --ar-gradient-btn: linear-gradient(135deg, rgba(212, 175, 55, 0.16), rgba(30, 26, 20, 0.96));
+    --ar-logo: #d4af37;
+    --ar-border-accent: #d4af37;
+    --ar-glow: rgba(212, 175, 55, 0.3);
+    --ar-switch-track: rgba(212, 175, 55, 0.22);
+    --ar-switch-thumb: #f5d77b;
+    --ar-switch-icon: #1a160f;
+    --ar-theme-transition: background-color 0.35s ease, color 0.35s ease, border-color 0.35s ease, box-shadow 0.35s ease, fill 0.35s ease, stroke 0.35s ease;
+}
+
+html[data-theme="light"] {
+    --ar-header-bg: rgba(255, 250, 241, 0.94);
+    --ar-footer-bg: rgba(255, 250, 241, 0.94);
+    --ar-panel-bg: #fffaf1;
+    --ar-panel-soft: rgba(122, 143, 42, 0.08);
+    --ar-control-bg: rgba(122, 143, 42, 0.1);
+    --ar-user-bg: #f4edd8;
+    --ar-input-bg: #fffdf8;
+    --ar-gradient-panel: linear-gradient(180deg, #fffaf1, #f4e6c8);
+    --ar-gradient-btn: linear-gradient(135deg, rgba(122, 143, 42, 0.14), rgba(255, 250, 241, 0.98));
+    --ar-logo: #5f741f;
+    --ar-border-accent: #7a8f2a;
+    --ar-glow: rgba(95, 116, 31, 0.22);
+    --ar-switch-track: rgba(122, 143, 42, 0.28);
+    --ar-switch-thumb: #fffdf6;
+    --ar-switch-icon: #4a5a24;
+}
+
+html.theme-transition,
+html.theme-transition *,
+html.theme-transition *::before,
+html.theme-transition *::after {
+    transition: var(--ar-theme-transition) !important;
+}
+
+/* Base surfaces driven by tokens */
+header {
+    background: var(--ar-header-bg) !important;
+    border-bottom-color: var(--ar-border-accent) !important;
+}
+
+.footer {
+    background: var(--ar-footer-bg) !important;
+}
+
+.logo,
+.footer-logo,
+.main-title,
+.not-found-code {
+    color: var(--ar-logo) !important;
+    -webkit-text-fill-color: var(--ar-logo) !important;
+}
+
+nav a {
+    color: var(--ar-muted-strong) !important;
+    background: var(--ar-control-bg) !important;
+    border-color: var(--ar-border) !important;
+}
+
+nav a:hover {
+    color: var(--ar-text) !important;
+    border-color: var(--ar-border-accent) !important;
+}
+
+.user-info {
+    background: var(--ar-user-bg) !important;
+    border-color: var(--ar-border) !important;
+}
+
+.user-info .dropdown-toggle,
+.dropdown-menu a,
+.dropdown-menu button,
+.notification-item,
+.notifications-head,
+.daily-quest-menu-head,
+.daily-quest-title {
+    color: var(--ar-text) !important;
+}
+
+.dropdown-menu,
+.daily-quest-menu,
+.notifications-menu {
+    background: var(--ar-panel-bg) !important;
+    border-color: var(--ar-border) !important;
+    box-shadow: 0 16px 38px var(--ar-shadow) !important;
+}
+
+.daily-quest-card,
+.daily-quest-empty,
+.notification-item:hover,
+.notification-item.unread {
+    background: var(--ar-panel-soft) !important;
+    border-color: var(--ar-border) !important;
+}
+
+.daily-quest-card p,
+.notification-item small,
+.notification-empty,
+.daily-quest-menu-head span {
+    color: var(--ar-muted) !important;
+}
+
+.daily-quest-toggle,
+.notifications-toggle,
+.daily-quest-actions button,
+.notifications-head button {
+    color: var(--ar-muted-strong) !important;
+    background: var(--ar-control-bg) !important;
+    border-color: var(--ar-border) !important;
+}
+
+.steam-login-button {
+    background: var(--ar-gradient-btn) !important;
+    color: var(--ar-muted-strong) !important;
+    border-color: var(--ar-border) !important;
+}
+
+.steam-login-button:hover {
+    color: var(--ar-text) !important;
+    border-color: var(--ar-border-accent) !important;
+}
+
+.steam-login-icon {
+    background: var(--ar-accent) !important;
+    color: var(--ar-bg) !important;
+}
+
+.start-btn {
+    background: var(--ar-surface-strong) !important;
+    color: var(--ar-muted-strong) !important;
+    border-color: var(--ar-border) !important;
+}
+
+.start-btn:hover {
+    color: var(--ar-text) !important;
+    border-color: var(--ar-border-accent) !important;
+}
+
+.catalog-toolbar,
+.challenge-filter-panel,
+.challenge-create-panel,
+.challenges-list-section,
+.not-found-card,
+.admin-page {
+    background: var(--ar-gradient-panel) !important;
+}
+
+.admin-page {
+    color: var(--ar-text) !important;
+}
+
+.admin-header h1,
+.admin-section-head h2,
+.request-body h3 {
+    color: var(--ar-text) !important;
+}
+
+.admin-header p,
+.admin-empty,
+.request-date {
+    color: var(--ar-muted) !important;
+}
+
+.not-found-page {
+    color: var(--ar-text) !important;
+}
+
+.not-found-card p {
+    color: var(--ar-muted) !important;
+}
+
+/* Footer theme switch (Playerok-style pill) */
+.footer-theme {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 8px;
+    min-width: 148px;
+}
+
+.footer-theme-label {
+    margin: 0;
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: var(--ar-muted);
+}
+
+.theme-switch {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    width: 72px;
+    height: 36px;
+    padding: 0;
+    border: 1px solid var(--ar-switch-track);
+    border-radius: 999px;
+    background: var(--ar-switch-track);
+    cursor: pointer;
+    overflow: hidden;
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.12);
+    transition: border-color 0.3s ease, background 0.3s ease, transform 0.2s ease;
+}
+
+.theme-switch:hover {
+    transform: translateY(-1px);
+    border-color: var(--ar-border-accent);
+}
+
+.theme-switch:focus-visible {
+    outline: 3px solid var(--ar-glow);
+    outline-offset: 3px;
+}
+
+.theme-switch-thumb {
+    position: absolute;
+    top: 3px;
+    left: 3px;
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    background: var(--ar-switch-thumb);
+    box-shadow: 0 4px 14px var(--ar-shadow);
+    transition: transform 0.42s cubic-bezier(0.34, 1.4, 0.64, 1), background 0.35s ease;
+    will-change: transform;
+}
+
+html[data-theme="dark"] .theme-switch-thumb {
+    transform: translateX(36px);
+}
+
+.theme-switch-icons {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+    padding: 0 9px;
+    pointer-events: none;
+}
+
+.theme-switch-icons span {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 18px;
+    height: 18px;
+    font-size: 14px;
+    line-height: 1;
+    color: var(--ar-switch-icon);
+    opacity: 0.45;
+    transition: opacity 0.3s ease, transform 0.35s ease, color 0.35s ease;
+}
+
+html[data-theme="light"] .theme-switch-icons .icon-sun,
+html[data-theme="dark"] .theme-switch-icons .icon-moon {
+    opacity: 1;
+    transform: scale(1.12);
+    color: var(--ar-accent-strong);
+}
+
+.theme-switch.is-animating .theme-switch-thumb {
+    animation: theme-thumb-pulse 0.45s ease;
+}
+
+@keyframes theme-thumb-pulse {
+    0% {
+        transform: translateX(var(--thumb-pos, 0)) scale(1);
+    }
+    40% {
+        transform: translateX(var(--thumb-pos, 0)) scale(1.14);
+    }
+    100% {
+        transform: translateX(var(--thumb-pos, 0)) scale(1);
+    }
+}
+
+html[data-theme="dark"] .theme-switch.is-animating .theme-switch-thumb {
+    --thumb-pos: 36px;
+}
+
+.footer-bottom-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 20px;
+    flex-wrap: wrap;
+}
+
+@media (max-width: 768px) {
+    .footer-theme {
+        align-items: flex-start;
+        width: 100%;
+    }
+
+    .footer-bottom-row {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .theme-switch-thumb,
+    .theme-switch.is-animating .theme-switch-thumb {
+        animation: none !important;
+        transition-duration: 0.01ms !important;
+    }
+}
+
+/* Page modules: inherit light tokens */
+html[data-theme="light"] .profile-card,
+html[data-theme="light"] .profile-stat,
+html[data-theme="light"] .profile-level,
+html[data-theme="light"] .achievement-timeline-panel,
+html[data-theme="light"] .achievement-card,
+html[data-theme="light"] .leaderboard-container,
+html[data-theme="light"] .leaderboard-current-card,
+html[data-theme="light"] .leaderboard-item,
+html[data-theme="light"] .game-main-card,
+html[data-theme="light"] .game-achievements-panel,
+html[data-theme="light"] .game-stat,
+html[data-theme="light"] .admin-stat-card,
+html[data-theme="light"] .admin-section,
+html[data-theme="light"] .request-card,
+html[data-theme="light"] .catalog-toolbar,
+html[data-theme="light"] .card,
+html[data-theme="light"] .challenge-filter-panel,
+html[data-theme="light"] .challenge-create-panel,
+html[data-theme="light"] .challenges-list-section,
+html[data-theme="light"] .challenge-card,
+html[data-theme="light"] .challenge-detail-panel,
+html[data-theme="light"] .challenge-details-hero,
+html[data-theme="light"] .not-found-card {
+    background: var(--ar-surface) !important;
+    border-color: var(--ar-border) !important;
+    box-shadow: 0 16px 34px var(--ar-shadow) !important;
+}
+
+html[data-theme="light"] .profile-name,
+html[data-theme="light"] .profile-section-title,
+html[data-theme="light"] .profile-stat-value,
+html[data-theme="light"] .leaderboard-title-block h1,
+html[data-theme="light"] .leaderboard-board-title h2,
+html[data-theme="light"] .leaderboard-name,
+html[data-theme="light"] .game-title,
+html[data-theme="light"] .challenges-hero h1,
+html[data-theme="light"] .challenge-card-title,
+html[data-theme="light"] .catalog-toolbar-head h1,
+html[data-theme="light"] .achievement-name,
+html[data-theme="light"] .footer-contacts h4,
+html[data-theme="light"] .footer-tagline,
+html[data-theme="light"] .footer-contacts a {
+    color: var(--ar-text) !important;
+}
+
+html[data-theme="light"] .profile-section-subtitle,
+html[data-theme="light"] .profile-level-next,
+html[data-theme="light"] .profile-stat-label,
+html[data-theme="light"] .leaderboard-title-block p,
+html[data-theme="light"] .leaderboard-board-title p,
+html[data-theme="light"] .leaderboard-xp,
+html[data-theme="light"] .challenges-hero p,
+html[data-theme="light"] .challenge-card-top p,
+html[data-theme="light"] .section-kicker,
+html[data-theme="light"] .catalog-toolbar-head span {
+    color: var(--ar-muted) !important;
+}
+
+html[data-theme="light"] .logo,
+html[data-theme="light"] .footer-logo,
+html[data-theme="light"] .main-title,
+html[data-theme="light"] .not-found-code {
+    color: var(--ar-accent-strong) !important;
+    -webkit-text-fill-color: var(--ar-accent-strong) !important;
+}
+
+html[data-theme="light"] .profile-sync-btn,
+html[data-theme="light"] .page-btn,
+html[data-theme="light"] .rarity-filter-btn {
+    color: var(--ar-muted-strong) !important;
+}
+
+html[data-theme="light"] .subtitle {
+    color: var(--ar-muted) !important;
+}
+
+html[data-theme="light"] input,
+html[data-theme="light"] select,
+html[data-theme="light"] textarea {
+    color: var(--ar-text) !important;
+    background: var(--ar-input-bg) !important;
+    border-color: var(--ar-border) !important;
+}

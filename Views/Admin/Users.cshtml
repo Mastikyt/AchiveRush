@@ -1,0 +1,95 @@
+@model WebApplication1.Models.AdminUsersViewModel
+
+@{
+    ViewData["Title"] = "Админка: пользователи";
+}
+
+<div class="admin-page">
+    <div class="admin-container">
+        <div class="admin-header">
+            <div>
+                <h1>Пользователи</h1>
+                <p>Профили, XP за квесты, ежедневки и выполненные челленджи.</p>
+            </div>
+            <form method="post" asp-controller="Admin" asp-action="Logout">
+                @Html.AntiForgeryToken()
+                <button type="submit" class="admin-logout-btn">Выйти</button>
+            </form>
+        </div>
+
+        <partial name="_AdminNav" />
+
+        @if (TempData["AdminSuccess"] != null)
+        {
+            <div class="admin-flash admin-flash-success">@TempData["AdminSuccess"]</div>
+        }
+        @if (TempData["AdminError"] != null)
+        {
+            <div class="admin-flash admin-flash-error">@TempData["AdminError"]</div>
+        }
+
+        <div class="admin-stats">
+            <div class="admin-stat-card"><span>Всего пользователей</span><strong>@Model.TotalUsers</strong></div>
+        </div>
+
+        <section class="admin-section">
+            <div class="admin-section-head">
+                <h2>Список пользователей</h2>
+                <p>Статистика помогает видеть прогресс ежедневок и челленджей.</p>
+            </div>
+
+                <form method="post" asp-controller="Admin" asp-action="SyncAllUsers" onsubmit="return confirm('Запустить синхронизацию всех пользователей? Это может занять время.');">
+                    @Html.AntiForgeryToken()
+                    <button type="submit" class="btn-refresh">&#1057;&#1080;&#1085;&#1093;&#1088;&#1086;&#1085;&#1080;&#1079;&#1080;&#1088;&#1086;&#1074;&#1072;&#1090;&#1100; &#1074;&#1089;&#1077;&#1093;</button>
+                </form>
+
+            @if (!Model.Users.Any())
+            {
+                <div class="admin-empty">Пользователей пока нет.</div>
+            }
+            else
+            {
+                <div class="admin-grid">
+                    @foreach (var user in Model.Users)
+                    {
+                        <div class="request-card">
+                            <div class="request-image-wrap">
+                                <img src="@user.AvatarUrl" alt="@user.SteamName" class="request-image" />
+                                <div class="request-status approved">#@user.Id</div>
+                            </div>
+                            <div class="request-body">
+                                <h3>@user.SteamName</h3>
+                                <div class="request-meta">
+                                    <div class="request-meta-item"><span>Ачивок</span><strong>@user.TotalAchievements</strong></div>
+                                    <div class="request-meta-item"><span>Quest XP</span><strong>@user.QuestExperience</strong></div>
+                                    <div class="request-meta-item"><span>Ежедневок</span><strong>@user.CompletedDailyQuests</strong></div>
+                                    <div class="request-meta-item"><span>Челленджей</span><strong>@user.CompletedChallenges</strong></div>
+                                </div>
+                                <div class="request-link-box"><span>Steam ID</span><div>@user.SteamId</div></div>
+                                <div class="request-date">
+                                    Создан: @user.CreatedAt.ToLocalTime().ToString("dd.MM.yyyy HH:mm")
+                                    @if (user.LastSync.HasValue)
+                                    {
+                                        <span> · sync: @user.LastSync.Value.ToLocalTime().ToString("dd.MM.yyyy HH:mm")</span>
+                                    }
+                                </div>
+                            </div>
+                        </div>
+                    }
+                </div>
+
+                @if (Model.UsersTotalPages > 1)
+                {
+                    <div class="admin-pagination">
+                        @for (var i = 1; i <= Model.UsersTotalPages; i++)
+                        {
+                            <a class="@(i == Model.UsersPage ? "active" : "")" asp-controller="Admin" asp-action="Users" asp-route-usersPage="@i">@i</a>
+                        }
+                    </div>
+                }
+            }
+        </section>
+    </div>
+</div>
+
+<partial name="_AdminStyles" />

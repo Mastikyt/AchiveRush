@@ -1,0 +1,179 @@
+@model WebApplication1.Models.AdminChallengesViewModel
+@using WebApplication1.Models
+
+@{
+    ViewData["Title"] = "Админка: челленджи";
+
+    string DifficultyLabel(string value) => value switch
+    {
+        ChallengeDifficulties.Easy => "Легко",
+        ChallengeDifficulties.Normal => "Нормально",
+        ChallengeDifficulties.Hard => "Сложно",
+        ChallengeDifficulties.Legendary => "Легендарно",
+        _ => value
+    };
+
+    string CategoryLabel(string value) => value switch
+    {
+        ChallengeCategories.Completion => "Закрытие",
+        ChallengeCategories.Speedrun => "Спидран",
+        ChallengeCategories.Collection => "Коллекция",
+        ChallengeCategories.RareHunt => "Редкости",
+        ChallengeCategories.Skill => "Скилл",
+        ChallengeCategories.Coop => "Кооператив",
+        ChallengeCategories.Hardcore => "Хардкор",
+        ChallengeCategories.Discovery => "Исследование",
+        ChallengeCategories.Creative => "Креатив",
+        ChallengeCategories.Community => "Сообщество",
+        _ => value
+    };
+
+    string TypeLabel(string value) => value switch
+    {
+        ChallengeTypes.Completion => "100% игры",
+        ChallengeTypes.AchievementHunt => "Охота за достижениями",
+        ChallengeTypes.RareAchievementHunt => "Редкие достижения",
+        ChallengeTypes.TimeTrial => "На время",
+        ChallengeTypes.Marathon => "Марафон",
+        ChallengeTypes.NoDeath => "Без смертей",
+        ChallengeTypes.TeamRun => "Командный забег",
+        ChallengeTypes.CreativeProof => "Креативное доказательство",
+        _ => value
+    };
+
+    string GoalLabel(AdminChallengeListItemViewModel item)
+    {
+        if (item.VerificationType == ChallengeVerificationTypes.Manual)
+            return "Ручная";
+
+        return item.AutoGoalType switch
+        {
+            ChallengeAutoGoalTypes.EarnAchievementsInGame => $"{item.TargetValue} достиж.",
+            ChallengeAutoGoalTypes.EarnRareAchievementsInGame => $"{item.TargetValue} редк.",
+            _ => "100% игры"
+        };
+    }
+}
+
+<div class="admin-page">
+    <div class="admin-container">
+        <div class="admin-header">
+            <div>
+                <h1>Челленджи</h1>
+                <p>Модерация пользовательских испытаний, обложек, типов и наград.</p>
+            </div>
+            <form method="post" asp-controller="Admin" asp-action="Logout">
+                @Html.AntiForgeryToken()
+                <button type="submit" class="admin-logout-btn">Выйти</button>
+            </form>
+        </div>
+
+        <partial name="_AdminNav" />
+
+        @if (TempData["AdminSuccess"] != null)
+        {
+            <div class="admin-flash admin-flash-success">@TempData["AdminSuccess"]</div>
+        }
+        @if (TempData["AdminError"] != null)
+        {
+            <div class="admin-flash admin-flash-error">@TempData["AdminError"]</div>
+        }
+
+        <div class="admin-stats">
+            <div class="admin-stat-card"><span>Ожидают</span><strong>@Model.PendingChallengesCount</strong></div>
+            <div class="admin-stat-card"><span>Одобрено</span><strong>@Model.ApprovedChallengesCount</strong></div>
+            <div class="admin-stat-card"><span>Отклонено</span><strong>@Model.RejectedChallengesCount</strong></div>
+        </div>
+
+        <section class="admin-section" id="admin-challenges">
+            <div class="admin-section-head">
+                <h2>Заявки и опубликованные челленджи</h2>
+                <p>Автоматические челленджи проверяются системой, ручные подтверждает создатель по доказательству участника.</p>
+            </div>
+
+            @if (!Model.Challenges.Any())
+            {
+                <div class="admin-empty">Челленджей пока нет.</div>
+            }
+            else
+            {
+                <div class="admin-grid">
+                    @foreach (var item in Model.Challenges)
+                    {
+                        var statusClass = item.Status switch
+                        {
+                            ChallengeStatuses.Approved => "approved",
+                            ChallengeStatuses.Rejected => "rejected",
+                            _ => "pending"
+                        };
+                        var imageUrl = string.IsNullOrWhiteSpace(item.CoverImageUrl) ? item.GameAvatarUrl : item.CoverImageUrl;
+
+                        <div class="request-card">
+                            <div class="request-image-wrap">
+                                @if (!string.IsNullOrWhiteSpace(imageUrl))
+                                {
+                                    <img src="@imageUrl" alt="@item.Title" class="request-image" />
+                                }
+                                else
+                                {
+                                    <div class="request-image placeholder">@CategoryLabel(item.Category)</div>
+                                }
+                                <div class="request-status @statusClass">@item.Status</div>
+                            </div>
+                            <div class="request-body">
+                                <h3>@item.Title</h3>
+                                <div class="request-meta">
+                                    <div class="request-meta-item"><span>Категория</span><strong>@CategoryLabel(item.Category)</strong></div>
+                                    <div class="request-meta-item"><span>Тип</span><strong>@TypeLabel(item.ChallengeType)</strong></div>
+                                    <div class="request-meta-item"><span>Сложность</span><strong>@DifficultyLabel(item.Difficulty)</strong></div>
+                                    <div class="request-meta-item"><span>Проверка</span><strong>@GoalLabel(item)</strong></div>
+                                    <div class="request-meta-item"><span>Награда</span><strong>@item.RewardExperience XP</strong></div>
+                                    <div class="request-meta-item"><span>Мест</span><strong>@item.ParticipantsCount / @item.ParticipantLimit</strong></div>
+                                </div>
+                                @if (!string.IsNullOrWhiteSpace(item.GameName))
+                                {
+                                    <div class="request-link-box"><span>Игра</span><div>@item.GameName</div></div>
+                                }
+                                <div class="request-link-box"><span>Описание</span><div>@item.Description</div></div>
+                                <div class="request-date">Автор: @item.CreatedByName · @item.CreatedAt.ToLocalTime().ToString("dd.MM.yyyy HH:mm")</div>
+
+                                <div class="request-actions">
+                                    @if (item.Status == ChallengeStatuses.Approved)
+                                    {
+                                        <a class="btn-refresh" asp-controller="Challenges" asp-action="Details" asp-route-id="@item.Id">Открыть</a>
+                                    }
+
+                                    @if (item.Status == ChallengeStatuses.Pending)
+                                    {
+                                        <form method="post" asp-controller="Admin" asp-action="ApproveChallenge" data-admin-dynamic-form>
+                                            @Html.AntiForgeryToken()
+                                            <input type="hidden" name="id" value="@item.Id" />
+                                            <button type="submit" class="btn-approve">Одобрить</button>
+                                        </form>
+                                        <form method="post" asp-controller="Admin" asp-action="RejectChallenge" data-admin-dynamic-form>
+                                            @Html.AntiForgeryToken()
+                                            <input type="hidden" name="id" value="@item.Id" />
+                                            <button type="submit" class="btn-reject">Отклонить</button>
+                                        </form>
+                                    }
+
+                                    <form method="post"
+                                          asp-controller="Admin"
+                                          asp-action="DeleteChallenge"
+                                          data-admin-dynamic-form
+                                          data-confirm="Удалить этот челлендж? Участники и заявки по нему тоже будут удалены.">
+                                        @Html.AntiForgeryToken()
+                                        <input type="hidden" name="id" value="@item.Id" />
+                                        <button type="submit" class="btn-delete">Удалить</button>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    }
+                </div>
+            }
+        </section>
+    </div>
+</div>
+
+<partial name="_AdminStyles" />

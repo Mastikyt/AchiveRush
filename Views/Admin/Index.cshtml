@@ -1,10 +1,12 @@
-﻿@model List<WebApplication1.Models.GameRequest>
+﻿@model WebApplication1.Models.AdminIndexViewModel
 
 @{
     ViewData["Title"] = "Админка";
-    var pendingCount = Model.Count(x => x.Status == "Pending");
-    var approvedCount = Model.Count(x => x.Status == "Approved");
-    var rejectedCount = Model.Count(x => x.Status == "Rejected");
+    var pendingCount = Model.PendingRequestsCount;
+    var approvedCount = Model.ApprovedRequestsCount;
+    var rejectedCount = Model.RejectedRequestsCount;
+    var deletedCount = Model.DeletedRequestsCount;
+    var gamesCount = Model.GamesTotalCount;
 }
 
 <div class="admin-page">
@@ -14,7 +16,7 @@
             <div>
                 <div class="admin-badge">AchiveRush Control Panel</div>
                 <h1>Админка</h1>
-                <p>Проверка заявок на добавление игр и будущий раздел заявок на достижения.</p>
+                <p>Проверка заявок на добавление игр и заявок на игры, новые достижения и подтверждение кастомных ачивок.</p>
             </div>
 
             <form method="post" asp-controller="Admin" asp-action="Logout">
@@ -46,15 +48,108 @@
                 <span>Отклонено</span>
                 <strong>@rejectedCount</strong>
             </div>
+            <div class="admin-stat-card">
+                <span>Удалено</span>
+                <strong>@deletedCount</strong>
+            </div>
+            <div class="admin-stat-card">
+                <span>В каталоге</span>
+                <strong>@gamesCount</strong>
+            </div>
         </div>
 
-        <section class="admin-section">
+        <section class="admin-section" id="admin-games">
+            <div class="admin-section-head">
+                <h2>Игры в каталоге</h2>
+                <p>Удаление игры также удалит её достижения из профилей пользователей и пересчитает их статистику.</p>
+                <form method="post" asp-controller="Admin" asp-action="RefreshAllGameLocalizations" asp-route-requestsPage="@Model.RequestsPage" asp-route-gamesPage="@Model.GamesPage" class="admin-inline-action">
+                    @Html.AntiForgeryToken()
+                    <button type="submit" class="btn-refresh">Обновить русский для всех</button>
+                </form>
+            </div>
+
+            @if (!Model.Games.Any())
+            {
+                <div class="admin-empty">
+                    В каталоге пока нет игр.
+                </div>
+            }
+            else
+            {
+                <div class="admin-grid">
+                    @foreach (var game in Model.Games)
+                    {
+                        <div class="request-card">
+                            <div class="request-image-wrap">
+                                <img src="@game.AvatarUrl" alt="@game.Name" class="request-image" />
+                                <div class="request-status approved">В каталоге</div>
+                            </div>
+
+                            <div class="request-body">
+                                <h3>@game.Name</h3>
+
+                                <div class="request-meta">
+                                    <div class="request-meta-item">
+                                        <span>Steam App ID</span>
+                                        <strong>@game.SteamAppId</strong>
+                                    </div>
+                                    <div class="request-meta-item">
+                                        <span>Достижений</span>
+                                        <strong>@game.AchievementsCount</strong>
+                                    </div>
+                                    <div class="request-meta-item">
+                                        <span>Записей в профилях</span>
+                                        <strong>@game.ProfileAchievementsCount</strong>
+                                    </div>
+                                </div>
+
+                                <div class="request-actions">
+                                    <form method="post"
+                                          asp-controller="Admin"
+                                          asp-action="RefreshGameLocalization" asp-route-requestsPage="@Model.RequestsPage" asp-route-gamesPage="@Model.GamesPage">
+                                        @Html.AntiForgeryToken()
+                                        <input type="hidden" name="id" value="@game.Id" />
+                                        <button type="submit" class="btn-refresh">Обновить русский</button>
+                                    </form>
+
+                                    <form method="post"
+                                          asp-controller="Admin"
+                                          asp-action="DeleteGame" asp-route-requestsPage="@Model.RequestsPage" asp-route-gamesPage="@Model.GamesPage"
+                                          data-admin-dynamic-form
+                                          data-confirm="Удалить эту игру? Все её достижения будут удалены из профилей пользователей.">
+                                        @Html.AntiForgeryToken()
+                                        <input type="hidden" name="id" value="@game.Id" />
+                                        <button type="submit" class="btn-delete">Удалить игру</button>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    }
+                </div>
+                @if (Model.GamesTotalPages > 1)
+                {
+                    <div class="admin-pagination">
+                        @for (var i = 1; i <= Model.GamesTotalPages; i++)
+                        {
+                            <a class="@(i == Model.GamesPage ? "active" : "")"
+                               asp-controller="Admin"
+                               asp-action="Index"
+                               asp-route-gamesPage="@i"
+                               asp-route-requestsPage="@Model.RequestsPage"
+                               asp-fragment="admin-games">@i</a>
+                        }
+                    </div>
+                }
+            }
+        </section>
+
+        <section class="admin-section" id="game-requests">
             <div class="admin-section-head">
                 <h2>Заявки на добавление игр</h2>
                 <p>В основную БД игра попадает только после одобрения администратором.</p>
             </div>
 
-            @if (!Model.Any())
+            @if (!Model.Requests.Any())
             {
                 <div class="admin-empty">
                     Пока нет ни одной заявки.
@@ -63,12 +158,13 @@
             else
             {
                 <div class="admin-grid">
-                    @foreach (var item in Model)
+                    @foreach (var item in Model.Requests)
                     {
                         var statusClass = item.Status switch
                         {
                             "Approved" => "approved",
                             "Rejected" => "rejected",
+                            "Deleted" => "deleted",
                             _ => "pending"
                         };
 
@@ -104,13 +200,13 @@
                                 @if (item.Status == "Pending")
                                 {
                                     <div class="request-actions">
-                                        <form method="post" asp-controller="Admin" asp-action="ApproveGameRequest">
+                                        <form method="post" asp-controller="Admin" asp-action="ApproveGameRequest" asp-route-requestsPage="@Model.RequestsPage" asp-route-gamesPage="@Model.GamesPage" data-admin-dynamic-form>
                                             @Html.AntiForgeryToken()
                                             <input type="hidden" name="id" value="@item.Id" />
                                             <button type="submit" class="btn-approve">Одобрить</button>
                                         </form>
 
-                                        <form method="post" asp-controller="Admin" asp-action="RejectGameRequest">
+                                        <form method="post" asp-controller="Admin" asp-action="RejectGameRequest" asp-route-requestsPage="@Model.RequestsPage" asp-route-gamesPage="@Model.GamesPage" data-admin-dynamic-form>
                                             @Html.AntiForgeryToken()
                                             <input type="hidden" name="id" value="@item.Id" />
                                             <button type="submit" class="btn-reject">Отклонить</button>
@@ -121,24 +217,135 @@
                         </div>
                     }
                 </div>
+                @if (Model.RequestsTotalPages > 1)
+                {
+                    <div class="admin-pagination">
+                        @for (var i = 1; i <= Model.RequestsTotalPages; i++)
+                        {
+                            <a class="@(i == Model.RequestsPage ? "active" : "")"
+                               asp-controller="Admin"
+                               asp-action="Index"
+                               asp-route-requestsPage="@i"
+                               asp-route-gamesPage="@Model.GamesPage"
+                               asp-fragment="game-requests">@i</a>
+                        }
+                    </div>
+                }
             }
         </section>
 
-        <section class="admin-section admin-placeholder">
+        <section class="admin-section" id="custom-achievement-requests">
             <div class="admin-section-head">
-                <h2>Запрос на добавление достижения в игру</h2>
-                <p>Пока заглушка. Позже можно сделать отдельную таблицу заявок, модерацию и ручную привязку к игре.</p>
+                <h2>Заявки на добавление достижений</h2>
+                <p>Новые пользовательские достижения попадают в игру только после проверки.</p>
             </div>
 
-            <div class="placeholder-card">
-                <div class="placeholder-icon">★</div>
-                <div>
-                    <h3>Раздел скоро появится</h3>
-                    <p>
-                        Тут позже будет список заявок на новые достижения, статус проверки и действия администратора.
-                    </p>
+            @if (!Model.CustomAchievementRequests.Any())
+            {
+                <div class="admin-empty">Нет заявок на добавление достижений.</div>
+            }
+            else
+            {
+                <div class="admin-grid">
+                    @foreach (var item in Model.CustomAchievementRequests)
+                    {
+                        <div class="request-card">
+                            <div class="request-image-wrap">
+                                <img src="@(string.IsNullOrWhiteSpace(item.IconUrl) ? item.GameAvatarUrl : item.IconUrl)" alt="@item.Title" class="request-image" />
+                                <div class="request-status pending">Pending</div>
+                            </div>
+                            <div class="request-body">
+                                <h3>@item.Title</h3>
+                                <div class="request-meta">
+                                    <div class="request-meta-item"><span>Игра</span><strong>@item.GameName</strong></div>
+                                    <div class="request-meta-item"><span>Автор</span><strong>@item.RequestedBy</strong></div>
+                                </div>
+                                <div class="request-link-box">
+                                    <span>Описание</span>
+                                    <div>@item.Description</div>
+                                </div>
+                                <div class="request-link-box">
+                                    <span>Как получить</span>
+                                    <div>@item.ObtainMethod</div>
+                                </div>
+                                <div class="request-date">Создано: @item.CreatedAt.ToLocalTime().ToString("dd.MM.yyyy HH:mm")</div>
+                                <div class="request-actions">
+                                    <form method="post" asp-controller="Admin" asp-action="ApproveCustomAchievementRequest" asp-route-requestsPage="@Model.RequestsPage" asp-route-gamesPage="@Model.GamesPage">
+                                        @Html.AntiForgeryToken()
+                                        <input type="hidden" name="id" value="@item.Id" />
+                                        <button type="submit" class="btn-approve">Подтвердить</button>
+                                    </form>
+                                    <form method="post" asp-controller="Admin" asp-action="RejectCustomAchievementRequest" asp-route-requestsPage="@Model.RequestsPage" asp-route-gamesPage="@Model.GamesPage">
+                                        @Html.AntiForgeryToken()
+                                        <input type="hidden" name="id" value="@item.Id" />
+                                        <button type="submit" class="btn-reject">Отклонить</button>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    }
                 </div>
+            }
+        </section>
+
+        <section class="admin-section" id="custom-claim-requests">
+            <div class="admin-section-head">
+                <h2>Подтверждение получения пользовательских достижений</h2>
+                <p>Для кастомных ачивок Steam не даёт автоматический факт выполнения, поэтому пользователь отправляет заявку, а админ подтверждает или отклоняет.</p>
             </div>
+
+            @if (!Model.CustomAchievementClaimRequests.Any())
+            {
+                <div class="admin-empty">Нет заявок на подтверждение получения.</div>
+            }
+            else
+            {
+                <div class="admin-grid">
+                    @foreach (var item in Model.CustomAchievementClaimRequests)
+                    {
+                        <div class="request-card">
+                            <div class="request-image-wrap">
+                                <img src="@item.GameAvatarUrl" alt="@item.GameName" class="request-image" />
+                                <div class="request-status pending">Pending</div>
+                            </div>
+                            <div class="request-body">
+                                <h3>@item.AchievementTitle</h3>
+                                <div class="request-meta">
+                                    <div class="request-meta-item"><span>Игра</span><strong>@item.GameName</strong></div>
+                                    <div class="request-meta-item"><span>Пользователь</span><strong>@item.UserName</strong></div>
+                                </div>
+                                @if (!string.IsNullOrWhiteSpace(item.Comment))
+                                {
+                                    <div class="request-link-box">
+                                        <span>Комментарий</span>
+                                        <div>@item.Comment</div>
+                                    </div>
+                                }
+                                @if (!string.IsNullOrWhiteSpace(item.ProofUrl))
+                                {
+                                    <div class="request-link-box">
+                                        <span>Доказательство</span>
+                                        <a href="@item.ProofUrl" target="_blank" rel="noopener noreferrer">@item.ProofUrl</a>
+                                    </div>
+                                }
+                                <div class="request-date">Создано: @item.CreatedAt.ToLocalTime().ToString("dd.MM.yyyy HH:mm")</div>
+                                <div class="request-actions">
+                                    <form method="post" asp-controller="Admin" asp-action="ApproveCustomAchievementClaimRequest" asp-route-requestsPage="@Model.RequestsPage" asp-route-gamesPage="@Model.GamesPage">
+                                        @Html.AntiForgeryToken()
+                                        <input type="hidden" name="id" value="@item.Id" />
+                                        <button type="submit" class="btn-approve">Подтвердить</button>
+                                    </form>
+                                    <form method="post" asp-controller="Admin" asp-action="RejectCustomAchievementClaimRequest" asp-route-requestsPage="@Model.RequestsPage" asp-route-gamesPage="@Model.GamesPage">
+                                        @Html.AntiForgeryToken()
+                                        <input type="hidden" name="id" value="@item.Id" />
+                                        <button type="submit" class="btn-reject">Отклонить</button>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    }
+                </div>
+            }
         </section>
 
     </div>
@@ -229,7 +436,7 @@
 
     .admin-stats {
         display: grid;
-        grid-template-columns: repeat(3, minmax(180px, 1fr));
+        grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
         gap: 16px;
         margin-bottom: 28px;
     }
@@ -266,6 +473,10 @@
 
     .admin-section-head {
         margin-bottom: 22px;
+    }
+
+    .admin-inline-action {
+        margin-top: 14px;
     }
 
         .admin-section-head h2 {
@@ -343,6 +554,12 @@
             background: rgba(185,40,40,0.12);
             color: #fecaca;
             border: 1px solid rgba(248,113,113,0.2);
+        }
+
+        .request-status.deleted {
+            background: rgba(148, 163, 184, 0.14);
+            color: #cbd5e1;
+            border: 1px solid rgba(148, 163, 184, 0.22);
         }
 
     .request-body {
@@ -446,6 +663,23 @@
         border: 1px solid rgba(220,120,120,0.2);
     }
 
+    .btn-refresh {
+        color: #fef3d6;
+        background: linear-gradient(135deg, #334155, #1f2937);
+        border: 1px solid rgba(148, 163, 184, 0.28);
+        border-radius: 14px;
+        padding: 12px 14px;
+        font-weight: 700;
+        cursor: pointer;
+        transition: 0.2s ease;
+    }
+
+    .btn-delete {
+        color: #fef3d6;
+        background: linear-gradient(135deg, #5a1f1f, #2a1111);
+        border: 1px solid rgba(248,113,113,0.28);
+    }
+
     .request-actions button:hover {
         transform: translateY(-1px);
     }
@@ -485,6 +719,30 @@
         margin: 0;
         color: #dcbc6a;
         line-height: 1.6;
+    }
+
+    .admin-pagination {
+        display: flex;
+        gap: 8px;
+        flex-wrap: wrap;
+        margin-top: 22px;
+    }
+
+    .admin-pagination a {
+        min-width: 42px;
+        text-align: center;
+        padding: 10px 13px;
+        border-radius: 12px;
+        color: #f3d58e;
+        text-decoration: none;
+        background: rgba(212,175,55,0.06);
+        border: 1px solid rgba(212,175,55,0.16);
+        font-weight: 800;
+    }
+
+    .admin-pagination a.active {
+        color: #0b0907;
+        background: #d4af37;
     }
 
     @@media (max-width: 900px) {

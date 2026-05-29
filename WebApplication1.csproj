@@ -39,4 +39,11 @@
     <Folder Include="wwwroot\scss\" />
   </ItemGroup>
 
+  <ItemGroup>
+    <None Update="AdminUsers.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </None>
+  </ItemGroup>
+
 </Project>

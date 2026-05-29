@@ -1,0 +1,189 @@
+@model WebApplication1.Models.AdminIndexViewModel
+
+@{
+    ViewData["Title"] = "Админка: игры";
+}
+
+<div class="admin-page">
+    <div class="admin-container">
+        <div class="admin-header">
+            <div>
+                <h1>Игры</h1>
+                <p>Каталог игр и заявки на добавление игр из Steam.</p>
+            </div>
+            <form method="post" asp-controller="Admin" asp-action="Logout">
+                @Html.AntiForgeryToken()
+                <button type="submit" class="admin-logout-btn">Выйти</button>
+            </form>
+        </div>
+
+        <partial name="_AdminNav" />
+
+        @if (TempData["AdminSuccess"] != null)
+        {
+            <div class="admin-flash admin-flash-success">@TempData["AdminSuccess"]</div>
+        }
+        @if (TempData["AdminError"] != null)
+        {
+            <div class="admin-flash admin-flash-error">@TempData["AdminError"]</div>
+        }
+
+        <div class="admin-stats">
+            <div class="admin-stat-card"><span>Ожидают</span><strong>@Model.PendingRequestsCount</strong></div>
+            <div class="admin-stat-card"><span>Одобрено</span><strong>@Model.ApprovedRequestsCount</strong></div>
+            <div class="admin-stat-card"><span>Отклонено</span><strong>@Model.RejectedRequestsCount</strong></div>
+            <div class="admin-stat-card"><span>Удалено</span><strong>@Model.DeletedRequestsCount</strong></div>
+            <div class="admin-stat-card"><span>В каталоге</span><strong>@Model.GamesTotalCount</strong></div>
+        </div>
+
+        <section class="admin-section" id="admin-games">
+            <div class="admin-section-head">
+                <h2>Игры в каталоге</h2>
+                <p>Удаление игры также удалит её достижения из профилей пользователей и пересчитает статистику.</p>
+                <form method="post" asp-controller="Admin" asp-action="RefreshAllGameLocalizations" asp-route-requestsPage="@Model.RequestsPage" asp-route-gamesPage="@Model.GamesPage">
+                    @Html.AntiForgeryToken()
+                    <button type="submit" class="btn-refresh">Обновить русский для всех</button>
+                </form>
+            </div>
+
+            @if (!Model.Games.Any())
+            {
+                <div class="admin-empty">В каталоге пока нет игр.</div>
+            }
+            else
+            {
+                <div class="admin-grid">
+                    @foreach (var game in Model.Games)
+                    {
+                        <div class="request-card">
+                            <div class="request-image-wrap">
+                                <img src="@game.AvatarUrl" alt="@game.Name" class="request-image" />
+                                <div class="request-status approved">В каталоге</div>
+                            </div>
+                            <div class="request-body">
+                                <h3>@game.Name</h3>
+                                <div class="request-meta">
+                                    <div class="request-meta-item"><span>Steam App ID</span><strong>@game.SteamAppId</strong></div>
+                                    <div class="request-meta-item"><span>Достижений</span><strong>@game.AchievementsCount</strong></div>
+                                    <div class="request-meta-item"><span>Записей в профилях</span><strong>@game.ProfileAchievementsCount</strong></div>
+                                </div>
+                                <div class="request-actions">
+                                    <form method="post" asp-controller="Admin" asp-action="RefreshGameLocalization" asp-route-requestsPage="@Model.RequestsPage" asp-route-gamesPage="@Model.GamesPage">
+                                        @Html.AntiForgeryToken()
+                                        <input type="hidden" name="id" value="@game.Id" />
+                                        <button type="submit" class="btn-refresh">Обновить русский</button>
+                                    </form>
+                                    <form method="post"
+                                          asp-controller="Admin"
+                                          asp-action="DeleteGame"
+                                          asp-route-requestsPage="@Model.RequestsPage"
+                                          asp-route-gamesPage="@Model.GamesPage"
+                                          data-admin-dynamic-form
+                                          data-confirm="Удалить эту игру? Все её достижения будут удалены из профилей пользователей.">
+                                        @Html.AntiForgeryToken()
+                                        <input type="hidden" name="id" value="@game.Id" />
+                                        <button type="submit" class="btn-delete">Удалить</button>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    }
+                </div>
+
+                @if (Model.GamesTotalPages > 1)
+                {
+                    <div class="admin-pagination">
+                        @for (var i = 1; i <= Model.GamesTotalPages; i++)
+                        {
+                            <a class="@(i == Model.GamesPage ? "active" : "")" asp-controller="Admin" asp-action="Games" asp-route-gamesPage="@i" asp-route-requestsPage="@Model.RequestsPage" asp-fragment="admin-games">@i</a>
+                        }
+                    </div>
+                }
+            }
+        </section>
+
+        <section class="admin-section" id="game-requests">
+            <div class="admin-section-head">
+                <h2>Заявки на добавление игр</h2>
+                <p>Игра попадает в основной каталог только после одобрения.</p>
+            </div>
+
+            @if (!Model.Requests.Any())
+            {
+                <div class="admin-empty">Пока нет ни одной заявки.</div>
+            }
+            else
+            {
+                <div class="admin-grid">
+                    @foreach (var item in Model.Requests)
+                    {
+                        var statusClass = item.Status switch
+                        {
+                            "Approved" => "approved",
+                            "Rejected" => "rejected",
+                            "Deleted" => "deleted",
+                            _ => "pending"
+                        };
+
+                        <div class="request-card">
+                            <div class="request-image-wrap">
+                                <img src="@item.ImageUrl" alt="@item.Name" class="request-image" />
+                                <div class="request-status @statusClass">@item.Status</div>
+                            </div>
+                            <div class="request-body">
+                                <h3>@item.Name</h3>
+                                <div class="request-meta">
+                                    <div class="request-meta-item"><span>Steam App ID</span><strong>@item.SteamAppId</strong></div>
+                                    <div class="request-meta-item"><span>Достижений</span><strong>@item.AchievementsCount</strong></div>
+                                </div>
+                                <div class="request-link-box">
+                                    <span>Ссылка</span>
+                                    <a href="@item.SteamUrl" target="_blank" rel="noopener noreferrer">@item.SteamUrl</a>
+                                </div>
+                                <div class="request-date">Создано: @item.CreatedAt.ToLocalTime().ToString("dd.MM.yyyy HH:mm")</div>
+
+                                @if (item.Status == "Pending")
+                                {
+                                    <div class="request-actions">
+                                        <form method="post"
+                                              asp-controller="Admin"
+                                              asp-action="ApproveGameRequest"
+                                              asp-route-requestsPage="@Model.RequestsPage"
+                                              asp-route-gamesPage="@Model.GamesPage"
+                                              data-admin-dynamic-form>
+                                            @Html.AntiForgeryToken()
+                                            <input type="hidden" name="id" value="@item.Id" />
+                                            <button type="submit" class="btn-approve">Одобрить</button>
+                                        </form>
+                                        <form method="post"
+                                              asp-controller="Admin"
+                                              asp-action="RejectGameRequest"
+                                              asp-route-requestsPage="@Model.RequestsPage"
+                                              asp-route-gamesPage="@Model.GamesPage"
+                                              data-admin-dynamic-form>
+                                            @Html.AntiForgeryToken()
+                                            <input type="hidden" name="id" value="@item.Id" />
+                                            <button type="submit" class="btn-reject">Отклонить</button>
+                                        </form>
+                                    </div>
+                                }
+                            </div>
+                        </div>
+                    }
+                </div>
+
+                @if (Model.RequestsTotalPages > 1)
+                {
+                    <div class="admin-pagination">
+                        @for (var i = 1; i <= Model.RequestsTotalPages; i++)
+                        {
+                            <a class="@(i == Model.RequestsPage ? "active" : "")" asp-controller="Admin" asp-action="Games" asp-route-requestsPage="@i" asp-route-gamesPage="@Model.GamesPage" asp-fragment="game-requests">@i</a>
+                        }
+                    </div>
+                }
+            }
+        </section>
+    </div>
+</div>
+
+<partial name="_AdminStyles" />

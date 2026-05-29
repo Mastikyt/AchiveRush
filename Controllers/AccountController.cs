@@ -10,19 +10,22 @@ public class AccountController : Controller
     private readonly ApplicationDbContext _context;
     private readonly UserManager<ApplicationUser> _userManager;
     private readonly SignInManager<ApplicationUser> _signInManager;
+    private readonly SteamService _steamService;
 
     public AccountController(
         ApplicationDbContext context,
         UserManager<ApplicationUser> userManager,
-        SignInManager<ApplicationUser> signInManager)
+        SignInManager<ApplicationUser> signInManager,
+        SteamService steamService)
     {
         _context = context;
         _userManager = userManager;
         _signInManager = signInManager;
+        _steamService = steamService;
     }
 
     [HttpGet]
-    public async Task<IActionResult> SteamResponse()
+    public async Task<IActionResult> SteamResponse(string? returnUrl = null)
     {
         var result = await HttpContext.AuthenticateAsync("Steam");
         if (!result.Succeeded)
@@ -35,6 +38,16 @@ public class AccountController : Controller
         var steamId = rawSteamId.Contains('/') ? rawSteamId.Split('/').Last() : rawSteamId;
         var personaName = result.Principal?.FindFirst(ClaimTypes.Name)?.Value ?? steamId;
         var avatarUrl = result.Principal?.FindFirst("urn:steam:avatarfull")?.Value;
+
+        var steamProfile = await _steamService.GetProfileAsync(steamId);
+        if (steamProfile != null)
+        {
+            if (!string.IsNullOrWhiteSpace(steamProfile.Personaname))
+                personaName = steamProfile.Personaname;
+
+            if (!string.IsNullOrWhiteSpace(steamProfile.Avatarfull))
+                avatarUrl = steamProfile.Avatarfull;
+        }
 
         if (string.IsNullOrWhiteSpace(avatarUrl))
             avatarUrl = "/images/default_avatar.png";
@@ -96,14 +109,17 @@ public class AccountController : Controller
         await _context.SaveChangesAsync();
         await _signInManager.SignInAsync(identityUser, isPersistent: true);
 
+        if (!string.IsNullOrWhiteSpace(returnUrl) && Url.IsLocalUrl(returnUrl))
+            return LocalRedirect(returnUrl);
+
         return RedirectToAction("Index", "Profile");
     }
 
-    public IActionResult Login()
+    public IActionResult Login(string? returnUrl = null)
     {
         return Challenge(new AuthenticationProperties
         {
-            RedirectUri = Url.Action("SteamResponse")
+            RedirectUri = Url.Action("SteamResponse", new { returnUrl })
         }, "Steam");
     }
 

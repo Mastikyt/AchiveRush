@@ -1,7 +1,9 @@
 ﻿@model WebApplication1.Models.GameDetailsViewModel
+@using System.Net
 
 @{
     ViewData["Title"] = Model.Game.Name;
+    var gameDescription = WebUtility.HtmlDecode(Model.Game.Description ?? "");
     var completionPercent = Model.TotalAchievements == 0
         ? 0
         : (int)Math.Round((double)Model.CompletedAchievements / Model.TotalAchievements * 100);
@@ -19,9 +21,9 @@
                     <h1 class="game-title">@Model.Game.Name</h1>
 
                     <div class="game-description">
-                        @(string.IsNullOrWhiteSpace(Model.Game.Description)
-                                                ? "Описание игры пока отсутствует."
-                                                : Model.Game.Description)
+                        @(string.IsNullOrWhiteSpace(gameDescription)
+                            ? "Описание игры пока отсутствует."
+                            : gameDescription)
                     </div>
 
                     <div class="game-stats">
@@ -44,35 +46,158 @@
             </div>
         </div>
 
-        <aside class="game-achievements-panel">
-            <h2>ACHIEVEMENTS</h2>
+        <section class="game-achievements-panel">
+            <div class="game-achievements-head">
+                <div>
+                    <h2>Достижения</h2>
+                    <span>@Model.CompletedAchievements из @Model.TotalAchievements получено</span>
+                </div>
+
+                @if (Model.CanAddCustomAchievement)
+                {
+                    <button type="button" class="add-achievement-toggle" id="toggleCustomAchievement" aria-label="Добавить достижение">
+                        <span>+</span>
+                        Добавить достижение
+                    </button>
+                }
+            </div>
+
+            @if (TempData["GameDetailsSuccess"] is string successMessage)
+            {
+                <div class="game-details-alert success">@successMessage</div>
+            }
+
+            @if (TempData["GameDetailsError"] is string errorMessage)
+            {
+                <div class="game-details-alert error">@errorMessage</div>
+            }
+
+            @if (Model.CanAddCustomAchievement)
+            {
+                <form asp-controller="Games" asp-action="AddCustomAchievement" method="post" class="custom-achievement-form hidden" id="customAchievementForm">
+                    @Html.AntiForgeryToken()
+                    <input type="hidden" name="GameId" value="@Model.Game.Id" />
+
+                    <div class="custom-achievement-grid">
+                        <input type="text" name="Title" placeholder="Название" maxlength="140" required />
+                        <input type="text" name="IconUrl" placeholder="Ссылка на иконку" maxlength="2048" />
+                        <textarea name="Description" placeholder="Описание" maxlength="1000" required></textarea>
+                        <textarea name="ObtainMethod" placeholder="Способ получения" maxlength="1000" required></textarea>
+                    </div>
+
+                    <div class="custom-achievement-actions">
+                        <button type="submit" class="custom-achievement-submit">Отправить на проверку</button>
+                        <button type="button" class="custom-achievement-cancel" id="cancelCustomAchievement">Отмена</button>
+                    </div>
+                </form>
+            }
 
             @if (Model.AchievementItems.Any())
             {
                 <div class="game-achievements-list">
                     @foreach (var achievement in Model.AchievementItems)
                     {
-                        <div class="game-achievement @(achievement.IsCompleted ? "completed" : "locked")">
-                            <div class="game-achievement-status">
-                                @(achievement.IsCompleted ? "✓" : "×")
-                            </div>
+                        <article class="game-achievement @(achievement.IsCompleted ? "completed" : "locked") @(achievement.IsCustom ? "custom" : "")">
+                            <img src="@achievement.IconUrl" alt="@achievement.Title" class="game-achievement-icon" loading="lazy" />
 
                             <div class="game-achievement-content">
                                 <div class="game-achievement-title">@achievement.Title</div>
                                 <div class="game-achievement-description">
                                     @(string.IsNullOrWhiteSpace(achievement.Description)
-                                                                ? "Без описания"
-                                                                : achievement.Description)
-                        </div>
-                    </div>
-                </div>
+                                        ? "Без описания"
+                                        : WebUtility.HtmlDecode(achievement.Description))
+                                </div>
+
+                                @if (!string.IsNullOrWhiteSpace(achievement.ObtainMethod))
+                                {
+                                    <div class="game-achievement-method">@WebUtility.HtmlDecode(achievement.ObtainMethod)</div>
                                 }
+
+                                <div class="game-achievement-meta">
+                                    @if (achievement.IsCustom)
+                                    {
+                                        <span>Пользовательское достижение</span>
+                                    }
+                                    else if (achievement.GlobalUnlockRate > 0)
+                                    {
+                                        <span>Это достижение есть у @achievement.GlobalUnlockRate.ToString("0.##")% игроков</span>
+                                    }
+                                    else
+                                    {
+                                        <span>Редкость пока неизвестна</span>
+                                    }
+                                </div>
+                            </div>
+
+                            <div class="game-achievement-state">
+                                @if (achievement.IsCompleted && achievement.UnlockTime.HasValue)
+                                {
+                                    <span>Получено @achievement.UnlockTime.Value.ToLocalTime().ToString("dd.MM.yyyy, HH:mm")</span>
+                                }
+                                else if (achievement.IsCompleted)
+                                {
+                                    <span>Получено</span>
+                                }
+                                else if (achievement.HasPendingCompletionRequest)
+                                {
+                                    <span>На проверке</span>
+                                }
+                                else
+                                {
+                                    <span>Не получено</span>
+                                }
+
+                                @if (achievement.CanRequestCompletion)
+                                {
+                                    <details class="custom-claim-box">
+                                        <summary>Получить достижение</summary>
+                                        <form asp-controller="Games" asp-action="RequestCustomAchievementCompletion" method="post" class="custom-claim-form">
+                                            @Html.AntiForgeryToken()
+                                            <input type="hidden" name="achievementId" value="@achievement.AchievementId" />
+                                            <input type="url" name="proofUrl" placeholder="Ссылка на скриншот, видео или профиль (необязательно)" maxlength="2048" />
+                                            <textarea name="comment" placeholder="Комментарий (необязательно)" maxlength="1000"></textarea>
+                                            <button type="submit">Добавить в профиль</button>
+                                        </form>
+                                    </details>
+                                }
+
+                                @if (achievement.CanDeleteCustomAchievement)
+                                {
+                                    <form asp-controller="Games"
+                                          asp-action="DeleteCustomAchievement"
+                                          method="post"
+                                          class="custom-delete-form"
+                                          onsubmit="return confirm('Удалить пользовательское достижение? Оно пропадет из профилей пользователей.');">
+                                        @Html.AntiForgeryToken()
+                                        <input type="hidden" name="achievementId" value="@achievement.AchievementId" />
+                                        <button type="submit">Удалить кастомное</button>
+                                    </form>
+                                }
+                            </div>
+                        </article>
+                    }
                 </div>
             }
             else
             {
                 <div class="game-achievements-empty">У этой игры нет ачивок в базе.</div>
             }
-        </aside>
+        </section>
     </div>
 </section>
+
+<script>
+    (() => {
+        const toggle = document.getElementById('toggleCustomAchievement');
+        const form = document.getElementById('customAchievementForm');
+        const cancel = document.getElementById('cancelCustomAchievement');
+
+        toggle?.addEventListener('click', () => {
+            form?.classList.toggle('hidden');
+        });
+
+        cancel?.addEventListener('click', () => {
+            form?.classList.add('hidden');
+        });
+    })();
+</script>

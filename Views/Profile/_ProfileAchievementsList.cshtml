@@ -1,0 +1,98 @@
+@using WebApplication1.Models
+@{
+    var pagedAchievements = ViewBag.PagedAchievements as IEnumerable<AchievementCardViewModel>
+        ?? new List<AchievementCardViewModel>();
+    var currentPage = (int)(ViewBag.CurrentPage ?? 1);
+    var totalPages = (int)(ViewBag.TotalPages ?? 1);
+    var pageSize = (int)(ViewBag.PageSize ?? 24);
+    var currentRarityFilter = (string)(ViewBag.CurrentRarityFilter ?? "all");
+    var filteredAchievements = (int)(ViewBag.FilteredAchievements ?? 0);
+    var steamId = (string)(ViewBag.ProfileSteamId ?? "");
+    var pagerStart = Math.Max(1, currentPage - 2);
+    var pagerEnd = Math.Min(totalPages, currentPage + 2);
+
+    if (currentPage <= 4)
+    {
+        pagerEnd = Math.Min(totalPages, 7);
+    }
+
+    if (currentPage >= totalPages - 3)
+    {
+        pagerStart = Math.Max(1, totalPages - 6);
+    }
+}
+
+<div class="profile-achievements-state"
+     data-achievements-state
+     data-current-page="@currentPage"
+     data-total-pages="@totalPages"
+     data-rarity="@currentRarityFilter"
+     data-filtered="@filteredAchievements"
+     hidden></div>
+
+<div class="profile-section-head">
+    <div>
+        <h2 class="profile-section-title">Все достижения</h2>
+        <div class="profile-section-subtitle">Показано: @filteredAchievements</div>
+    </div>
+
+    <div class="profile-rarity-filter">
+        <a asp-action="UserProfile" asp-route-steamId="@steamId" asp-route-rarity="all" asp-route-page="1" asp-route-pageSize="@pageSize" data-achievement-page="1" data-achievement-rarity="all" class="rarity-filter-btn @(currentRarityFilter == "all" ? "active" : "")">Все</a>
+        <a asp-action="UserProfile" asp-route-steamId="@steamId" asp-route-rarity="legendary" asp-route-page="1" asp-route-pageSize="@pageSize" data-achievement-page="1" data-achievement-rarity="legendary" class="rarity-filter-btn legendary @(currentRarityFilter == "legendary" ? "active" : "")">Легендарные</a>
+        <a asp-action="UserProfile" asp-route-steamId="@steamId" asp-route-rarity="epic" asp-route-page="1" asp-route-pageSize="@pageSize" data-achievement-page="1" data-achievement-rarity="epic" class="rarity-filter-btn epic @(currentRarityFilter == "epic" ? "active" : "")">Эпические</a>
+        <a asp-action="UserProfile" asp-route-steamId="@steamId" asp-route-rarity="rare" asp-route-page="1" asp-route-pageSize="@pageSize" data-achievement-page="1" data-achievement-rarity="rare" class="rarity-filter-btn rare @(currentRarityFilter == "rare" ? "active" : "")">Редкие</a>
+        <a asp-action="UserProfile" asp-route-steamId="@steamId" asp-route-rarity="common" asp-route-page="1" asp-route-pageSize="@pageSize" data-achievement-page="1" data-achievement-rarity="common" class="rarity-filter-btn common @(currentRarityFilter == "common" ? "active" : "")">Обычные</a>
+    </div>
+</div>
+
+@if (pagedAchievements.Any())
+{
+    <div class="achievements-grid" aria-live="polite">
+        @foreach (var ua in pagedAchievements)
+        {
+            <partial name="_AchievementCard" model="ua" />
+        }
+    </div>
+
+    @if (totalPages > 1)
+    {
+        <div class="pagination">
+            @if (currentPage > 1)
+            {
+                <a asp-action="UserProfile" asp-route-steamId="@steamId" asp-route-page="@(currentPage - 1)" asp-route-pageSize="@pageSize" asp-route-rarity="@currentRarityFilter" data-achievement-page="@(currentPage - 1)" data-achievement-rarity="@currentRarityFilter" class="page-btn" aria-label="Предыдущая страница">&laquo;</a>
+            }
+
+            @if (pagerStart > 1)
+            {
+                <a asp-action="UserProfile" asp-route-steamId="@steamId" asp-route-page="1" asp-route-pageSize="@pageSize" asp-route-rarity="@currentRarityFilter" data-achievement-page="1" data-achievement-rarity="@currentRarityFilter" class="page-btn">1</a>
+                @if (pagerStart > 2)
+                {
+                    <span class="page-ellipsis">...</span>
+                }
+            }
+
+            @for (int i = pagerStart; i <= pagerEnd; i++)
+            {
+                <a asp-action="UserProfile" asp-route-steamId="@steamId" asp-route-page="@i" asp-route-pageSize="@pageSize" asp-route-rarity="@currentRarityFilter" data-achievement-page="@i" data-achievement-rarity="@currentRarityFilter" class="page-btn @(i == currentPage ? "active" : "")">@i</a>
+            }
+
+            @if (pagerEnd < totalPages)
+            {
+                @if (pagerEnd < totalPages - 1)
+                {
+                    <span class="page-ellipsis">...</span>
+                }
+                <a asp-action="UserProfile" asp-route-steamId="@steamId" asp-route-page="@totalPages" asp-route-pageSize="@pageSize" asp-route-rarity="@currentRarityFilter" data-achievement-page="@totalPages" data-achievement-rarity="@currentRarityFilter" class="page-btn">@totalPages</a>
+            }
+
+            @if (currentPage < totalPages)
+            {
+                <a asp-action="UserProfile" asp-route-steamId="@steamId" asp-route-page="@(currentPage + 1)" asp-route-pageSize="@pageSize" asp-route-rarity="@currentRarityFilter" data-achievement-page="@(currentPage + 1)" data-achievement-rarity="@currentRarityFilter" class="page-btn" aria-label="Следующая страница">&raquo;</a>
+            }
+        </div>
+    }
+}
+else
+{
+    <div class="no-achievements">Достижения еще не синхронизированы.</div>
+}

@@ -1,95 +1,442 @@
 .leaderboard-page {
-    max-width: 1180px;
-    margin: 50px auto 80px;
+    width: min(1480px, 100%);
+    margin: 42px auto 80px;
     padding: 0 24px;
 }
 
+.leaderboard-title-block {
+    margin-bottom: 22px;
+}
+
+.leaderboard-title-block h1 {
+    margin: 0 0 8px;
+    color: #fef3d6;
+    font-size: 34px;
+    line-height: 1.15;
+}
+
+.leaderboard-title-block p,
+.leaderboard-board-title p {
+    margin: 0;
+    color: #dcbc6a;
+    line-height: 1.45;
+}
+
+.leaderboard-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 18px;
+    align-items: start;
+}
+
 .leaderboard-container {
+    min-width: 0;
     background: #1c1812;
     border: 1px solid rgba(212, 175, 55, 0.3);
-    border-radius: 28px;
-    padding: 24px;
-    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.4);
+    border-radius: 8px;
+    padding: 18px;
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.34);
+}
+
+.leaderboard-board-title {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 16px;
+    margin-bottom: 14px;
+}
+
+.leaderboard-board-title h2 {
+    margin: 0 0 5px;
+    color: #fef3d6;
+    font-size: 22px;
+    line-height: 1.2;
+}
+
+.leaderboard-current-card {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 4px 12px;
+    align-items: center;
+    min-height: 64px;
+    margin-bottom: 14px;
+    padding: 12px 14px;
+    border-radius: 8px;
+    border: 1px solid rgba(212, 175, 55, 0.38);
+    background: rgba(212, 175, 55, 0.1);
+    color: #fef3d6;
+    text-decoration: none;
+}
+
+.leaderboard-current-card span {
+    color: #e6c87a;
+    font-weight: 800;
+}
+
+.leaderboard-current-card strong {
+    grid-row: span 2;
+    color: #d4af37;
+    font-size: 28px;
+    line-height: 1;
+}
+
+.leaderboard-current-card small {
+    color: #f5e7c8;
+}
+
+.leaderboard-current-card.muted {
+    display: flex;
+    justify-content: center;
+    text-align: center;
+    color: #dcbc6a;
 }
 
 .leaderboard-header,
 .leaderboard-row {
     display: grid;
-    grid-template-columns: 140px 1fr 180px;
     align-items: center;
-    gap: 20px;
+    gap: 14px;
+}
+
+.achievement-board {
+    grid-template-columns: 68px minmax(0, 1fr) 70px;
+}
+
+.level-board {
+    grid-template-columns: 68px minmax(0, 1fr) 74px 96px;
+}
+
+.weekly-board {
+    grid-template-columns: 68px minmax(0, 1fr) 70px 70px;
 }
 
 .leaderboard-header {
-    padding: 16px 20px;
+    padding: 12px 14px;
     color: #e6c87a;
-    font-size: 18px;
-    font-weight: 700;
+    font-size: 13px;
+    font-weight: 800;
+    text-transform: uppercase;
     border-bottom: 1px solid rgba(212, 175, 55, 0.25);
-    margin-bottom: 12px;
+}
+
+.leaderboard-scroll {
+    max-height: 438px;
+    overflow-y: auto;
+    padding: 10px 6px 0 0;
+    scrollbar-color: rgba(212, 175, 55, 0.55) rgba(255, 255, 255, 0.05);
+    scrollbar-width: thin;
+}
+
+.leaderboard-scroll:focus-visible {
+    outline: 3px solid rgba(212, 175, 55, 0.24);
+    outline-offset: 4px;
 }
 
 a.leaderboard-row,
 a.leaderboard-row:visited,
 a.leaderboard-row:hover,
 a.leaderboard-row:active {
-    padding: 18px 20px;
-    margin-bottom: 12px;
-    border-radius: 20px;
+    min-height: 78px;
+    padding: 10px 14px;
+    margin-bottom: 10px;
+    border-radius: 8px;
     text-decoration: none;
     color: #fef3d6;
     background: rgba(212, 175, 55, 0.03);
-    transition: transform 0.15s ease, background 0.15s ease;
-    display: grid;
+    transition: transform 0.15s ease, background 0.15s ease, border-color 0.15s ease;
     border: 1px solid rgba(212, 175, 55, 0.08);
 }
 
-    a.leaderboard-row:hover {
-        transform: translateY(-2px);
-        background: rgba(212, 175, 55, 0.08);
-        border-color: rgba(212, 175, 55, 0.25);
-    }
+a.leaderboard-row:hover {
+    transform: translateY(-1px);
+    background: rgba(212, 175, 55, 0.08);
+    border-color: rgba(212, 175, 55, 0.25);
+}
+
+a.leaderboard-row.current-user {
+    background: rgba(212, 175, 55, 0.15);
+    border-color: rgba(212, 175, 55, 0.52);
+    box-shadow: inset 3px 0 0 #d4af37;
+}
 
 .leaderboard-place {
-    font-size: 26px;
-    font-weight: 800;
+    font-size: 22px;
+    font-weight: 900;
     color: #d4af37;
 }
 
-.leaderboard-achievements {
-    font-size: 24px;
-    font-weight: 800;
+.leaderboard-achievements,
+.leaderboard-level,
+.leaderboard-xp {
     color: #d4af37;
+    font-size: 20px;
+    font-weight: 900;
     text-align: right;
+}
+
+.leaderboard-achievements.weekly {
+    color: #34d399;
+}
+
+.leaderboard-achievements.total {
+    color: #dcbc6a;
+    font-size: 17px;
 }
 
 .leaderboard-user {
     display: flex;
     align-items: center;
-    gap: 16px;
+    gap: 12px;
     min-width: 0;
 }
 
 .leaderboard-avatar {
-    width: 72px !important;
-    height: 72px !important;
+    width: 56px !important;
+    height: 56px !important;
     object-fit: cover;
-    border-radius: 18px;
+    border-radius: 8px;
     flex-shrink: 0;
     border: 1px solid rgba(212, 175, 55, 0.35);
     display: block;
 }
 
 .leaderboard-name {
-    font-size: 24px;
-    font-weight: 700;
+    min-width: 0;
     color: #fef3d6;
-    word-break: break-word;
+    font-size: 17px;
+    font-weight: 800;
+    overflow-wrap: anywhere;
+}
+
+.leaderboard-xp {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 4px;
+}
+
+.leaderboard-xp strong {
+    color: #d4af37;
+    font-size: 16px;
+    line-height: 1.1;
+}
+
+.leaderboard-xp span {
+    color: #dcbc6a;
+    font-size: 12px;
+    font-weight: 800;
+}
+
+.leaderboard-level-progress {
+    height: 6px;
+    overflow: hidden;
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.08);
+}
+
+.leaderboard-level-progress div {
+    height: 100%;
+    border-radius: inherit;
+    background: linear-gradient(90deg, #d4af37, #34d399);
 }
 
 .leaderboard-empty {
-    padding: 30px 20px;
+    padding: 24px 14px;
     text-align: center;
     color: #e6c87a;
-    font-size: 18px;
+    font-size: 16px;
+}
+
+@media (max-width: 1240px) {
+    .leaderboard-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 680px) {
+    .leaderboard-page {
+        margin-top: 28px;
+        padding: 0 14px;
+    }
+
+    .leaderboard-title-block h1 {
+        font-size: 28px;
+    }
+
+    .leaderboard-container {
+        padding: 14px;
+    }
+
+    .leaderboard-header {
+        display: none;
+    }
+
+    .leaderboard-scroll {
+        max-height: 426px;
+        padding-right: 4px;
+    }
+
+    .achievement-board,
+    .weekly-board,
+    .level-board,
+    a.leaderboard-row.achievement-board,
+    a.leaderboard-row.weekly-board,
+    a.leaderboard-row.level-board {
+        grid-template-columns: 64px minmax(0, 1fr);
+    }
+
+    .leaderboard-achievements,
+    .leaderboard-level,
+    .leaderboard-xp {
+        grid-column: 2;
+        text-align: left;
+    }
+
+    .leaderboard-xp {
+        align-items: stretch;
+    }
+
+    .leaderboard-place {
+        font-size: 20px;
+    }
+
+    .leaderboard-avatar {
+        width: 48px !important;
+        height: 48px !important;
+    }
+
+    .leaderboard-name {
+        font-size: 16px;
+    }
+}
+
+.leaderboard-carousel {
+    max-width: 1080px;
+    margin: 0 auto;
+}
+
+.leaderboard-carousel-top {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 14px;
+    margin-bottom: 18px;
+}
+
+.leaderboard-carousel-tabs {
+    display: inline-flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 8px;
+    padding: 7px;
+    border-radius: 999px;
+    border: 1px solid rgba(212, 175, 55, 0.22);
+    background: rgba(212, 175, 55, 0.05);
+}
+
+.leaderboard-carousel-tab,
+.leaderboard-carousel-arrow {
+    border: 1px solid rgba(212, 175, 55, 0.25);
+    background: rgba(212, 175, 55, 0.07);
+    color: #fef3d6;
+    font-weight: 900;
+    cursor: pointer;
+    transition: transform 0.18s ease, border-color 0.18s ease, background 0.18s ease, box-shadow 0.18s ease;
+}
+
+.leaderboard-carousel-tab {
+    min-height: 38px;
+    padding: 8px 16px;
+    border-radius: 999px;
+}
+
+.leaderboard-carousel-arrow {
+    width: 42px;
+    height: 42px;
+    border-radius: 50%;
+    font-size: 30px;
+    line-height: 1;
+}
+
+.leaderboard-carousel-tab:hover,
+.leaderboard-carousel-tab.active,
+.leaderboard-carousel-arrow:hover {
+    transform: translateY(-1px);
+    border-color: #d4af37;
+    background: rgba(212, 175, 55, 0.16);
+    box-shadow: 0 0 16px rgba(212, 175, 55, 0.18);
+}
+
+.leaderboard-carousel-window {
+    overflow: hidden;
+    border-radius: 10px;
+}
+
+.leaderboard-carousel-track {
+    display: flex;
+    align-items: flex-start;
+    transition: transform 0.42s cubic-bezier(0.2, 0.8, 0.2, 1);
+    will-change: transform;
+}
+
+.leaderboard-slide {
+    flex: 0 0 100%;
+    min-width: 100%;
+    opacity: 0.35;
+    transform: scale(0.985);
+    transition: opacity 0.28s ease, transform 0.28s ease;
+}
+
+.leaderboard-slide.active {
+    opacity: 1;
+    transform: scale(1);
+}
+
+.leaderboard-slide .leaderboard-container {
+    min-height: 620px;
+}
+
+html[data-theme="light"] .leaderboard-carousel-tabs,
+html[data-theme="light"] .leaderboard-carousel-tab,
+html[data-theme="light"] .leaderboard-carousel-arrow {
+    color: var(--ar-muted-strong) !important;
+    border-color: var(--ar-border) !important;
+    background: rgba(119, 140, 42, 0.09) !important;
+}
+
+html[data-theme="light"] .leaderboard-carousel-tab.active,
+html[data-theme="light"] .leaderboard-carousel-tab:hover,
+html[data-theme="light"] .leaderboard-carousel-arrow:hover {
+    color: var(--ar-accent-strong) !important;
+    background: rgba(119, 140, 42, 0.16) !important;
+    box-shadow: 0 10px 22px rgba(68, 88, 27, 0.13) !important;
+}
+
+@media (max-width: 680px) {
+    .leaderboard-carousel-top {
+        gap: 8px;
+    }
+
+    .leaderboard-carousel-tab {
+        padding: 8px 12px;
+    }
+
+    .leaderboard-carousel-arrow {
+        width: 38px;
+        height: 38px;
+        font-size: 26px;
+    }
+
+    .leaderboard-slide .leaderboard-container {
+        min-height: 560px;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .leaderboard-carousel-track,
+    .leaderboard-slide,
+    .leaderboard-carousel-tab,
+    .leaderboard-carousel-arrow {
+        transition: none !important;
+    }
 }

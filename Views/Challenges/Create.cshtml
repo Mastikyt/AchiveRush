@@ -1,0 +1,245 @@
+@model WebApplication1.Models.ChallengeCreateViewModel
+@using WebApplication1.Models
+
+@{
+    ViewData["Title"] = "Создать челлендж";
+
+    string DifficultyLabel(string value) => value switch
+    {
+        ChallengeDifficulties.Easy => "Легко",
+        ChallengeDifficulties.Normal => "Нормально",
+        ChallengeDifficulties.Hard => "Сложно",
+        ChallengeDifficulties.Legendary => "Легендарно",
+        _ => value
+    };
+
+    string CategoryLabel(string value) => value switch
+    {
+        ChallengeCategories.Completion => "Закрытие",
+        ChallengeCategories.Speedrun => "Спидран",
+        ChallengeCategories.Collection => "Коллекция",
+        ChallengeCategories.RareHunt => "Редкости",
+        ChallengeCategories.Skill => "Скилл",
+        ChallengeCategories.Coop => "Кооператив",
+        ChallengeCategories.Hardcore => "Хардкор",
+        ChallengeCategories.Discovery => "Исследование",
+        ChallengeCategories.Creative => "Креатив",
+        ChallengeCategories.Community => "Сообщество",
+        _ => value
+    };
+
+    string TypeLabel(string value) => value switch
+    {
+        ChallengeTypes.Completion => "100% игры",
+        ChallengeTypes.AchievementHunt => "Охота за достижениями",
+        ChallengeTypes.RareAchievementHunt => "Редкие достижения",
+        ChallengeTypes.TimeTrial => "На время",
+        ChallengeTypes.Marathon => "Марафон",
+        ChallengeTypes.NoDeath => "Без смертей",
+        ChallengeTypes.TeamRun => "Командный забег",
+        ChallengeTypes.CreativeProof => "Креативное доказательство",
+        _ => value
+    };
+}
+
+<main class="challenges-page">
+    <section class="challenges-hero">
+        <div>
+            <span class="section-kicker">Новая заявка</span>
+            <h1>Создать челлендж</h1>
+            <p>После отправки челлендж попадет в админку на проверку.</p>
+        </div>
+    </section>
+
+    <nav class="challenge-tabs" aria-label="Разделы челленджей">
+        <a asp-controller="Challenges" asp-action="Index">Каталог</a>
+    </nav>
+
+    @if (TempData["ChallengesSuccess"] is string successMessage)
+    {
+        <div class="challenge-flash success">@successMessage</div>
+    }
+
+    @if (TempData["ChallengesError"] is string errorMessage)
+    {
+        <div class="challenge-flash error">@errorMessage</div>
+    }
+
+    <section class="challenge-create-panel">
+        @if (Model.IsSignedIn)
+        {
+            <form asp-controller="Challenges" asp-action="Create" method="post" enctype="multipart/form-data" class="challenge-create-form">
+                @Html.AntiForgeryToken()
+
+                <div class="challenge-form-layout">
+                    <div class="challenge-upload-panel">
+                        <input id="coverImageInput" class="challenge-upload-input" type="file" name="CoverImage" accept="image/png,image/jpeg,image/webp,image/gif" />
+                        <label for="coverImageInput" class="challenge-upload-zone">
+                            <img id="coverPreview" alt="" />
+                            <span>Загрузить обложку</span>
+                            <small>JPG, PNG, WEBP или GIF до 4 МБ</small>
+                        </label>
+                    </div>
+
+                    <div class="challenge-form-grid">
+                        <label class="wide">
+                            Название
+                            <input type="text" name="Title" maxlength="180" required />
+                        </label>
+
+                        <label>
+                            Категория
+                            <select name="Category">
+                                @foreach (var category in ChallengeCategories.All)
+                                {
+                                    <option value="@category">@CategoryLabel(category)</option>
+                                }
+                            </select>
+                        </label>
+
+                        <label>
+                            Тип
+                            <select name="ChallengeType" id="challengeTypeSelect">
+                                @foreach (var type in ChallengeTypes.All)
+                                {
+                                    <option value="@type">@TypeLabel(type)</option>
+                                }
+                            </select>
+                        </label>
+
+                        <label>
+                            Сложность
+                            <select name="Difficulty">
+                                @foreach (var difficulty in ChallengeDifficulties.All)
+                                {
+                                    <option value="@difficulty" selected="@(difficulty == ChallengeDifficulties.Normal ? "selected" : null)">@DifficultyLabel(difficulty)</option>
+                                }
+                            </select>
+                        </label>
+
+                        <label>
+                            Проверка
+                            <select name="VerificationType" id="verificationTypeSelect">
+                                <option value="@ChallengeVerificationTypes.Automatic">Автоматическая</option>
+                                <option value="@ChallengeVerificationTypes.Manual">Ручная</option>
+                            </select>
+                        </label>
+
+                        <label class="challenge-auto-field" data-verification-panel="automatic">
+                            Автоцель
+                            <select name="AutoGoalType" id="autoGoalSelect">
+                                <option value="@ChallengeAutoGoalTypes.GameCompletion100">Закрыть игру на 100%</option>
+                                <option value="@ChallengeAutoGoalTypes.EarnAchievementsInGame">Получить N достижений</option>
+                                <option value="@ChallengeAutoGoalTypes.EarnRareAchievementsInGame">Получить N редких</option>
+                            </select>
+                        </label>
+
+                        <label class="challenge-auto-field" data-verification-panel="automatic">
+                            Цель N
+                            <input type="number" name="TargetValue" id="targetValueInput" min="1" max="500" value="1" />
+                        </label>
+
+                        <label>
+                            Награда XP
+                            <input type="number" name="RewardExperience" min="1" max="100000" value="100" required />
+                        </label>
+
+                        <label>
+                            Мест
+                            <input type="number" name="ParticipantLimit" min="1" max="1000" value="10" required />
+                        </label>
+
+                        <label class="wide" id="gameField">
+                            Игра
+                            <select name="GameId" id="gameSelect">
+                                <option value="">Без привязки</option>
+                                @foreach (var game in Model.Games)
+                                {
+                                    <option value="@game.Id">@game.Name</option>
+                                }
+                            </select>
+                        </label>
+
+                        <label class="wide">
+                            Описание
+                            <textarea name="Description" maxlength="2000" required></textarea>
+                        </label>
+
+                        <label class="wide challenge-manual-field" data-verification-panel="manual">
+                            Правило ручного подтверждения
+                            <textarea name="ManualProofDescription" id="manualProofTextarea" maxlength="1000" placeholder="Например: отправить видео с финальным временем или скриншот таблицы результатов."></textarea>
+                        </label>
+                    </div>
+                </div>
+
+                <div class="challenge-create-actions">
+                    <button type="submit" class="challenge-btn primary">Отправить админу</button>
+                    <a class="challenge-btn secondary" asp-controller="Challenges" asp-action="Index">Отмена</a>
+                </div>
+            </form>
+        }
+        else
+        {
+            <div class="challenge-empty">
+                Чтобы создать челлендж, войди через Steam.
+                <a class="challenge-btn primary" asp-controller="Account" asp-action="Login">Войти</a>
+            </div>
+        }
+    </section>
+</main>
+
+<script>
+    (() => {
+        const fileInput = document.getElementById('coverImageInput');
+        const preview = document.getElementById('coverPreview');
+        const verification = document.getElementById('verificationTypeSelect');
+        const autoGoal = document.getElementById('autoGoalSelect');
+        const targetValue = document.getElementById('targetValueInput');
+        const manualProof = document.getElementById('manualProofTextarea');
+        const gameSelect = document.getElementById('gameSelect');
+        const automaticPanels = document.querySelectorAll('[data-verification-panel="automatic"]');
+        const manualPanels = document.querySelectorAll('[data-verification-panel="manual"]');
+        const challengeType = document.getElementById('challengeTypeSelect');
+
+        fileInput?.addEventListener('change', () => {
+            const file = fileInput.files?.[0];
+            if (!file || !preview) return;
+
+            preview.src = URL.createObjectURL(file);
+            preview.classList.add('visible');
+        });
+
+        challengeType?.addEventListener('change', () => {
+            if (!autoGoal) return;
+
+            if (challengeType.value === '@ChallengeTypes.AchievementHunt') {
+                autoGoal.value = '@ChallengeAutoGoalTypes.EarnAchievementsInGame';
+            } else if (challengeType.value === '@ChallengeTypes.RareAchievementHunt') {
+                autoGoal.value = '@ChallengeAutoGoalTypes.EarnRareAchievementsInGame';
+            } else if (challengeType.value === '@ChallengeTypes.Completion') {
+                autoGoal.value = '@ChallengeAutoGoalTypes.GameCompletion100';
+            }
+        });
+
+        const updateVerificationFields = () => {
+            const isManual = verification?.value === '@ChallengeVerificationTypes.Manual';
+
+            automaticPanels.forEach(panel => {
+                panel.hidden = isManual;
+            });
+
+            manualPanels.forEach(panel => {
+                panel.hidden = !isManual;
+            });
+
+            autoGoal?.toggleAttribute('disabled', isManual);
+            targetValue?.toggleAttribute('disabled', isManual);
+            manualProof?.toggleAttribute('disabled', !isManual);
+            manualProof?.toggleAttribute('required', isManual);
+            gameSelect?.toggleAttribute('required', !isManual);
+        };
+
+        verification?.addEventListener('change', updateVerificationFields);
+        updateVerificationFields();
+    })();
+</script>

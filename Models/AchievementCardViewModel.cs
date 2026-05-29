@@ -1,4 +1,4 @@
-namespace WebApplication1.Models
+﻿namespace WebApplication1.Models
 {
     public class AchievementCardViewModel
     {
@@ -9,6 +9,8 @@ namespace WebApplication1.Models
         public string Description { get; set; } = "";
 
         public string GameName { get; set; } = "";
+
+        public int GameId { get; set; }
 
         public string GameAvatarUrl { get; set; } = "";
 

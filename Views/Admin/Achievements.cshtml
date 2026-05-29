@@ -1,0 +1,138 @@
+@model WebApplication1.Models.AdminAchievementsViewModel
+
+@{
+    ViewData["Title"] = "Админка: достижения";
+}
+
+<div class="admin-page">
+    <div class="admin-container">
+        <div class="admin-header">
+            <div>
+                <h1>Достижения</h1>
+                <p>Модерация новых пользовательских достижений и подтверждение их выполнения.</p>
+            </div>
+            <form method="post" asp-controller="Admin" asp-action="Logout">
+                @Html.AntiForgeryToken()
+                <button type="submit" class="admin-logout-btn">Выйти</button>
+            </form>
+        </div>
+
+        <partial name="_AdminNav" />
+
+        @if (TempData["AdminSuccess"] != null)
+        {
+            <div class="admin-flash admin-flash-success">@TempData["AdminSuccess"]</div>
+        }
+        @if (TempData["AdminError"] != null)
+        {
+            <div class="admin-flash admin-flash-error">@TempData["AdminError"]</div>
+        }
+
+        <section class="admin-section" id="custom-achievement-requests">
+            <div class="admin-section-head">
+                <h2>Заявки на добавление достижений</h2>
+                <p>После одобрения достижение появится на странице игры.</p>
+            </div>
+
+            @if (!Model.CustomAchievementRequests.Any())
+            {
+                <div class="admin-empty">Нет заявок на добавление достижений.</div>
+            }
+            else
+            {
+                <div class="admin-grid">
+                    @foreach (var item in Model.CustomAchievementRequests)
+                    {
+                        <div class="request-card">
+                            <div class="request-image-wrap">
+                                <img src="@(string.IsNullOrWhiteSpace(item.IconUrl) ? item.GameAvatarUrl : item.IconUrl)" alt="@item.Title" class="request-image" />
+                                <div class="request-status pending">Pending</div>
+                            </div>
+                            <div class="request-body">
+                                <h3>@item.Title</h3>
+                                <div class="request-meta">
+                                    <div class="request-meta-item"><span>Игра</span><strong>@item.GameName</strong></div>
+                                    <div class="request-meta-item"><span>Автор</span><strong>@item.RequestedBy</strong></div>
+                                </div>
+                                <div class="request-link-box"><span>Описание</span><div>@item.Description</div></div>
+                                <div class="request-link-box"><span>Как получить</span><div>@item.ObtainMethod</div></div>
+                                <div class="request-date">Создано: @item.CreatedAt.ToLocalTime().ToString("dd.MM.yyyy HH:mm")</div>
+                                <div class="request-actions">
+                                    <form method="post" asp-controller="Admin" asp-action="ApproveCustomAchievementRequest">
+                                        @Html.AntiForgeryToken()
+                                        <input type="hidden" name="id" value="@item.Id" />
+                                        <button type="submit" class="btn-approve">Подтвердить</button>
+                                    </form>
+                                    <form method="post" asp-controller="Admin" asp-action="RejectCustomAchievementRequest">
+                                        @Html.AntiForgeryToken()
+                                        <input type="hidden" name="id" value="@item.Id" />
+                                        <button type="submit" class="btn-reject">Отклонить</button>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    }
+                </div>
+            }
+        </section>
+
+        <section class="admin-section" id="custom-claim-requests">
+            <div class="admin-section-head">
+                <h2>Подтверждение получения достижений</h2>
+                <p>Для кастомных достижений пользователь отправляет доказательство, а админ подтверждает результат.</p>
+            </div>
+
+            @if (!Model.CustomAchievementClaimRequests.Any())
+            {
+                <div class="admin-empty">Нет заявок на подтверждение получения.</div>
+            }
+            else
+            {
+                <div class="admin-grid">
+                    @foreach (var item in Model.CustomAchievementClaimRequests)
+                    {
+                        <div class="request-card">
+                            <div class="request-image-wrap">
+                                <img src="@item.GameAvatarUrl" alt="@item.GameName" class="request-image" />
+                                <div class="request-status pending">Pending</div>
+                            </div>
+                            <div class="request-body">
+                                <h3>@item.AchievementTitle</h3>
+                                <div class="request-meta">
+                                    <div class="request-meta-item"><span>Игра</span><strong>@item.GameName</strong></div>
+                                    <div class="request-meta-item"><span>Пользователь</span><strong>@item.UserName</strong></div>
+                                </div>
+                                @if (!string.IsNullOrWhiteSpace(item.Comment))
+                                {
+                                    <div class="request-link-box"><span>Комментарий</span><div>@item.Comment</div></div>
+                                }
+                                @if (!string.IsNullOrWhiteSpace(item.ProofUrl))
+                                {
+                                    <div class="request-link-box">
+                                        <span>Доказательство</span>
+                                        <a href="@item.ProofUrl" target="_blank" rel="noopener noreferrer">@item.ProofUrl</a>
+                                    </div>
+                                }
+                                <div class="request-date">Создано: @item.CreatedAt.ToLocalTime().ToString("dd.MM.yyyy HH:mm")</div>
+                                <div class="request-actions">
+                                    <form method="post" asp-controller="Admin" asp-action="ApproveCustomAchievementClaimRequest">
+                                        @Html.AntiForgeryToken()
+                                        <input type="hidden" name="id" value="@item.Id" />
+                                        <button type="submit" class="btn-approve">Подтвердить</button>
+                                    </form>
+                                    <form method="post" asp-controller="Admin" asp-action="RejectCustomAchievementClaimRequest">
+                                        @Html.AntiForgeryToken()
+                                        <input type="hidden" name="id" value="@item.Id" />
+                                        <button type="submit" class="btn-reject">Отклонить</button>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    }
+                </div>
+            }
+        </section>
+    </div>
+</div>
+
+<partial name="_AdminStyles" />

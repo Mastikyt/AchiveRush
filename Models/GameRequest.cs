@@ -16,6 +16,10 @@ namespace WebApplication1.Models
 
         public int AchievementsCount { get; set; }
 
+        public int? RequestedByUserId { get; set; }
+
+        public User? RequestedByUser { get; set; }
+
         [Required]
         public string SteamUrl { get; set; } = string.Empty;
 
