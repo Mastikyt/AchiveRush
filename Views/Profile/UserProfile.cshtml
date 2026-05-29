@@ -26,30 +26,16 @@
     }
 
     var recentAchievements = (IEnumerable<WebApplication1.Models.AchievementCardViewModel>)ViewBag.RecentAchievements;
-    var rareAchievements = (IEnumerable<WebApplication1.Models.AchievementCardViewModel>)ViewBag.RareAchievements;
-    var pagedAchievements = (IEnumerable<WebApplication1.Models.AchievementCardViewModel>)ViewBag.PagedAchievements;
     var currentPage = (int)(ViewBag.CurrentPage ?? 1);
-    var totalPages = (int)(ViewBag.TotalPages ?? 1);
     var pageSize = (int)(ViewBag.PageSize ?? 24);
     var currentRarityFilter = (string)(ViewBag.CurrentRarityFilter ?? "all");
-    var filteredAchievements = (int)(ViewBag.FilteredAchievements ?? ViewBag.TotalAchievements ?? 0);
+    var timelineSeries = (ViewBag.AchievementTimeline as WebApplication1.Models.AchievementTimelineViewModel)?.Series
+        ?? new List<WebApplication1.Models.AchievementTimelineSeriesViewModel>();
     var levelInfo = ViewBag.LevelInfo as WebApplication1.Models.AchievementLevelInfo;
     var levelProgress = levelInfo?.ProgressPercent.ToString("0.##", CultureInfo.InvariantCulture) ?? "0";
     var steamProfileUrl = string.IsNullOrWhiteSpace(Model.SteamId)
         ? ""
         : $"https://steamcommunity.com/profiles/{Uri.EscapeDataString(Model.SteamId)}";
-    var pagerStart = Math.Max(1, currentPage - 2);
-    var pagerEnd = Math.Min(totalPages, currentPage + 2);
-
-    if (currentPage <= 4)
-    {
-        pagerEnd = Math.Min(totalPages, 7);
-    }
-
-    if (currentPage >= totalPages - 3)
-    {
-        pagerStart = Math.Max(1, totalPages - 6);
-    }
 }
 
 <section class="profile-page">
@@ -97,6 +83,11 @@
                                 @Html.AntiForgeryToken()
                                 <button class="profile-sync-btn" type="submit">Синхронизировать ачивки</button>
                             </form>
+
+                            <div id="profile-auto-sync"
+                                 data-url="@Url.Action("AutoSync", "Profile")"
+                                 data-total="@((int)(ViewBag.TotalAchievements ?? 0))"
+                                 hidden></div>
                             }
                         </div>
                     }
@@ -134,6 +125,131 @@
         </div>
     </div>
 
+    @if (timelineSeries.Any())
+    {
+        <section class="achievement-timeline-panel" aria-labelledby="achievement-timeline-title">
+            <div class="achievement-timeline-head">
+                <div>
+                    <h2 id="achievement-timeline-title">Статистика получения ачивок</h2>
+                    <p>Динамика по датам получения достижений.</p>
+                </div>
+
+                <div class="achievement-timeline-tabs" role="tablist" aria-label="Период статистики">
+                    @for (var i = 0; i < timelineSeries.Count; i++)
+                    {
+                        var series = timelineSeries[i];
+                        <button class="achievement-timeline-tab @(i == 0 ? "active" : "")"
+                                type="button"
+                                role="tab"
+                                aria-selected="@(i == 0 ? "true" : "false")"
+                                aria-controls="achievement-timeline-@series.Key"
+                                data-timeline-tab="@series.Key">
+                            @series.Label
+                        </button>
+                    }
+                </div>
+            </div>
+
+            @for (var i = 0; i < timelineSeries.Count; i++)
+            {
+                var series = timelineSeries[i];
+                var graphWidth = 960d;
+                var graphHeight = 300d;
+                var graphLeft = 54d;
+                var graphRight = 24d;
+                var graphTop = 24d;
+                var graphBottom = 238d;
+                var plotWidth = graphWidth - graphLeft - graphRight;
+                var plotHeight = graphBottom - graphTop;
+                var graphPoints = series.Points
+                    .Select((point, index) => new
+                    {
+                        Point = point,
+                        Index = index,
+                        X = graphLeft + (series.Points.Count <= 1 ? plotWidth / 2 : plotWidth * index / (series.Points.Count - 1)),
+                        Y = graphBottom - point.Percent * plotHeight / 100d
+                    })
+                    .ToList();
+                var linePath = graphPoints.Any()
+                    ? string.Join(" ", graphPoints.Select((point, index) =>
+                        $"{(index == 0 ? "M" : "L")} {point.X.ToString("0.##", CultureInfo.InvariantCulture)} {point.Y.ToString("0.##", CultureInfo.InvariantCulture)}"))
+                    : "";
+                var areaPath = graphPoints.Any()
+                    ? $"M {graphPoints.First().X.ToString("0.##", CultureInfo.InvariantCulture)} {graphBottom.ToString("0.##", CultureInfo.InvariantCulture)} " +
+                      string.Join(" ", graphPoints.Select(point =>
+                          $"L {point.X.ToString("0.##", CultureInfo.InvariantCulture)} {point.Y.ToString("0.##", CultureInfo.InvariantCulture)}")) +
+                      $" L {graphPoints.Last().X.ToString("0.##", CultureInfo.InvariantCulture)} {graphBottom.ToString("0.##", CultureInfo.InvariantCulture)} Z"
+                    : "";
+
+                <div id="achievement-timeline-@series.Key"
+                     class="achievement-timeline-chart @(i == 0 ? "active" : "")"
+                     role="tabpanel"
+                     data-timeline-chart="@series.Key">
+                    <div class="achievement-timeline-meta">
+                        <span>@series.Description</span>
+                        <strong>@series.Total</strong>
+                    </div>
+
+                    <div class="achievement-graph-scroll">
+                        <svg class="achievement-graph"
+                             viewBox="0 0 @graphWidth.ToString("0", CultureInfo.InvariantCulture) @graphHeight.ToString("0", CultureInfo.InvariantCulture)"
+                             role="img"
+                             aria-label="@($"{series.Label}: {series.Total} ачивок")">
+                            <defs>
+                                <linearGradient id="achievement-line-gradient-@series.Key" x1="0" y1="0" x2="1" y2="0">
+                                    <stop offset="0%" stop-color="#34d399" />
+                                    <stop offset="50%" stop-color="#d4af37" />
+                                    <stop offset="100%" stop-color="#f5d77b" />
+                                </linearGradient>
+                                <linearGradient id="achievement-area-gradient-@series.Key" x1="0" y1="0" x2="0" y2="1">
+                                    <stop offset="0%" stop-color="#d4af37" stop-opacity="0.28" />
+                                    <stop offset="100%" stop-color="#34d399" stop-opacity="0.03" />
+                                </linearGradient>
+                            </defs>
+
+                            @for (var grid = 0; grid <= 4; grid++)
+                            {
+                                var y = graphBottom - plotHeight * grid / 4d;
+                                var value = series.MaxCount == 0 ? 0 : (int)Math.Round(series.MaxCount * grid / 4d);
+                                <line class="achievement-graph-grid"
+                                      x1="@graphLeft.ToString("0.##", CultureInfo.InvariantCulture)"
+                                      y1="@y.ToString("0.##", CultureInfo.InvariantCulture)"
+                                      x2="@((graphWidth - graphRight).ToString("0.##", CultureInfo.InvariantCulture))"
+                                      y2="@y.ToString("0.##", CultureInfo.InvariantCulture)" />
+                                @Html.Raw($"<text class=\"achievement-graph-axis\" x=\"14\" y=\"{(y + 4).ToString("0.##", CultureInfo.InvariantCulture)}\">{value}</text>")
+                            }
+
+                            @if (graphPoints.Any())
+                            {
+                                <path class="achievement-graph-area" d="@areaPath" />
+                                <path class="achievement-graph-line" d="@linePath" pathLength="1" />
+
+                                @foreach (var point in graphPoints)
+                                {
+                                    var pointDelay = $"{(220 + point.Index * 36).ToString(CultureInfo.InvariantCulture)}ms";
+                                    var labelClass = series.Points.Count > 12 && point.Index % 3 != 0
+                                        ? "achievement-graph-label compact-hidden"
+                                        : "achievement-graph-label";
+
+                                    <g class="achievement-graph-point"
+                                       style="--point-delay:@pointDelay"
+                                       tabindex="0">
+                                        <title>@($"{point.Point.Label}: {point.Point.Count}")</title>
+                                        <circle cx="@point.X.ToString("0.##", CultureInfo.InvariantCulture)"
+                                                cy="@point.Y.ToString("0.##", CultureInfo.InvariantCulture)"
+                                                r="5" />
+                                    </g>
+
+                                    @Html.Raw($"<text class=\"{labelClass}\" x=\"{point.X.ToString("0.##", CultureInfo.InvariantCulture)}\" y=\"276\">{System.Net.WebUtility.HtmlEncode(point.Point.ShortLabel)}</text>")
+                                }
+                            }
+                        </svg>
+                    </div>
+                </div>
+            }
+        </section>
+    }
+
     <h2 class="profile-section-title">Последние достижения</h2>
     @if (recentAchievements.Any())
     {
@@ -149,69 +265,190 @@
         <div class="no-achievements">Пока нет полученных достижений.</div>
     }
 
-    <div class="profile-section-head">
-        <div>
-            <h2 class="profile-section-title">Все достижения</h2>
-            <div class="profile-section-subtitle">Показано: @filteredAchievements</div>
-        </div>
-
-        <div class="profile-rarity-filter">
-            <a asp-action="UserProfile" asp-route-steamId="@Model.SteamId" asp-route-rarity="all" asp-route-page="1" asp-route-pageSize="@pageSize" class="rarity-filter-btn @(currentRarityFilter == "all" ? "active" : "")">Все</a>
-            <a asp-action="UserProfile" asp-route-steamId="@Model.SteamId" asp-route-rarity="legendary" asp-route-page="1" asp-route-pageSize="@pageSize" class="rarity-filter-btn legendary @(currentRarityFilter == "legendary" ? "active" : "")">Легендарные</a>
-            <a asp-action="UserProfile" asp-route-steamId="@Model.SteamId" asp-route-rarity="epic" asp-route-page="1" asp-route-pageSize="@pageSize" class="rarity-filter-btn epic @(currentRarityFilter == "epic" ? "active" : "")">Эпические</a>
-            <a asp-action="UserProfile" asp-route-steamId="@Model.SteamId" asp-route-rarity="rare" asp-route-page="1" asp-route-pageSize="@pageSize" class="rarity-filter-btn rare @(currentRarityFilter == "rare" ? "active" : "")">Редкие</a>
-            <a asp-action="UserProfile" asp-route-steamId="@Model.SteamId" asp-route-rarity="common" asp-route-page="1" asp-route-pageSize="@pageSize" class="rarity-filter-btn common @(currentRarityFilter == "common" ? "active" : "")">Обычные</a>
-        </div>
-    </div>
-    @if (pagedAchievements.Any())
-    {
-        <div class="achievements-grid">
-            @foreach (var ua in pagedAchievements)
-            {
-                <partial name="_AchievementCard" model="ua" />
-            }
-        </div>
-
-        @if (totalPages > 1)
-        {
-            <div class="pagination">
-                @if (currentPage > 1)
-                {
-                    <a asp-action="UserProfile" asp-route-steamId="@Model.SteamId" asp-route-page="@(currentPage - 1)" asp-route-pageSize="@pageSize" asp-route-rarity="@currentRarityFilter" class="page-btn" aria-label="Предыдущая страница">&laquo;</a>
-                }
-
-                @if (pagerStart > 1)
-                {
-                    <a asp-action="UserProfile" asp-route-steamId="@Model.SteamId" asp-route-page="1" asp-route-pageSize="@pageSize" asp-route-rarity="@currentRarityFilter" class="page-btn">1</a>
-                    @if (pagerStart > 2)
-                    {
-                        <span class="page-ellipsis">...</span>
-                    }
-                }
-
-                @for (int i = pagerStart; i <= pagerEnd; i++)
-                {
-                    <a asp-action="UserProfile" asp-route-steamId="@Model.SteamId" asp-route-page="@i" asp-route-pageSize="@pageSize" asp-route-rarity="@currentRarityFilter" class="page-btn @(i == currentPage ? "active" : "")">@i</a>
-                }
-
-                @if (pagerEnd < totalPages)
-                {
-                    @if (pagerEnd < totalPages - 1)
-                    {
-                        <span class="page-ellipsis">...</span>
-                    }
-                    <a asp-action="UserProfile" asp-route-steamId="@Model.SteamId" asp-route-page="@totalPages" asp-route-pageSize="@pageSize" asp-route-rarity="@currentRarityFilter" class="page-btn">@totalPages</a>
-                }
-
-                @if (currentPage < totalPages)
-                {
-                    <a asp-action="UserProfile" asp-route-steamId="@Model.SteamId" asp-route-page="@(currentPage + 1)" asp-route-pageSize="@pageSize" asp-route-rarity="@currentRarityFilter" class="page-btn" aria-label="Следующая страница">&raquo;</a>
-                }
-            </div>
-        }
-    }
-    else
-    {
-        <div class="no-achievements">Достижения еще не синхронизированы.</div>
-    }
+    <section id="profile-achievements"
+             class="profile-achievements-panel"
+             data-achievements-url="@Url.Action("Achievements", "Profile", new { steamId = Model.SteamId })"
+             data-page-size="@pageSize"
+             data-current-page="@currentPage"
+             data-current-rarity="@currentRarityFilter">
+        <partial name="_ProfileAchievementsList" />
+    </section>
 </section>
+
+<script>
+    (() => {
+        const panel = document.querySelector('.achievement-timeline-panel');
+        if (!panel) {
+            return;
+        }
+
+        const tabs = [...panel.querySelectorAll('[data-timeline-tab]')];
+        const charts = [...panel.querySelectorAll('[data-timeline-chart]')];
+        const reveal = () => panel.classList.add('is-visible');
+
+        if ('IntersectionObserver' in window) {
+            const observer = new IntersectionObserver((entries) => {
+                if (entries.some((entry) => entry.isIntersecting)) {
+                    reveal();
+                    observer.disconnect();
+                }
+            }, { threshold: 0.2 });
+
+            observer.observe(panel);
+        } else {
+            reveal();
+        }
+
+        tabs.forEach((tab) => {
+            tab.addEventListener('click', () => {
+                const key = tab.dataset.timelineTab;
+
+                tabs.forEach((item) => {
+                    const isActive = item === tab;
+                    item.classList.toggle('active', isActive);
+                    item.setAttribute('aria-selected', isActive ? 'true' : 'false');
+                });
+
+                charts.forEach((chart) => {
+                    const isActive = chart.dataset.timelineChart === key;
+                    chart.classList.toggle('active', isActive);
+
+                    if (isActive) {
+                        chart.classList.remove('is-replaying');
+                        void chart.offsetWidth;
+                        chart.classList.add('is-replaying');
+                    }
+                });
+            });
+        });
+    })();
+</script>
+
+<script>
+    (() => {
+        const container = document.getElementById('profile-achievements');
+        if (!container || !window.fetch) {
+            return;
+        }
+
+        const endpoint = container.dataset.achievementsUrl;
+        const pageSize = container.dataset.pageSize || '24';
+        let loading = false;
+
+        const updateState = () => {
+            const state = container.querySelector('[data-achievements-state]');
+            if (!state) {
+                return;
+            }
+
+            container.dataset.currentPage = state.dataset.currentPage || container.dataset.currentPage || '1';
+            container.dataset.currentRarity = state.dataset.rarity || container.dataset.currentRarity || 'all';
+        };
+
+        const loadAchievements = async (page, rarity) => {
+            if (loading || !endpoint) {
+                return;
+            }
+
+            loading = true;
+            container.classList.add('is-loading');
+
+            const url = new URL(endpoint, window.location.origin);
+            url.searchParams.set('page', page || container.dataset.currentPage || '1');
+            url.searchParams.set('pageSize', pageSize);
+            url.searchParams.set('rarity', rarity || container.dataset.currentRarity || 'all');
+
+            try {
+                const response = await fetch(url.toString(), {
+                    method: 'GET',
+                    credentials: 'same-origin',
+                    headers: {
+                        'X-Requested-With': 'XMLHttpRequest'
+                    }
+                });
+
+                if (!response.ok) {
+                    window.location.href = url.toString().replace('/Achievements', '/UserProfile');
+                    return;
+                }
+
+                container.innerHTML = await response.text();
+                updateState();
+                container.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            } catch {
+                window.location.reload();
+            } finally {
+                loading = false;
+                container.classList.remove('is-loading');
+            }
+        };
+
+        updateState();
+
+        container.addEventListener('click', (event) => {
+            const link = event.target.closest('[data-achievement-page]');
+            if (!link) {
+                return;
+            }
+
+            event.preventDefault();
+            loadAchievements(link.dataset.achievementPage, link.dataset.achievementRarity);
+        });
+    })();
+</script>
+
+@if (isOwner)
+{
+    <script>
+        (() => {
+            const marker = document.getElementById('profile-auto-sync');
+            if (!marker || !window.fetch) {
+                return;
+            }
+
+            const tokenInput = document.querySelector('.profile-actions input[name="__RequestVerificationToken"]');
+            const token = tokenInput ? tokenInput.value : '';
+            const url = marker.dataset.url;
+            let knownTotal = Number(marker.dataset.total || '0');
+            let syncing = false;
+
+            const syncProfile = async () => {
+                if (document.hidden || syncing || !token || !url) {
+                    return;
+                }
+
+                syncing = true;
+
+                try {
+                    const response = await fetch(url, {
+                        method: 'POST',
+                        credentials: 'same-origin',
+                        headers: {
+                            'RequestVerificationToken': token
+                        }
+                    });
+
+                    if (!response.ok) {
+                        return;
+                    }
+
+                    const data = await response.json();
+                    const total = Number(data.totalAchievements || knownTotal);
+
+                    if (data.changed || total !== knownTotal) {
+                        window.location.reload();
+                        return;
+                    }
+
+                    knownTotal = total;
+                } catch {
+                } finally {
+                    syncing = false;
+                }
+            };
+
+            window.setTimeout(syncProfile, 2000);
+            window.setInterval(syncProfile, 60000);
+        })();
+    </script>
+}

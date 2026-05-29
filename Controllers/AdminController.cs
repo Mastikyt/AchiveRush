@@ -61,6 +61,72 @@ namespace WebApplication1.Controllers
             HttpContext.Session.Remove("AdminAccessSteamId");
         }
 
+        private bool IsDynamicAdminRequest()
+        {
+            return string.Equals(
+                Request.Headers["X-Requested-With"],
+                "XMLHttpRequest",
+                StringComparison.OrdinalIgnoreCase);
+        }
+
+        private static string GameRequestStatusClass(string status)
+        {
+            return status switch
+            {
+                "Approved" => "approved",
+                "Rejected" => "rejected",
+                "Deleted" => "deleted",
+                _ => "pending"
+            };
+        }
+
+        private static string ChallengeStatusClass(string status)
+        {
+            return status switch
+            {
+                ChallengeStatuses.Approved => "approved",
+                ChallengeStatuses.Rejected => "rejected",
+                _ => "pending"
+            };
+        }
+
+        private IActionResult AdminDynamicOrRedirect(
+            string actionName,
+            object? routeValues,
+            string fragment,
+            string? successMessage = null,
+            string? errorMessage = null,
+            string? status = null,
+            string? statusClass = null,
+            bool removeCard = false,
+            bool disableActions = true)
+        {
+            if (IsDynamicAdminRequest())
+            {
+                Response.StatusCode = string.IsNullOrWhiteSpace(errorMessage)
+                    ? StatusCodes.Status200OK
+                    : StatusCodes.Status400BadRequest;
+
+                return Json(new
+                {
+                    ok = string.IsNullOrWhiteSpace(errorMessage),
+                    message = string.IsNullOrWhiteSpace(errorMessage) ? successMessage : errorMessage,
+                    status,
+                    statusClass,
+                    removeCard,
+                    disableActions
+                });
+            }
+
+            if (!string.IsNullOrWhiteSpace(successMessage))
+                TempData["AdminSuccess"] = successMessage;
+
+            if (!string.IsNullOrWhiteSpace(errorMessage))
+                TempData["AdminError"] = errorMessage;
+
+            return RedirectToAction(actionName, null, routeValues, fragment);
+        }
+
         private async Task PrepareLoginViewAsync(ApplicationUser? identityUser = null)
         {
             identityUser ??= await _userManager.GetUserAsync(User);
@@ -498,10 +564,21 @@ namespace WebApplication1.Controllers
 
             var request = await _context.GameRequests.FirstOrDefaultAsync(x => x.Id == id);
             if (request == null)
+            {
+                if (IsDynamicAdminRequest())
+                    return AdminDynamicOrRedirect(nameof(Games), new { requestsPage, gamesPage }, "game-requests", errorMessage: "Запись не найдена.");
+
                 return View("~/Views/Shared/NotFound.cshtml", "Запись не найдена.");
+            }
 
             if (request.Status != "Pending")
-                return RedirectToAction(nameof(Games), null, new { requestsPage, gamesPage }, "game-requests");
+                return AdminDynamicOrRedirect(
+                    nameof(Games),
+                    new { requestsPage, gamesPage },
+                    "game-requests",
+                    errorMessage: "Эта заявка уже обработана.",
+                    status: request.Status,
+                    statusClass: GameRequestStatusClass(request.Status));
 
             var existingGame = await _context.Games
                 .FirstOrDefaultAsync(g => g.SteamAppId == request.SteamAppId);
@@ -516,7 +593,13 @@ namespace WebApplication1.Controllers
                     $"Предложенная игра «{existingGame.Name}» уже есть в каталоге.",
                     $"/Games/Details/{existingGame.Id}");
                 await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Games), null, new { requestsPage, gamesPage }, "game-requests");
+                return AdminDynamicOrRedirect(
+                    nameof(Games),
+                    new { requestsPage, gamesPage },
+                    "game-requests",
+                    successMessage: $"Игра «{existingGame.Name}» уже была в каталоге, заявка отмечена как одобренная.",
+                    status: request.Status,
+                    statusClass: GameRequestStatusClass(request.Status));
             }
 
             var gameDataTask = _steamService.GetGameDataAsync(request.SteamAppId);
@@ -528,8 +611,12 @@ namespace WebApplication1.Controllers
             var gameData = await gameDataTask;
             if (gameData == null)
             {
-                TempData["AdminError"] = "Не удалось получить данные игры из Steam.";
-                return RedirectToAction(nameof(Games), null, new { requestsPage, gamesPage }, "game-requests");
+                return AdminDynamicOrRedirect(
+                    nameof(Games),
+                    new { requestsPage, gamesPage },
+                    "game-requests",
+                    errorMessage: "Не удалось получить данные игры из Steam.",
+                    disableActions: false);
             }
 
             var schemaAchievements = await schemaAchievementsTask;
@@ -537,8 +624,13 @@ namespace WebApplication1.Controllers
             {
                 request.Status = "Rejected";
                 await _context.SaveChangesAsync();
-                TempData["AdminError"] = "Steam не вернул достижения для этой игры. Заявка отклонена автоматически.";
-                return RedirectToAction(nameof(Games), null, new { requestsPage, gamesPage }, "game-requests");
+                return AdminDynamicOrRedirect(
+                    nameof(Games),
+                    new { requestsPage, gamesPage },
+                    "game-requests",
+                    errorMessage: "Steam не вернул достижения для этой игры. Заявка отклонена автоматически.",
+                    status: request.Status,
+                    statusClass: GameRequestStatusClass(request.Status));
             }
 
             var game = new Game
@@ -593,8 +685,13 @@ namespace WebApplication1.Controllers
                 $"/Games/Details/{game.Id}");
             await _context.SaveChangesAsync();
 
-            TempData["AdminSuccess"] = "Игра успешно добавлена в каталог.";
-            return RedirectToAction(nameof(Games), null, new { requestsPage, gamesPage }, "game-requests");
+            return AdminDynamicOrRedirect(
+                nameof(Games),
+                new { requestsPage, gamesPage },
+                "game-requests",
+                successMessage: "Игра успешно добавлена в каталог.",
+                status: request.Status,
+                statusClass: GameRequestStatusClass(request.Status));
         }
 
         [HttpPost]
@@ -680,13 +777,23 @@ namespace WebApplication1.Controllers
 
             var request = await _context.GameRequests.FirstOrDefaultAsync(x => x.Id == id);
             if (request == null)
+            {
+                if (IsDynamicAdminRequest())
+                    return AdminDynamicOrRedirect(nameof(Games), new { requestsPage, gamesPage }, "game-requests", errorMessage: "Запись не найдена.");
+
                 return View("~/Views/Shared/NotFound.cshtml", "Запись не найдена.");
+            }
 
             request.Status = "Rejected";
             await _context.SaveChangesAsync();
 
-            TempData["AdminSuccess"] = "Заявка отклонена.";
-            return RedirectToAction(nameof(Games), null, new { requestsPage, gamesPage }, "game-requests");
+            return AdminDynamicOrRedirect(
+                nameof(Games),
+                new { requestsPage, gamesPage },
+                "game-requests",
+                successMessage: "Заявка отклонена.",
+                status: request.Status,
+                statusClass: GameRequestStatusClass(request.Status));
         }
 
         [HttpPost]
@@ -777,8 +884,11 @@ namespace WebApplication1.Controllers
 
             if (game == null)
             {
-                TempData["AdminError"] = "Игра не найдена.";
-                return RedirectToAction(nameof(Games), null, new { requestsPage, gamesPage }, "admin-games");
+                return AdminDynamicOrRedirect(
+                    nameof(Games),
+                    new { requestsPage, gamesPage },
+                    "admin-games",
+                    errorMessage: "Игра не найдена.");
             }
 
             var changes = await RefreshGameLocalizationAsync(game);
@@ -883,8 +993,12 @@ namespace WebApplication1.Controllers
 
             await transaction.CommitAsync();
 
-            TempData["AdminSuccess"] = $"Игра «{game.Name}» удалена. Удалено достижений: {deletedAchievements}, записей в профилях: {deletedProfileAchievements}.";
-            return RedirectToAction(nameof(Games), null, new { requestsPage, gamesPage }, "admin-games");
+            return AdminDynamicOrRedirect(
+                nameof(Games),
+                new { requestsPage, gamesPage },
+                "admin-games",
+                successMessage: $"Игра «{game.Name}» удалена. Удалено достижений: {deletedAchievements}, записей в профилях: {deletedProfileAchievements}.",
+                removeCard: true);
         }
 
         [HttpPost]
@@ -896,10 +1010,21 @@ namespace WebApplication1.Controllers
 
             var challenge = await _context.Challenges.FirstOrDefaultAsync(x => x.Id == id);
             if (challenge == null)
+            {
+                if (IsDynamicAdminRequest())
+                    return AdminDynamicOrRedirect(nameof(Challenges), null, "admin-challenges", errorMessage: "Челлендж не найден.");
+
                 return View("~/Views/Shared/NotFound.cshtml", "Челлендж не найден.");
+            }
 
             if (challenge.Status != ChallengeStatuses.Pending)
-                return RedirectToAction(nameof(Challenges), null, null, "admin-challenges");
+                return AdminDynamicOrRedirect(
+                    nameof(Challenges),
+                    null,
+                    "admin-challenges",
+                    errorMessage: "Этот челлендж уже обработан.",
+                    status: challenge.Status,
+                    statusClass: ChallengeStatusClass(challenge.Status));
 
             challenge.Status = ChallengeStatuses.Approved;
             challenge.ReviewedAt = DateTime.UtcNow;
@@ -911,8 +1036,13 @@ namespace WebApplication1.Controllers
                 $"/Challenges/Details/{challenge.Id}");
             await _context.SaveChangesAsync();
 
-            TempData["AdminSuccess"] = "Челлендж одобрен и опубликован.";
-            return RedirectToAction(nameof(Challenges), null, null, "admin-challenges");
+            return AdminDynamicOrRedirect(
+                nameof(Challenges),
+                null,
+                "admin-challenges",
+                successMessage: "Челлендж одобрен и опубликован.",
+                status: challenge.Status,
+                statusClass: ChallengeStatusClass(challenge.Status));
         }
 
         [HttpPost]
@@ -924,7 +1054,12 @@ namespace WebApplication1.Controllers
 
             var challenge = await _context.Challenges.FirstOrDefaultAsync(x => x.Id == id);
             if (challenge == null)
+            {
+                if (IsDynamicAdminRequest())
+                    return AdminDynamicOrRedirect(nameof(Challenges), null, "admin-challenges", errorMessage: "Челлендж не найден.");
+
                 return View("~/Views/Shared/NotFound.cshtml", "Челлендж не найден.");
+            }
 
             challenge.Status = ChallengeStatuses.Rejected;
             challenge.ReviewedAt = DateTime.UtcNow;
@@ -936,8 +1071,80 @@ namespace WebApplication1.Controllers
                 "/Challenges");
             await _context.SaveChangesAsync();
 
-            TempData["AdminSuccess"] = "Челлендж отклонен.";
-            return RedirectToAction(nameof(Challenges), null, null, "admin-challenges");
+            return AdminDynamicOrRedirect(
+                nameof(Challenges),
+                null,
+                "admin-challenges",
+                successMessage: "Челлендж отклонен.",
+                status: challenge.Status,
+                statusClass: ChallengeStatusClass(challenge.Status));
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> DeleteChallenge(int id)
+        {
+            if (!await IsAdminAuthenticatedAsync())
+                return RedirectToAction(nameof(Login));
+
+            var challenge = await _context.Challenges
+                .AsNoTracking()
+                .FirstOrDefaultAsync(x => x.Id == id);
+
+            if (challenge == null)
+                return AdminDynamicOrRedirect(nameof(Challenges), null, "admin-challenges", errorMessage: "Челлендж не найден.");
+
+            await using var transaction = await _context.Database.BeginTransactionAsync();
+
+            var rewardedParticipants = await _context.ChallengeParticipants
+                .Where(x => x.ChallengeId == id && x.RewardGranted)
+                .GroupBy(x => x.UserId)
+                .Select(g => new
+                {
+                    UserId = g.Key,
+                    Experience = g.Count() * challenge.RewardExperience
+                })
+                .ToListAsync();
+
+            if (rewardedParticipants.Count > 0)
+            {
+                var rewardedUserIds = rewardedParticipants.Select(x => x.UserId).ToList();
+                var users = await _context.Users
+                    .Where(x => rewardedUserIds.Contains(x.Id))
+                    .ToListAsync();
+
+                foreach (var user in users)
+                {
+                    var experience = rewardedParticipants
+                        .Where(x => x.UserId == user.Id)
+                        .Sum(x => x.Experience);
+
+                    user.QuestExperience = Math.Max(0, user.QuestExperience - experience);
+                }
+
+                await _context.SaveChangesAsync();
+            }
+
+            var deletedSubmissions = await _context.ChallengeSubmissions
+                .Where(x => x.ChallengeId == id)
+                .ExecuteDeleteAsync();
+
+            var deletedParticipants = await _context.ChallengeParticipants
+                .Where(x => x.ChallengeId == id)
+                .ExecuteDeleteAsync();
+
+            await _context.Challenges
+                .Where(x => x.Id == id)
+                .ExecuteDeleteAsync();
+
+            await transaction.CommitAsync();
+
+            return AdminDynamicOrRedirect(
+                nameof(Challenges),
+                null,
+                "admin-challenges",
+                successMessage: $"Челлендж «{challenge.Title}» удален. Участников: {deletedParticipants}, заявок: {deletedSubmissions}.",
+                removeCard: true);
         }
 
         [HttpPost]

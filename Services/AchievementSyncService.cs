@@ -17,17 +17,23 @@ namespace WebApplication1.Services
             _steamService = steamService;
         }
 
-        public async Task SyncAchievementsForUserAsync(int userId, bool force = false)
+        public async Task<AchievementSyncResult> SyncAchievementsForUserAsync(
+            int userId,
+            bool force = false,
+            TimeSpan? minInterval = null)
         {
             var user = await _db.Users.FirstOrDefaultAsync(u => u.Id == userId);
             if (user == null)
-                return;
+                return AchievementSyncResult.SkippedResult(0, null);
 
             if (string.IsNullOrWhiteSpace(user.SteamId))
-                return;
+                return AchievementSyncResult.SkippedResult(user.TotalAchievements, user.LastSync);
 
-            if (!force && user.LastSync.HasValue && (DateTime.UtcNow - user.LastSync.Value).TotalMinutes < 10)
-                return;
+            var previousTotal = user.TotalAchievements;
+            var interval = minInterval ?? TimeSpan.FromMinutes(10);
+
+            if (!force && user.LastSync.HasValue && DateTime.UtcNow - user.LastSync.Value < interval)
+                return AchievementSyncResult.SkippedResult(previousTotal, user.LastSync);
 
             var localGames = await _db.Games
                 .AsNoTracking()
@@ -52,7 +58,13 @@ namespace WebApplication1.Services
                 user.TotalAchievements = 0;
                 user.LastSync = DateTime.UtcNow;
                 await _db.SaveChangesAsync();
-                return;
+                return new AchievementSyncResult
+                {
+                    PreviousTotalAchievements = previousTotal,
+                    TotalAchievements = user.TotalAchievements,
+                    SyncedAt = user.LastSync,
+                    Skipped = false
+                };
             }
 
             var ownedGames = await _steamService.GetOwnedGames(user.SteamId);
@@ -145,6 +157,14 @@ namespace WebApplication1.Services
 
             user.LastSync = now;
             await _db.SaveChangesAsync();
+
+            return new AchievementSyncResult
+            {
+                PreviousTotalAchievements = previousTotal,
+                TotalAchievements = user.TotalAchievements,
+                SyncedAt = user.LastSync,
+                Skipped = false
+            };
         }
 
         private static string Normalize(string? s)
@@ -172,6 +192,30 @@ namespace WebApplication1.Services
         {
             public SyncGame Game { get; set; } = null!;
             public List<SteamPlayerAchievement> PlayerAchievements { get; set; } = new();
+        }
+    }
+
+    public sealed class AchievementSyncResult
+    {
+        public int PreviousTotalAchievements { get; set; }
+
+        public int TotalAchievements { get; set; }
+
+        public DateTime? SyncedAt { get; set; }
+
+        public bool Skipped { get; set; }
+
+        public bool HasChanges => PreviousTotalAchievements != TotalAchievements;
+
+        public static AchievementSyncResult SkippedResult(int totalAchievements, DateTime? syncedAt)
+        {
+            return new AchievementSyncResult
+            {
+                PreviousTotalAchievements = totalAchievements,
+                TotalAchievements = totalAchievements,
+                SyncedAt = syncedAt,
+                Skipped = true
+            };
         }
     }
 }

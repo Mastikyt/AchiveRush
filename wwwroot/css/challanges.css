@@ -455,6 +455,10 @@
     grid-column: 1 / -1;
 }
 
+.challenge-form-grid [hidden] {
+    display: none !important;
+}
+
 .challenge-form-grid textarea,
 .challenge-proof-form textarea {
     min-height: 100px;

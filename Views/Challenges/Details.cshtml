@@ -195,7 +195,9 @@
 
             @if (challenge.VerificationType == ChallengeVerificationTypes.Manual && !string.IsNullOrWhiteSpace(challenge.ManualProofDescription))
             {
+                @if (!challenge.UserHasPendingSubmission){
                 <div class="challenge-proof-rule">@challenge.ManualProofDescription</div>
+                }
             }
 
             @if (challenge.UserCanSubmitProof)

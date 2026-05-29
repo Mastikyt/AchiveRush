@@ -30,6 +30,57 @@ public class SteamService
         return WebUtility.HtmlDecode(value).Trim();
     }
 
+    private static string? GetStringProperty(JsonElement element, params string[] names)
+    {
+        foreach (var name in names)
+        {
+            if (!element.TryGetProperty(name, out var value))
+                continue;
+
+            if (value.ValueKind == JsonValueKind.String)
+                return value.GetString();
+
+            if (value.ValueKind is JsonValueKind.Number or JsonValueKind.True or JsonValueKind.False)
+                return value.ToString();
+        }
+
+        return null;
+    }
+
+    private static bool ReadSteamBoolean(JsonElement element)
+    {
+        if (element.ValueKind == JsonValueKind.True)
+            return true;
+
+        if (element.ValueKind == JsonValueKind.False)
+            return false;
+
+        if (element.ValueKind == JsonValueKind.Number && element.TryGetInt32(out var number))
+            return number == 1;
+
+        if (element.ValueKind == JsonValueKind.String)
+        {
+            var value = element.GetString()?.Trim();
+            return value == "1" || string.Equals(value, "true", StringComparison.OrdinalIgnoreCase);
+        }
+
+        return false;
+    }
+
+    private static long ReadSteamUnixTime(JsonElement element)
+    {
+        if (element.ValueKind == JsonValueKind.Number && element.TryGetInt64(out var number))
+            return number;
+
+        if (element.ValueKind == JsonValueKind.String &&
+            long.TryParse(element.GetString(), NumberStyles.Integer, CultureInfo.InvariantCulture, out var value))
+        {
+            return value;
+        }
+
+        return 0;
+    }
+
     public SteamService(IConfiguration config, IHttpClientFactory factory)
     {
         _config = config;
@@ -179,19 +230,17 @@ public class SteamService
             if (!json.RootElement.TryGetProperty("playerstats", out var playerStats))
                 return list;
 
-            if (!playerStats.TryGetProperty("success", out var successElement))
-                return list;
-
-            var success = successElement.ValueKind switch
+            if (playerStats.TryGetProperty("success", out var successElement))
             {
-                JsonValueKind.True => true,
-                JsonValueKind.False => false,
-                JsonValueKind.Number => successElement.GetInt32() == 1,
-                _ => false
-            };
+                if (!ReadSteamBoolean(successElement))
+                    return list;
+            }
 
-            if (!success)
+            if (playerStats.TryGetProperty("error", out var errorElement) &&
+                !string.IsNullOrWhiteSpace(errorElement.GetString()))
+            {
                 return list;
+            }
 
             if (!playerStats.TryGetProperty("achievements", out var achievementsElement) ||
                 achievementsElement.ValueKind != JsonValueKind.Array)
@@ -199,9 +248,7 @@ public class SteamService
 
             foreach (var ach in achievementsElement.EnumerateArray())
             {
-                var apiName = ach.TryGetProperty("apiname", out var apiNameEl)
-                    ? apiNameEl.GetString()
-                    : null;
+                var apiName = GetStringProperty(ach, "apiname", "name");
 
                 if (string.IsNullOrWhiteSpace(apiName))
                     continue;
@@ -209,15 +256,13 @@ public class SteamService
                 var achieved = false;
                 if (ach.TryGetProperty("achieved", out var achievedEl))
                 {
-                    achieved = achievedEl.ValueKind == JsonValueKind.Number
-                        ? achievedEl.GetInt32() == 1
-                        : achievedEl.ValueKind == JsonValueKind.True;
+                    achieved = ReadSteamBoolean(achievedEl);
                 }
 
                 DateTime? unlockTime = null;
-                if (achieved && ach.TryGetProperty("unlocktime", out var unlockTimeEl) && unlockTimeEl.ValueKind == JsonValueKind.Number)
+                if (achieved && ach.TryGetProperty("unlocktime", out var unlockTimeEl))
                 {
-                    var unix = unlockTimeEl.GetInt64();
+                    var unix = ReadSteamUnixTime(unlockTimeEl);
                     if (unix > 0)
                         unlockTime = DateTimeOffset.FromUnixTimeSeconds(unix).UtcDateTime;
                 }

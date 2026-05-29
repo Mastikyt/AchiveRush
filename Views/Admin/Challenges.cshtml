@@ -145,17 +145,27 @@
 
                                     @if (item.Status == ChallengeStatuses.Pending)
                                     {
-                                        <form method="post" asp-controller="Admin" asp-action="ApproveChallenge">
+                                        <form method="post" asp-controller="Admin" asp-action="ApproveChallenge" data-admin-dynamic-form>
                                             @Html.AntiForgeryToken()
                                             <input type="hidden" name="id" value="@item.Id" />
                                             <button type="submit" class="btn-approve">Одобрить</button>
                                         </form>
-                                        <form method="post" asp-controller="Admin" asp-action="RejectChallenge">
+                                        <form method="post" asp-controller="Admin" asp-action="RejectChallenge" data-admin-dynamic-form>
                                             @Html.AntiForgeryToken()
                                             <input type="hidden" name="id" value="@item.Id" />
                                             <button type="submit" class="btn-reject">Отклонить</button>
                                         </form>
                                     }
+
+                                    <form method="post"
+                                          asp-controller="Admin"
+                                          asp-action="DeleteChallenge"
+                                          data-admin-dynamic-form
+                                          data-confirm="Удалить этот челлендж? Участники и заявки по нему тоже будут удалены.">
+                                        @Html.AntiForgeryToken()
+                                        <input type="hidden" name="id" value="@item.Id" />
+                                        <button type="submit" class="btn-delete">Удалить</button>
+                                    </form>
                                 </div>
                             </div>
                         </div>

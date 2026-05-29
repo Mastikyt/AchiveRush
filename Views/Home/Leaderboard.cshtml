@@ -1,45 +1,278 @@
-@model List<WebApplication1.Models.User>
+@model WebApplication1.Models.LeaderboardViewModel
 
 @{
     ViewData["Title"] = "Таблица лидеров";
 }
 
 <section class="leaderboard-page">
-    <div class="leaderboard-container">
-        <div class="leaderboard-header">
-            <div>Место</div>
-            <div>Пользователь</div>
-            <div>Ачивки</div>
+    <div class="leaderboard-title-block">
+        <h1>Таблица лидеров</h1>
+        <p>Сравнивай прогресс по ачивкам и уровню профиля.</p>
+    </div>
+
+    <div class="leaderboard-carousel" data-leaderboard-carousel>
+        <div class="leaderboard-carousel-top">
+            <button type="button" class="leaderboard-carousel-arrow" data-leaderboard-prev aria-label="Предыдущая таблица">‹</button>
+            <div class="leaderboard-carousel-tabs" role="tablist" aria-label="Разделы таблицы лидеров">
+                <button type="button" class="leaderboard-carousel-tab active" data-leaderboard-go="0" role="tab" aria-selected="true">Ачивки</button>
+                <button type="button" class="leaderboard-carousel-tab" data-leaderboard-go="1" role="tab" aria-selected="false">Уровни</button>
+                <button type="button" class="leaderboard-carousel-tab" data-leaderboard-go="2" role="tab" aria-selected="false">Неделя</button>
+            </div>
+            <button type="button" class="leaderboard-carousel-arrow" data-leaderboard-next aria-label="Следующая таблица">›</button>
         </div>
 
-        @if (Model != null && Model.Any())
-        {
-            @for (int i = 0; i < Model.Count; i++)
-            {
-                var user = Model[i];
-                var avatar = string.IsNullOrWhiteSpace(user.AvatarID)
-                ? "/images/default_avatar.png"
-                : user.AvatarID;
+        <div class="leaderboard-carousel-window">
+            <div class="leaderboard-carousel-track" data-leaderboard-track>
+                <div class="leaderboard-slide active" data-leaderboard-slide>
+                    <article class="leaderboard-container">
+                        <div class="leaderboard-board-title">
+                            <div>
+                                <h2>По ачивкам</h2>
+                                <p>Место считается по общему числу полученных достижений.</p>
+                            </div>
+                        </div>
 
-                <a class="leaderboard-row"
-                   asp-controller="Profile"
-                   asp-action="UserProfile"
-                   asp-route-steamId="@user.SteamId">
+                        @if (Model.CurrentAchievementEntry != null)
+                        {
+                            <a class="leaderboard-current-card"
+                               asp-controller="Profile"
+                               asp-action="UserProfile"
+                               asp-route-steamId="@Model.CurrentAchievementEntry.SteamId">
+                                <span>Твое место</span>
+                                <strong>#@Model.CurrentAchievementEntry.Rank</strong>
+                                <small>@Model.CurrentAchievementEntry.TotalAchievements ачивок</small>
+                            </a>
+                        }
+                        else
+                        {
+                            <div class="leaderboard-current-card muted">
+                                <span>@(Model.IsSignedIn ? "Место появится после синхронизации" : "Войди через Steam, чтобы видеть свое место")</span>
+                            </div>
+                        }
 
-                    <div class="leaderboard-place">#@(i + 1)</div>
+                        <div class="leaderboard-header achievement-board">
+                            <div>Место</div>
+                            <div>Пользователь</div>
+                            <div>Ачивки</div>
+                        </div>
 
-                    <div class="leaderboard-user">
-                        <img src="@avatar" alt="@user.SteamName" class="leaderboard-avatar" />
-                        <span class="leaderboard-name">@user.SteamName</span>
-                    </div>
+                        @if (Model.AchievementLeaders.Any())
+                        {
+                            <div class="leaderboard-scroll" tabindex="0">
+                                @foreach (var user in Model.AchievementLeaders)
+                                {
+                                    <a class="leaderboard-row achievement-board @(user.IsCurrentUser ? "current-user" : "")"
+                                       asp-controller="Profile"
+                                       asp-action="UserProfile"
+                                       asp-route-steamId="@user.SteamId">
+                                        <div class="leaderboard-place">#@user.Rank</div>
 
-                    <div class="leaderboard-achievements">@user.TotalAchievements</div>
-                </a>
-            }
-        }
-        else
-        {
-            <div class="leaderboard-empty">Пока нет пользователей</div>
-        }
+                                        <div class="leaderboard-user">
+                                            <img src="@user.AvatarUrl" alt="@user.SteamName" class="leaderboard-avatar" />
+                                            <span class="leaderboard-name">@user.SteamName</span>
+                                        </div>
+
+                                        <div class="leaderboard-achievements">@user.TotalAchievements</div>
+                                    </a>
+                                }
+                            </div>
+                        }
+                        else
+                        {
+                            <div class="leaderboard-empty">Пока нет пользователей</div>
+                        }
+                    </article>
+                </div>
+
+                <div class="leaderboard-slide" data-leaderboard-slide>
+                    <article class="leaderboard-container">
+                        <div class="leaderboard-board-title">
+                            <div>
+                                <h2>По уровням</h2>
+                                <p>Уровень складывается из XP за редкость ачивок, квесты и челленджи.</p>
+                            </div>
+                        </div>
+
+                        @if (Model.CurrentLevelEntry != null)
+                        {
+                            <a class="leaderboard-current-card"
+                               asp-controller="Profile"
+                               asp-action="UserProfile"
+                               asp-route-steamId="@Model.CurrentLevelEntry.SteamId">
+                                <span>Твое место</span>
+                                <strong>#@Model.CurrentLevelEntry.Rank</strong>
+                                <small>LVL @Model.CurrentLevelEntry.Level · @Model.CurrentLevelEntry.TotalXp XP</small>
+                            </a>
+                        }
+                        else
+                        {
+                            <div class="leaderboard-current-card muted">
+                                <span>@(Model.IsSignedIn ? "Место появится после синхронизации" : "Войди через Steam, чтобы видеть свое место")</span>
+                            </div>
+                        }
+
+                        <div class="leaderboard-header level-board">
+                            <div>Место</div>
+                            <div>Пользователь</div>
+                            <div>Уровень</div>
+                            <div>XP</div>
+                        </div>
+
+                        @if (Model.LevelLeaders.Any())
+                        {
+                            <div class="leaderboard-scroll" tabindex="0">
+                                @foreach (var user in Model.LevelLeaders)
+                                {
+                                    <a class="leaderboard-row level-board @(user.IsCurrentUser ? "current-user" : "")"
+                                       asp-controller="Profile"
+                                       asp-action="UserProfile"
+                                       asp-route-steamId="@user.SteamId">
+                                        <div class="leaderboard-place">#@user.Rank</div>
+
+                                        <div class="leaderboard-user">
+                                            <img src="@user.AvatarUrl" alt="@user.SteamName" class="leaderboard-avatar" />
+                                            <span class="leaderboard-name">@user.SteamName</span>
+                                        </div>
+
+                                        <div class="leaderboard-level">LVL @user.Level</div>
+
+                                        <div class="leaderboard-xp">
+                                            <strong>@user.TotalXp XP</strong>
+                                            <span>@user.CurrentLevelXp / @user.RequiredXp</span>
+                                            <div class="leaderboard-level-progress" aria-hidden="true">
+                                                <div style="width:@Math.Min(100, (int)Math.Round(user.ProgressPercent))%"></div>
+                                            </div>
+                                        </div>
+                                    </a>
+                                }
+                            </div>
+                        }
+                        else
+                        {
+                            <div class="leaderboard-empty">Пока нет пользователей</div>
+                        }
+                    </article>
+                </div>
+
+                <div class="leaderboard-slide" data-leaderboard-slide>
+                    <article class="leaderboard-container leaderboard-weekly-container">
+                        <div class="leaderboard-board-title">
+                            <div>
+                                <h2>За неделю</h2>
+                                <p>Место считается по числу ачивок, полученных за последние 7 дней.</p>
+                            </div>
+                        </div>
+
+                        @if (Model.CurrentWeeklyAchievementEntry != null)
+                        {
+                            <a class="leaderboard-current-card"
+                               asp-controller="Profile"
+                               asp-action="UserProfile"
+                               asp-route-steamId="@Model.CurrentWeeklyAchievementEntry.SteamId">
+                                <span>Твое место</span>
+                                <strong>#@Model.CurrentWeeklyAchievementEntry.Rank</strong>
+                                <small>@Model.CurrentWeeklyAchievementEntry.WeeklyAchievements за неделю</small>
+                            </a>
+                        }
+                        else
+                        {
+                            <div class="leaderboard-current-card muted">
+                                <span>@(Model.IsSignedIn ? "Место появится после получения ачивок" : "Войди через Steam, чтобы видеть свое место")</span>
+                            </div>
+                        }
+
+                        <div class="leaderboard-header weekly-board">
+                            <div>Место</div>
+                            <div>Пользователь</div>
+                            <div>Неделя</div>
+                            <div>Всего</div>
+                        </div>
+
+                        @if (Model.WeeklyAchievementLeaders.Any())
+                        {
+                            <div class="leaderboard-scroll" tabindex="0">
+                                @foreach (var user in Model.WeeklyAchievementLeaders)
+                                {
+                                    <a class="leaderboard-row weekly-board @(user.IsCurrentUser ? "current-user" : "")"
+                                       asp-controller="Profile"
+                                       asp-action="UserProfile"
+                                       asp-route-steamId="@user.SteamId">
+                                        <div class="leaderboard-place">#@user.Rank</div>
+
+                                        <div class="leaderboard-user">
+                                            <img src="@user.AvatarUrl" alt="@user.SteamName" class="leaderboard-avatar" />
+                                            <span class="leaderboard-name">@user.SteamName</span>
+                                        </div>
+
+                                        <div class="leaderboard-achievements weekly">@user.WeeklyAchievements</div>
+
+                                        <div class="leaderboard-achievements total">@user.TotalAchievements</div>
+                                    </a>
+                                }
+                            </div>
+                        }
+                        else
+                        {
+                            <div class="leaderboard-empty">Пока нет пользователей</div>
+                        }
+                    </article>
+                </div>
+            </div>
+        </div>
     </div>
 </section>
+
+<script>
+    (() => {
+        const carousel = document.querySelector('[data-leaderboard-carousel]');
+        if (!carousel) {
+            return;
+        }
+
+        const track = carousel.querySelector('[data-leaderboard-track]');
+        const slides = [...carousel.querySelectorAll('[data-leaderboard-slide]')];
+        const tabs = [...carousel.querySelectorAll('[data-leaderboard-go]')];
+        const prev = carousel.querySelector('[data-leaderboard-prev]');
+        const next = carousel.querySelector('[data-leaderboard-next]');
+        let activeIndex = 0;
+
+        const setActive = (index) => {
+            if (!slides.length) {
+                return;
+            }
+
+            activeIndex = (index + slides.length) % slides.length;
+            track.style.transform = `translateX(-${activeIndex * 100}%)`;
+
+            slides.forEach((slide, slideIndex) => {
+                slide.classList.toggle('active', slideIndex === activeIndex);
+                slide.setAttribute('aria-hidden', slideIndex === activeIndex ? 'false' : 'true');
+            });
+
+            tabs.forEach((tab, tabIndex) => {
+                const isActive = tabIndex === activeIndex;
+                tab.classList.toggle('active', isActive);
+                tab.setAttribute('aria-selected', isActive ? 'true' : 'false');
+            });
+        };
+
+        prev?.addEventListener('click', () => setActive(activeIndex - 1));
+        next?.addEventListener('click', () => setActive(activeIndex + 1));
+
+        tabs.forEach((tab) => {
+            tab.addEventListener('click', () => setActive(Number(tab.dataset.leaderboardGo || '0')));
+        });
+
+        carousel.addEventListener('keydown', (event) => {
+            if (event.key === 'ArrowLeft') {
+                setActive(activeIndex - 1);
+            }
+
+            if (event.key === 'ArrowRight') {
+                setActive(activeIndex + 1);
+            }
+        });
+
+        setActive(0);
+    })();
+</script>

@@ -53,7 +53,6 @@
 
     <nav class="challenge-tabs" aria-label="Разделы челленджей">
         <a asp-controller="Challenges" asp-action="Index">Каталог</a>
-        <a class="active" asp-controller="Challenges" asp-action="Create">Создать челлендж</a>
     </nav>
 
     @if (TempData["ChallengesSuccess"] is string successMessage)
@@ -126,7 +125,7 @@
                             </select>
                         </label>
 
-                        <label>
+                        <label class="challenge-auto-field" data-verification-panel="automatic">
                             Автоцель
                             <select name="AutoGoalType" id="autoGoalSelect">
                                 <option value="@ChallengeAutoGoalTypes.GameCompletion100">Закрыть игру на 100%</option>
@@ -135,9 +134,9 @@
                             </select>
                         </label>
 
-                        <label>
+                        <label class="challenge-auto-field" data-verification-panel="automatic">
                             Цель N
-                            <input type="number" name="TargetValue" min="1" max="500" value="1" />
+                            <input type="number" name="TargetValue" id="targetValueInput" min="1" max="500" value="1" />
                         </label>
 
                         <label>
@@ -150,9 +149,9 @@
                             <input type="number" name="ParticipantLimit" min="1" max="1000" value="10" required />
                         </label>
 
-                        <label class="wide">
+                        <label class="wide" id="gameField">
                             Игра
-                            <select name="GameId">
+                            <select name="GameId" id="gameSelect">
                                 <option value="">Без привязки</option>
                                 @foreach (var game in Model.Games)
                                 {
@@ -166,9 +165,9 @@
                             <textarea name="Description" maxlength="2000" required></textarea>
                         </label>
 
-                        <label class="wide">
+                        <label class="wide challenge-manual-field" data-verification-panel="manual">
                             Правило ручного подтверждения
-                            <textarea name="ManualProofDescription" maxlength="1000" placeholder="Например: отправить видео с финальным временем или скриншот таблицы результатов."></textarea>
+                            <textarea name="ManualProofDescription" id="manualProofTextarea" maxlength="1000" placeholder="Например: отправить видео с финальным временем или скриншот таблицы результатов."></textarea>
                         </label>
                     </div>
                 </div>
@@ -195,6 +194,11 @@
         const preview = document.getElementById('coverPreview');
         const verification = document.getElementById('verificationTypeSelect');
         const autoGoal = document.getElementById('autoGoalSelect');
+        const targetValue = document.getElementById('targetValueInput');
+        const manualProof = document.getElementById('manualProofTextarea');
+        const gameSelect = document.getElementById('gameSelect');
+        const automaticPanels = document.querySelectorAll('[data-verification-panel="automatic"]');
+        const manualPanels = document.querySelectorAll('[data-verification-panel="manual"]');
         const challengeType = document.getElementById('challengeTypeSelect');
 
         fileInput?.addEventListener('change', () => {
@@ -217,9 +221,25 @@
             }
         });
 
-        verification?.addEventListener('change', () => {
-            const disabled = verification.value === '@ChallengeVerificationTypes.Manual';
-            autoGoal?.toggleAttribute('disabled', disabled);
-        });
+        const updateVerificationFields = () => {
+            const isManual = verification?.value === '@ChallengeVerificationTypes.Manual';
+
+            automaticPanels.forEach(panel => {
+                panel.hidden = isManual;
+            });
+
+            manualPanels.forEach(panel => {
+                panel.hidden = !isManual;
+            });
+
+            autoGoal?.toggleAttribute('disabled', isManual);
+            targetValue?.toggleAttribute('disabled', isManual);
+            manualProof?.toggleAttribute('disabled', !isManual);
+            manualProof?.toggleAttribute('required', isManual);
+            gameSelect?.toggleAttribute('required', !isManual);
+        };
+
+        verification?.addEventListener('change', updateVerificationFields);
+        updateVerificationFields();
     })();
 </script>

@@ -73,7 +73,13 @@
                                         <input type="hidden" name="id" value="@game.Id" />
                                         <button type="submit" class="btn-refresh">Обновить русский</button>
                                     </form>
-                                    <form method="post" asp-controller="Admin" asp-action="DeleteGame" asp-route-requestsPage="@Model.RequestsPage" asp-route-gamesPage="@Model.GamesPage" onsubmit="return confirm('Удалить эту игру?');">
+                                    <form method="post"
+                                          asp-controller="Admin"
+                                          asp-action="DeleteGame"
+                                          asp-route-requestsPage="@Model.RequestsPage"
+                                          asp-route-gamesPage="@Model.GamesPage"
+                                          data-admin-dynamic-form
+                                          data-confirm="Удалить эту игру? Все её достижения будут удалены из профилей пользователей.">
                                         @Html.AntiForgeryToken()
                                         <input type="hidden" name="id" value="@game.Id" />
                                         <button type="submit" class="btn-delete">Удалить</button>
@@ -139,12 +145,22 @@
                                 @if (item.Status == "Pending")
                                 {
                                     <div class="request-actions">
-                                        <form method="post" asp-controller="Admin" asp-action="ApproveGameRequest" asp-route-requestsPage="@Model.RequestsPage" asp-route-gamesPage="@Model.GamesPage">
+                                        <form method="post"
+                                              asp-controller="Admin"
+                                              asp-action="ApproveGameRequest"
+                                              asp-route-requestsPage="@Model.RequestsPage"
+                                              asp-route-gamesPage="@Model.GamesPage"
+                                              data-admin-dynamic-form>
                                             @Html.AntiForgeryToken()
                                             <input type="hidden" name="id" value="@item.Id" />
                                             <button type="submit" class="btn-approve">Одобрить</button>
                                         </form>
-                                        <form method="post" asp-controller="Admin" asp-action="RejectGameRequest" asp-route-requestsPage="@Model.RequestsPage" asp-route-gamesPage="@Model.GamesPage">
+                                        <form method="post"
+                                              asp-controller="Admin"
+                                              asp-action="RejectGameRequest"
+                                              asp-route-requestsPage="@Model.RequestsPage"
+                                              asp-route-gamesPage="@Model.GamesPage"
+                                              data-admin-dynamic-form>
                                             @Html.AntiForgeryToken()
                                             <input type="hidden" name="id" value="@item.Id" />
                                             <button type="submit" class="btn-reject">Отклонить</button>

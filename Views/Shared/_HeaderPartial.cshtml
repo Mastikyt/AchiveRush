@@ -208,8 +208,16 @@
         else
         {
             <div class="steam-badge">
-                <a asp-controller="Account" asp-action="Login">
-                    <img src="~/img/steam.png" alt="Steam login" height="50" width="225" />
+                <a asp-controller="Account" asp-action="Login" class="steam-login-button" aria-label="Войти через Steam">
+                    <span class="steam-login-icon" aria-hidden="true">
+                        <svg viewBox="0 0 24 24" focusable="false">
+                            <circle cx="12" cy="12" r="10" />
+                            <circle cx="16.6" cy="8.1" r="2.3" />
+                            <circle cx="8" cy="15.5" r="2.2" />
+                            <path d="M10 14.5l4.7-3.3M7.1 13.6l-3.2-1.3" />
+                        </svg>
+                    </span>
+                    <span>Войти через Steam</span>
                 </a>
             </div>
         }
@@ -220,19 +228,22 @@
     .header-left {
         display: flex;
         align-items: center;
-        gap: 25px;
+        gap: clamp(18px, 3vw, 36px);
+        min-width: 0;
     }
 
     nav a {
-        color: #d0d0ff;
+        min-height: 44px;
+        color: #e6c87a;
         text-decoration: none;
         padding: 10px 15px;
         border-radius: 8px;
         transition: .2s;
+        text-align: center;
     }
 
         nav a:hover {
-            background: rgba(140,80,255,.3);
+            background: rgba(212, 175, 55, 0.18);
         }
 
     .header-right {
@@ -240,7 +251,79 @@
         display: flex;
         align-items: center;
         gap: 15px;
+        min-width: 0;
     }
+
+    .steam-badge {
+        position: static;
+        right: auto;
+        bottom: auto;
+        display: flex;
+        align-items: center;
+        color: inherit;
+        font-size: inherit;
+        font-weight: inherit;
+        backdrop-filter: none;
+    }
+
+    .steam-login-button {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+        min-height: 44px;
+        padding: 0 16px 0 12px;
+        border-radius: 8px;
+        border: 1px solid rgba(212, 175, 55, 0.42);
+        background: linear-gradient(135deg, rgba(212, 175, 55, 0.16), rgba(30, 26, 20, 0.96));
+        color: #f2d77f;
+        text-decoration: none;
+        font-size: 15px;
+        font-weight: 800;
+        line-height: 1;
+        white-space: nowrap;
+        box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.07), 0 10px 24px rgba(0, 0, 0, 0.24);
+        transition: transform 0.2s ease, border-color 0.2s ease, background 0.2s ease, color 0.2s ease;
+    }
+
+        .steam-login-button:hover {
+            transform: translateY(-1px);
+            border-color: #d4af37;
+            background: linear-gradient(135deg, rgba(212, 175, 55, 0.24), rgba(42, 36, 26, 0.98));
+            color: #fff3e0;
+        }
+
+        .steam-login-button:focus-visible {
+            outline: 3px solid rgba(212, 175, 55, 0.32);
+            outline-offset: 3px;
+        }
+
+    .steam-login-icon {
+        width: 30px;
+        height: 30px;
+        border-radius: 50%;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        flex: 0 0 auto;
+        background: #d4af37;
+        color: #12100c;
+    }
+
+        .steam-login-icon svg {
+            width: 21px;
+            height: 21px;
+            fill: none;
+            stroke: currentColor;
+            stroke-width: 1.8;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+        }
+
+        .steam-login-icon circle:first-child {
+            fill: currentColor;
+            opacity: 0.16;
+        }
 
     .user-info.dropdown {
         position: relative;
@@ -342,6 +425,8 @@
         top: 48px;
         right: 0;
         width: min(360px, 88vw);
+        max-height: min(460px, calc(100vh - 96px));
+        overflow-y: auto;
         z-index: 225;
         padding: 12px;
         border-radius: 8px;
@@ -386,6 +471,7 @@
         color: #fef3d6;
         font-weight: 900;
         margin-bottom: 6px;
+        overflow-wrap: anywhere;
     }
 
     .daily-quest-card p {
@@ -393,6 +479,7 @@
         color: #dcbc6a;
         line-height: 1.45;
         font-size: 13px;
+        overflow-wrap: anywhere;
     }
 
     .daily-quest-inline {
@@ -486,7 +573,7 @@
         top: 48px;
         right: 0;
         width: min(360px, 88vw);
-        max-height: 460px;
+        max-height: min(460px, calc(100vh - 96px));
         overflow: auto;
         z-index: 220;
         padding: 10px;
@@ -561,6 +648,7 @@
             display: block;
             color: #e9c468;
             line-height: 1.35;
+            overflow-wrap: anywhere;
         }
 
         .notification-item em {
@@ -574,5 +662,188 @@
     .notification-empty {
         padding: 14px 10px;
         color: #e9c468;
+    }
+
+    @@media (max-width: 1100px) {
+        header {
+            flex-wrap: wrap;
+            gap: 16px;
+        }
+
+        .header-left {
+            flex: 1 1 100%;
+            justify-content: space-between;
+        }
+
+        nav {
+            flex-wrap: wrap;
+            justify-content: flex-end;
+            gap: 10px;
+        }
+
+        .header-right {
+            width: 100%;
+            justify-content: flex-end;
+        }
+    }
+
+    @@media (max-width: 768px) {
+        header {
+            padding: 18px 16px;
+        }
+
+        .header-left {
+            flex-direction: column;
+            align-items: stretch;
+            gap: 14px;
+        }
+
+        .logo {
+            text-align: center;
+            line-height: 1;
+        }
+
+        nav {
+            display: grid;
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            gap: 8px;
+            width: 100%;
+        }
+
+            nav a {
+                width: 100%;
+                min-height: 42px;
+                padding: 9px 8px;
+                justify-content: center;
+                white-space: normal;
+                line-height: 1.15;
+                font-size: 13px;
+            }
+
+        .header-right {
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .daily-quest-widget,
+        .notifications-widget {
+            position: static;
+        }
+
+        .daily-quest-toggle,
+        .notifications-toggle {
+            width: 46px;
+            height: 46px;
+        }
+
+        .steam-badge,
+        .steam-login-button {
+            width: 100%;
+        }
+
+        .steam-login-button {
+            min-height: 46px;
+        }
+
+        .user-info.dropdown {
+            max-width: 100%;
+        }
+
+        .user-info .dropdown-toggle {
+            min-width: 0;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .daily-quest-menu,
+        .notifications-menu {
+            position: fixed;
+            top: max(12px, env(safe-area-inset-top));
+            left: 12px;
+            right: 12px;
+            width: auto;
+            max-height: calc(100dvh - 24px);
+            overflow-y: auto;
+            transform: none;
+            z-index: 500;
+        }
+
+        .daily-quest-menu-head,
+        .daily-quest-inline {
+            align-items: flex-start;
+        }
+
+        .daily-quest-menu-head {
+            flex-wrap: wrap;
+        }
+
+        .daily-quest-actions {
+            flex-direction: column;
+            align-items: stretch;
+        }
+
+        .daily-quest-actions form {
+            width: 100%;
+        }
+
+        .daily-quest-actions button {
+            min-height: 42px;
+        }
+
+        .notifications-head {
+            align-items: flex-start;
+            flex-direction: column;
+        }
+
+        .notifications-actions {
+            width: 100%;
+            justify-content: stretch;
+            gap: 8px;
+        }
+
+        .notifications-actions form {
+            flex: 1 1 140px;
+        }
+
+        .notifications-head button {
+            width: 100%;
+            min-height: 36px;
+            padding: 8px 10px;
+            border-radius: 8px;
+            border: 1px solid rgba(212, 175, 55, 0.22);
+            background: rgba(212, 175, 55, 0.1);
+            text-align: center;
+        }
+
+        .notification-item {
+            padding: 12px;
+        }
+
+        .notification-item span {
+            overflow-wrap: anywhere;
+        }
+    }
+
+    @@media (max-width: 420px) {
+        nav {
+            grid-template-columns: 1fr;
+        }
+
+        .daily-quest-menu,
+        .notifications-menu {
+            left: 8px;
+            right: 8px;
+            max-height: calc(100dvh - 16px);
+        }
+
+        .daily-quest-inline {
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .notifications-actions {
+            flex-direction: column;
+        }
     }
 </style>
