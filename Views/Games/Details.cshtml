@@ -7,6 +7,12 @@
     var completionPercent = Model.TotalAchievements == 0
         ? 0
         : (int)Math.Round((double)Model.CompletedAchievements / Model.TotalAchievements * 100);
+    var visibleAchievements = Model.AchievementItems
+        .Where(x => !x.IsHidden)
+        .ToList();
+    var hiddenAchievements = Model.AchievementItems
+        .Where(x => x.IsHidden)
+        .ToList();
 }
 
 <section class="game-page">
@@ -79,10 +85,10 @@
                     <input type="hidden" name="GameId" value="@Model.Game.Id" />
 
                     <div class="custom-achievement-grid">
-                        <input type="text" name="Title" placeholder="Название" maxlength="140" required />
-                        <input type="text" name="IconUrl" placeholder="Ссылка на иконку" maxlength="2048" />
-                        <textarea name="Description" placeholder="Описание" maxlength="1000" required></textarea>
-                        <textarea name="ObtainMethod" placeholder="Способ получения" maxlength="1000" required></textarea>
+                        <input type="text" name="Title" placeholder="Название" maxlength="@CustomAchievementInputModel.TitleMaxLength" required />
+                        <input type="url" name="IconUrl" placeholder="Ссылка на иконку" maxlength="@CustomAchievementInputModel.IconUrlMaxLength" />
+                        <textarea name="Description" placeholder="Описание" maxlength="@CustomAchievementInputModel.DescriptionMaxLength" required></textarea>
+                        <textarea name="ObtainMethod" placeholder="Способ получения" maxlength="@CustomAchievementInputModel.ObtainMethodMaxLength" required></textarea>
                     </div>
 
                     <div class="custom-achievement-actions">
@@ -95,7 +101,7 @@
             @if (Model.AchievementItems.Any())
             {
                 <div class="game-achievements-list">
-                    @foreach (var achievement in Model.AchievementItems)
+                    @foreach (var achievement in visibleAchievements)
                     {
                         <article class="game-achievement @(achievement.IsCompleted ? "completed" : "locked") @(achievement.IsCustom ? "custom" : "")">
                             <img src="@achievement.IconUrl" alt="@achievement.Title" class="game-achievement-icon" loading="lazy" />
@@ -154,8 +160,8 @@
                                         <form asp-controller="Games" asp-action="RequestCustomAchievementCompletion" method="post" class="custom-claim-form">
                                             @Html.AntiForgeryToken()
                                             <input type="hidden" name="achievementId" value="@achievement.AchievementId" />
-                                            <input type="url" name="proofUrl" placeholder="Ссылка на скриншот, видео или профиль (необязательно)" maxlength="2048" />
-                                            <textarea name="comment" placeholder="Комментарий (необязательно)" maxlength="1000"></textarea>
+                                            <input type="url" name="proofUrl" placeholder="Ссылка на скриншот, видео или профиль (необязательно)" maxlength="@CustomAchievementClaimRequest.ProofUrlMaxLength" />
+                                            <textarea name="comment" placeholder="Комментарий (необязательно)" maxlength="@CustomAchievementClaimRequest.CommentMaxLength"></textarea>
                                             <button type="submit">Добавить в профиль</button>
                                         </form>
                                     </details>
@@ -177,6 +183,86 @@
                         </article>
                     }
                 </div>
+
+                @if (hiddenAchievements.Any())
+                {
+                    <section class="hidden-achievements-section" aria-label="Скрытые достижения">
+                        <div class="hidden-achievements-head">
+                            <div>
+                                <span class="hidden-achievements-kicker">Скрытые</span>
+                                <h3>Скрытые достижения</h3>
+                            </div>
+                            <span>@hiddenAchievements.Count</span>
+                        </div>
+
+                        <div class="game-achievements-list hidden-achievements-list">
+                            @foreach (var achievement in hiddenAchievements)
+                            {
+                                var revealHidden = achievement.IsCompleted;
+
+                                <article class="game-achievement hidden-achievement @(achievement.IsCompleted ? "completed" : "locked")">
+                                    @if (revealHidden)
+                                    {
+                                        <img src="@achievement.IconUrl" alt="@achievement.Title" class="game-achievement-icon" loading="lazy" />
+                                    }
+                                    else
+                                    {
+                                        <div class="game-achievement-icon hidden-achievement-icon" aria-hidden="true">?</div>
+                                    }
+
+                                    <div class="game-achievement-content">
+                                        <div class="game-achievement-title">
+                                            @(revealHidden ? achievement.Title : "Скрытое достижение")
+                                        </div>
+                                        <div class="game-achievement-description">
+                                            @if (revealHidden)
+                                            {
+                                                @(string.IsNullOrWhiteSpace(achievement.Description)
+                                                    ? "Без описания"
+                                                    : WebUtility.HtmlDecode(achievement.Description))
+                                            }
+                                            else
+                                            {
+                                                <text>Подробности появятся после получения.</text>
+                                            }
+                                        </div>
+
+                                        @if (revealHidden && !string.IsNullOrWhiteSpace(achievement.ObtainMethod))
+                                        {
+                                            <div class="game-achievement-method">@WebUtility.HtmlDecode(achievement.ObtainMethod)</div>
+                                        }
+
+                                        <div class="game-achievement-meta">
+                                            @if (revealHidden && achievement.GlobalUnlockRate > 0)
+                                            {
+                                                <span>Это достижение есть у @achievement.GlobalUnlockRate.ToString("0.##")% игроков</span>
+                                            }
+                                            else
+                                            {
+                                                <span>Скрыто Steam</span>
+                                            }
+                                        </div>
+                                    </div>
+
+                                    <div class="game-achievement-state">
+                                        @if (achievement.IsCompleted && achievement.UnlockTime.HasValue)
+                                        {
+                                            <span>Получено @achievement.UnlockTime.Value.ToLocalTime().ToString("dd.MM.yyyy, HH:mm")</span>
+                                        }
+                                        else if (achievement.IsCompleted)
+                                        {
+                                            <span>Получено</span>
+                                        }
+                                        else
+                                        {
+                                            <span>Не получено</span>
+                                        }
+                                    </div>
+                                </article>
+                            }
+                        </div>
+                    </section>
+                }
             }
             else
             {

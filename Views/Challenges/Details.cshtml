@@ -206,8 +206,8 @@
                     @Html.AntiForgeryToken()
                     <input type="hidden" name="id" value="@challenge.Id" />
                     <input type="hidden" name="returnUrl" value="@returnUrl" />
-                    <input type="url" name="proofUrl" placeholder="Ссылка на видео, скриншот или профиль" maxlength="2048" required />
-                    <textarea name="comment" placeholder="Комментарий создателю" maxlength="1000"></textarea>
+                    <input type="url" name="proofUrl" placeholder="Ссылка на видео, скриншот или профиль" maxlength="@ChallengeInputLimits.ProofUrlMaxLength" required />
+                    <textarea name="comment" placeholder="Комментарий создателю" maxlength="@ChallengeInputLimits.SubmissionCommentMaxLength"></textarea>
                     <button type="submit" class="challenge-btn primary">Отправить</button>
                 </form>
             }

@@ -34,16 +34,28 @@
             <div class="admin-stat-card"><span>Отклонено</span><strong>@Model.RejectedRequestsCount</strong></div>
             <div class="admin-stat-card"><span>Удалено</span><strong>@Model.DeletedRequestsCount</strong></div>
             <div class="admin-stat-card"><span>В каталоге</span><strong>@Model.GamesTotalCount</strong></div>
+            <div class="admin-stat-card"><span>Дубли в каталоге</span><strong>@Model.DuplicateGamesCount</strong></div>
         </div>
 
         <section class="admin-section" id="admin-games">
             <div class="admin-section-head">
                 <h2>Игры в каталоге</h2>
                 <p>Удаление игры также удалит её достижения из профилей пользователей и пересчитает статистику.</p>
-                <form method="post" asp-controller="Admin" asp-action="RefreshAllGameLocalizations" asp-route-requestsPage="@Model.RequestsPage" asp-route-gamesPage="@Model.GamesPage">
-                    @Html.AntiForgeryToken()
-                    <button type="submit" class="btn-refresh">Обновить русский для всех</button>
-                </form>
+                <div class="admin-section-actions">
+                    <form method="post" asp-controller="Admin" asp-action="RefreshAllGameLocalizations" asp-route-requestsPage="@Model.RequestsPage" asp-route-gamesPage="@Model.GamesPage">
+                        @Html.AntiForgeryToken()
+                        <button type="submit" class="btn-refresh">Обновить русский для всех</button>
+                    </form>
+                    <form method="post"
+                          asp-controller="Admin"
+                          asp-action="DeleteDuplicateGames"
+                          asp-route-requestsPage="@Model.RequestsPage"
+                          asp-route-gamesPage="@Model.GamesPage"
+                          onsubmit="return confirm('Удалить дубли игр в каталоге? Будет оставлена первая игра для каждого Steam App ID.');">
+                        @Html.AntiForgeryToken()
+                        <button type="submit" class="btn-delete">Удалить дубли в каталоге</button>
+                    </form>
+                </div>
             </div>
 
             @if (!Model.Games.Any())
@@ -108,6 +120,51 @@
                 <p>Игра попадает в основной каталог только после одобрения.</p>
             </div>
 
+            <div class="admin-request-tools">
+                <form method="get" asp-controller="Admin" asp-action="Games" class="admin-request-search">
+                    <input type="hidden" name="gamesPage" value="@Model.GamesPage" />
+                    <label>
+                        <span>Поиск по заявкам</span>
+                        <input type="search" name="requestSearch" value="@Model.RequestSearch" placeholder="Название, AppID, ссылка или статус" />
+                    </label>
+                    <button type="submit" class="btn-refresh">Найти</button>
+                    <a class="btn-refresh" asp-controller="Admin" asp-action="Games" asp-route-gamesPage="@Model.GamesPage" asp-fragment="game-requests">Сбросить</a>
+                </form>
+
+                <div class="admin-bulk-actions">
+                    <form method="post"
+                          asp-controller="Admin"
+                          asp-action="ApproveAllGameRequests"
+                          asp-route-requestsPage="@Model.RequestsPage"
+                          asp-route-gamesPage="@Model.GamesPage"
+                          asp-route-requestSearch="@Model.RequestSearch"
+                          onsubmit="return confirm('Одобрить все ожидающие заявки по текущему фильтру?');">
+                        @Html.AntiForgeryToken()
+                        <button type="submit" class="btn-approve">Принять все</button>
+                    </form>
+                    <form method="post"
+                          asp-controller="Admin"
+                          asp-action="RejectAllGameRequests"
+                          asp-route-requestsPage="@Model.RequestsPage"
+                          asp-route-gamesPage="@Model.GamesPage"
+                          asp-route-requestSearch="@Model.RequestSearch"
+                          onsubmit="return confirm('Отклонить все ожидающие заявки по текущему фильтру?');">
+                        @Html.AntiForgeryToken()
+                        <button type="submit" class="btn-reject">Отклонить все</button>
+                    </form>
+                    <form method="post"
+                          asp-controller="Admin"
+                          asp-action="ClearApprovedGameRequests"
+                          asp-route-requestsPage="@Model.RequestsPage"
+                          asp-route-gamesPage="@Model.GamesPage"
+                          asp-route-requestSearch="@Model.RequestSearch"
+                          onsubmit="return confirm('Очистить принятые и отклоненные заявки по текущему фильтру? Игры из каталога не удаляются.');">
+                        @Html.AntiForgeryToken()
+                        <button type="submit" class="btn-delete">Очистить</button>
+                    </form>
+                </div>
+            </div>
+
             @if (!Model.Requests.Any())
             {
                 <div class="admin-empty">Пока нет ни одной заявки.</div>
@@ -150,6 +207,7 @@
                                               asp-action="ApproveGameRequest"
                                               asp-route-requestsPage="@Model.RequestsPage"
                                               asp-route-gamesPage="@Model.GamesPage"
+                                              asp-route-requestSearch="@Model.RequestSearch"
                                               data-admin-dynamic-form>
                                             @Html.AntiForgeryToken()
                                             <input type="hidden" name="id" value="@item.Id" />
@@ -160,6 +218,7 @@
                                               asp-action="RejectGameRequest"
                                               asp-route-requestsPage="@Model.RequestsPage"
                                               asp-route-gamesPage="@Model.GamesPage"
+                                              asp-route-requestSearch="@Model.RequestSearch"
                                               data-admin-dynamic-form>
                                             @Html.AntiForgeryToken()
                                             <input type="hidden" name="id" value="@item.Id" />
@@ -177,7 +236,7 @@
                     <div class="admin-pagination">
                         @for (var i = 1; i <= Model.RequestsTotalPages; i++)
                         {
-                            <a class="@(i == Model.RequestsPage ? "active" : "")" asp-controller="Admin" asp-action="Games" asp-route-requestsPage="@i" asp-route-gamesPage="@Model.GamesPage" asp-fragment="game-requests">@i</a>
+                            <a class="@(i == Model.RequestsPage ? "active" : "")" asp-controller="Admin" asp-action="Games" asp-route-requestsPage="@i" asp-route-gamesPage="@Model.GamesPage" asp-route-requestSearch="@Model.RequestSearch" asp-fragment="game-requests">@i</a>
                         }
                     </div>
                 }

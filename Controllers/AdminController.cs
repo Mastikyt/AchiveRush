@@ -153,6 +153,150 @@ namespace WebApplication1.Controllers
             return await _steamService.GetAchievementsAsync(appId) ?? new List<SteamAchievementDto>();
         }
 
+        private static IQueryable<GameRequest> ApplyGameRequestSearch(IQueryable<GameRequest> query, string? search)
+        {
+            if (string.IsNullOrWhiteSpace(search))
+                return query;
+
+            var value = search.Trim();
+            var hasAppId = int.TryParse(value, out var appId);
+
+            query = query.Where(x =>
+                x.Name.Contains(value) ||
+                x.SteamUrl.Contains(value) ||
+                x.Status.Contains(value) ||
+                (hasAppId && x.SteamAppId == appId));
+
+            return query;
+        }
+
+        private static string DuplicateKey(string? value)
+        {
+            return Normalize(value).ToUpperInvariant();
+        }
+
+        private async Task<GameRequestProcessResult> ApproveGameRequestCoreAsync(GameRequest request)
+        {
+            if (request.Status != "Pending")
+            {
+                return new GameRequestProcessResult(
+                    false,
+                    "Эта заявка уже обработана.",
+                    request.Status,
+                    GameRequestStatusClass(request.Status));
+            }
+
+            var existingGame = await _context.Games
+                .FirstOrDefaultAsync(g => g.SteamAppId == request.SteamAppId);
+
+            if (existingGame != null)
+            {
+                request.Status = "Approved";
+                await _notificationService.AddAsync(
+                    request.RequestedByUserId,
+                    NotificationTypes.Game,
+                    "Игра добавлена",
+                    $"Предложенная игра «{existingGame.Name}» уже есть в каталоге.",
+                    $"/Games/Details/{existingGame.Id}");
+                await _context.SaveChangesAsync();
+
+                return new GameRequestProcessResult(
+                    true,
+                    $"Игра «{existingGame.Name}» уже была в каталоге, заявка отмечена как одобренная.",
+                    request.Status,
+                    GameRequestStatusClass(request.Status));
+            }
+
+            var gameDataTask = _steamService.GetGameDataAsync(request.SteamAppId);
+            var schemaAchievementsTask = GetSchemaAchievementsWithRetryAsync(request.SteamAppId);
+            var globalRatesTask = _steamService.GetGlobalRates(request.SteamAppId);
+
+            await Task.WhenAll(gameDataTask, schemaAchievementsTask, globalRatesTask);
+
+            var gameData = await gameDataTask;
+            if (gameData == null)
+            {
+                return new GameRequestProcessResult(
+                    false,
+                    "Не удалось получить данные игры из Steam.",
+                    request.Status,
+                    GameRequestStatusClass(request.Status),
+                    disableActions: false);
+            }
+
+            var schemaAchievements = await schemaAchievementsTask;
+            if (schemaAchievements.Count == 0)
+            {
+                request.Status = "Rejected";
+                await _context.SaveChangesAsync();
+
+                return new GameRequestProcessResult(
+                    false,
+                    "Steam не вернул достижения для этой игры. Заявка отклонена автоматически.",
+                    request.Status,
+                    GameRequestStatusClass(request.Status));
+            }
+
+            var game = new Game
+            {
+                SteamAppId = request.SteamAppId,
+                Name = gameData.Name,
+                Description = gameData.ShortDescription,
+                AvatarUrl = gameData.HeaderImage,
+                Achievements = new List<Achievement>()
+            };
+
+            var globalRates = await globalRatesTask;
+
+            foreach (var schemaAchievement in schemaAchievements)
+            {
+                var normalizedApiName = Normalize(schemaAchievement.Name);
+
+                var existingAchievement = game.Achievements
+                    .FirstOrDefault(a => Normalize(a.ApiName) == normalizedApiName);
+
+                if (existingAchievement != null)
+                {
+                    if (globalRates.TryGetValue(normalizedApiName, out var existingPercent))
+                        existingAchievement.GlobalUnlockRate = existingPercent;
+
+                    existingAchievement.Title = schemaAchievement.DisplayName ?? "";
+                    existingAchievement.Description = schemaAchievement.Description ?? "";
+                    existingAchievement.IconUrl = schemaAchievement.Icon;
+                    existingAchievement.IsHidden = schemaAchievement.IsHidden;
+                    continue;
+                }
+
+                game.Achievements.Add(new Achievement
+                {
+                    Title = schemaAchievement.DisplayName ?? "",
+                    Description = schemaAchievement.Description ?? "",
+                    ApiName = schemaAchievement.Name ?? "",
+                    IconUrl = schemaAchievement.Icon,
+                    IsHidden = schemaAchievement.IsHidden,
+                    GlobalUnlockRate = globalRates.TryGetValue(normalizedApiName, out var percent) ? percent : 0
+                });
+            }
+
+            _context.Games.Add(game);
+            request.Status = "Approved";
+            await _context.SaveChangesAsync();
+
+            await _notificationService.AddAsync(
+                request.RequestedByUserId,
+                NotificationTypes.Game,
+                "Игра добавлена",
+                $"Предложенная игра «{game.Name}» добавлена в каталог.",
+                $"/Games/Details/{game.Id}");
+            await _context.SaveChangesAsync();
+
+            return new GameRequestProcessResult(
+                true,
+                "Игра успешно добавлена в каталог.",
+                request.Status,
+                GameRequestStatusClass(request.Status));
+        }
+
         private async Task<int> RefreshGameLocalizationAsync(Game game)
         {
             var gameDataTask = _steamService.GetGameDataAsync(game.SteamAppId);
@@ -208,6 +352,12 @@ namespace WebApplication1.Controllers
                 if (!string.IsNullOrWhiteSpace(localized.Icon) && achievement.IconUrl != localized.Icon)
                 {
                     achievement.IconUrl = localized.Icon;
+                    changes++;
+                }
+
+                if (achievement.IsHidden != localized.IsHidden)
+                {
+                    achievement.IsHidden = localized.IsHidden;
                     changes++;
                 }
             }
@@ -270,7 +420,7 @@ namespace WebApplication1.Controllers
         }
 
         [HttpGet("/secret-admin/games")]
-        public async Task<IActionResult> Games(int requestsPage = 1, int gamesPage = 1)
+        public async Task<IActionResult> Games(int requestsPage = 1, int gamesPage = 1, string requestSearch = "")
         {
             if (!await IsAdminAuthenticatedAsync())
                 return RedirectToAction(nameof(Login));
@@ -291,18 +441,34 @@ namespace WebApplication1.Controllers
                 })
                 .ToDictionaryAsync(x => x.Status, x => x.Count);
 
-            var requestsTotalCount = await _context.GameRequests.AsNoTracking().CountAsync();
+            var cleanedRequestSearch = requestSearch?.Trim() ?? "";
+            var requestsQuery = ApplyGameRequestSearch(
+                _context.GameRequests
+                    .AsNoTracking()
+                    .Where(x => x.Status != "Deleted"),
+                cleanedRequestSearch);
+
+            var requestsTotalCount = await requestsQuery.CountAsync();
             var requestsTotalPages = Math.Max(1, (int)Math.Ceiling(requestsTotalCount / (double)requestsPageSize));
             safeRequestsPage = Math.Min(safeRequestsPage, requestsTotalPages);
 
-            var requests = await _context.GameRequests
-                .AsNoTracking()
+            var requests = await requestsQuery
                 .OrderByDescending(x => x.CreatedAt)
                 .Skip((safeRequestsPage - 1) * requestsPageSize)
                 .Take(requestsPageSize)
                 .ToListAsync();
 
             var gamesTotalCount = await _context.Games.AsNoTracking().CountAsync();
+            var duplicateGameGroupCounts = await _context.Games
+                .AsNoTracking()
+                .Where(x => x.SteamAppId > 0)
+                .GroupBy(x => x.SteamAppId)
+                .Select(g => g.Count())
+                .Where(count => count > 1)
+                .ToListAsync();
+
+            var duplicateGamesCount = duplicateGameGroupCounts.Sum(count => count - 1);
+
             var gamesTotalPages = Math.Max(1, (int)Math.Ceiling(gamesTotalCount / (double)gamesPageSize));
             safeGamesPage = Math.Min(safeGamesPage, gamesTotalPages);
 
@@ -395,10 +561,12 @@ namespace WebApplication1.Controllers
                 RequestsPageSize = requestsPageSize,
                 RequestsTotalPages = requestsTotalPages,
                 RequestsTotalCount = requestsTotalCount,
+                RequestSearch = cleanedRequestSearch,
                 GamesPage = safeGamesPage,
                 GamesPageSize = gamesPageSize,
                 GamesTotalPages = gamesTotalPages,
                 GamesTotalCount = gamesTotalCount,
+                DuplicateGamesCount = duplicateGamesCount,
                 PendingCustomAchievementRequestsCount = customAchievementRequests.Count,
                 PendingCustomAchievementClaimRequestsCount = customAchievementClaimRequests.Count
             });
@@ -542,7 +710,10 @@ namespace WebApplication1.Controllers
                     CompletedDailyQuests = _context.DailyQuestAssignments.Count(a => a.UserId == u.Id && a.Completed),
                     CompletedChallenges = _context.ChallengeParticipants.Count(p => p.UserId == u.Id && p.Status == ChallengeParticipantStatuses.Completed),
                     CreatedAt = u.CreatedAt,
-                    LastSync = u.LastSync
+                    LastSync = u.LastSync,
+                    BannedUntil = u.BannedUntil,
+                    BanReason = u.BanReason ?? "",
+                    IsBanned = u.BannedUntil != null && u.BannedUntil > DateTime.UtcNow
                 })
                 .ToListAsync();
 
@@ -557,7 +728,70 @@ namespace WebApplication1.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> ApproveGameRequest(int id, int requestsPage = 1, int gamesPage = 1)
+        public async Task<IActionResult> BanUser(int id, DateTime bannedUntil, string? reason, int usersPage = 1)
+        {
+            if (!await IsAdminAuthenticatedAsync())
+                return RedirectToAction(nameof(Login));
+
+            var user = await _context.Users.FirstOrDefaultAsync(x => x.Id == id);
+            if (user == null)
+            {
+                TempData["AdminError"] = "Пользователь не найден.";
+                return RedirectToAction(nameof(Users), new { usersPage });
+            }
+
+            var currentAdmin = await _userManager.GetUserAsync(User);
+            if (currentAdmin?.SteamId == user.SteamId)
+            {
+                TempData["AdminError"] = "Нельзя забанить свой аккаунт из админки.";
+                return RedirectToAction(nameof(Users), new { usersPage });
+            }
+
+            var untilUtc = DateTime.SpecifyKind(bannedUntil, DateTimeKind.Local).ToUniversalTime();
+            if (untilUtc <= DateTime.UtcNow)
+            {
+                TempData["AdminError"] = "Дата окончания бана должна быть в будущем.";
+                return RedirectToAction(nameof(Users), new { usersPage });
+            }
+
+            user.BannedUntil = untilUtc;
+            user.BannedAt = DateTime.UtcNow;
+            user.BanReason = string.IsNullOrWhiteSpace(reason)
+                ? "Нарушение правил сайта."
+                : reason.Trim()[..Math.Min(reason.Trim().Length, 500)];
+
+            await _context.SaveChangesAsync();
+
+            TempData["AdminSuccess"] = $"Пользователь «{user.SteamName}» забанен до {user.BannedUntil.Value.ToLocalTime():dd.MM.yyyy HH:mm}.";
+            return RedirectToAction(nameof(Users), new { usersPage });
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> UnbanUser(int id, int usersPage = 1)
+        {
+            if (!await IsAdminAuthenticatedAsync())
+                return RedirectToAction(nameof(Login));
+
+            var user = await _context.Users.FirstOrDefaultAsync(x => x.Id == id);
+            if (user == null)
+            {
+                TempData["AdminError"] = "Пользователь не найден.";
+                return RedirectToAction(nameof(Users), new { usersPage });
+            }
+
+            user.BannedUntil = null;
+            user.BannedAt = null;
+            user.BanReason = null;
+            await _context.SaveChangesAsync();
+
+            TempData["AdminSuccess"] = $"Пользователь «{user.SteamName}» разбанен.";
+            return RedirectToAction(nameof(Users), new { usersPage });
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> ApproveGameRequest(int id, int requestsPage = 1, int gamesPage = 1, string requestSearch = "")
         {
             if (!await IsAdminAuthenticatedAsync())
                 return RedirectToAction(nameof(Login));
@@ -566,132 +800,22 @@ namespace WebApplication1.Controllers
             if (request == null)
             {
                 if (IsDynamicAdminRequest())
-                    return AdminDynamicOrRedirect(nameof(Games), new { requestsPage, gamesPage }, "game-requests", errorMessage: "Запись не найдена.");
+                    return AdminDynamicOrRedirect(nameof(Games), new { requestsPage, gamesPage, requestSearch }, "game-requests", errorMessage: "Запись не найдена.");
 
                 return View("~/Views/Shared/NotFound.cshtml", "Запись не найдена.");
             }
 
-            if (request.Status != "Pending")
-                return AdminDynamicOrRedirect(
-                    nameof(Games),
-                    new { requestsPage, gamesPage },
-                    "game-requests",
-                    errorMessage: "Эта заявка уже обработана.",
-                    status: request.Status,
-                    statusClass: GameRequestStatusClass(request.Status));
-
-            var existingGame = await _context.Games
-                .FirstOrDefaultAsync(g => g.SteamAppId == request.SteamAppId);
-
-            if (existingGame != null)
-            {
-                request.Status = "Approved";
-                await _notificationService.AddAsync(
-                    request.RequestedByUserId,
-                    NotificationTypes.Game,
-                    "Игра добавлена",
-                    $"Предложенная игра «{existingGame.Name}» уже есть в каталоге.",
-                    $"/Games/Details/{existingGame.Id}");
-                await _context.SaveChangesAsync();
-                return AdminDynamicOrRedirect(
-                    nameof(Games),
-                    new { requestsPage, gamesPage },
-                    "game-requests",
-                    successMessage: $"Игра «{existingGame.Name}» уже была в каталоге, заявка отмечена как одобренная.",
-                    status: request.Status,
-                    statusClass: GameRequestStatusClass(request.Status));
-            }
-
-            var gameDataTask = _steamService.GetGameDataAsync(request.SteamAppId);
-            var schemaAchievementsTask = GetSchemaAchievementsWithRetryAsync(request.SteamAppId);
-            var globalRatesTask = _steamService.GetGlobalRates(request.SteamAppId);
-
-            await Task.WhenAll(gameDataTask, schemaAchievementsTask, globalRatesTask);
-
-            var gameData = await gameDataTask;
-            if (gameData == null)
-            {
-                return AdminDynamicOrRedirect(
-                    nameof(Games),
-                    new { requestsPage, gamesPage },
-                    "game-requests",
-                    errorMessage: "Не удалось получить данные игры из Steam.",
-                    disableActions: false);
-            }
-
-            var schemaAchievements = await schemaAchievementsTask;
-            if (schemaAchievements.Count == 0)
-            {
-                request.Status = "Rejected";
-                await _context.SaveChangesAsync();
-                return AdminDynamicOrRedirect(
-                    nameof(Games),
-                    new { requestsPage, gamesPage },
-                    "game-requests",
-                    errorMessage: "Steam не вернул достижения для этой игры. Заявка отклонена автоматически.",
-                    status: request.Status,
-                    statusClass: GameRequestStatusClass(request.Status));
-            }
-
-            var game = new Game
-            {
-                SteamAppId = request.SteamAppId,
-                Name = gameData.Name,
-                Description = gameData.ShortDescription,
-                AvatarUrl = gameData.HeaderImage,
-                Achievements = new List<Achievement>()
-            };
-
-            var globalRates = await globalRatesTask;
-
-            foreach (var schemaAchievement in schemaAchievements)
-            {
-                var normalizedApiName = Normalize(schemaAchievement.Name);
-
-                var existingAchievement = game.Achievements
-                    .FirstOrDefault(a => Normalize(a.ApiName) == normalizedApiName);
-
-                if (existingAchievement != null)
-                {
-                    if (globalRates.TryGetValue(normalizedApiName, out var existingPercent))
-                        existingAchievement.GlobalUnlockRate = existingPercent;
-
-                    existingAchievement.Title = schemaAchievement.DisplayName ?? "";
-                    existingAchievement.Description = schemaAchievement.Description ?? "";
-                    existingAchievement.IconUrl = schemaAchievement.Icon;
-                    continue;
-                }
-
-                game.Achievements.Add(new Achievement
-                {
-                    Title = schemaAchievement.DisplayName ?? "",
-                    Description = schemaAchievement.Description ?? "",
-                    ApiName = schemaAchievement.Name ?? "",
-                    IconUrl = schemaAchievement.Icon,
-                    GlobalUnlockRate = globalRates.TryGetValue(normalizedApiName, out var percent) ? percent : 0
-                });
-            }
-
-            _context.Games.Add(game);
-            request.Status = "Approved";
-
-            await _context.SaveChangesAsync();
-
-            await _notificationService.AddAsync(
-                request.RequestedByUserId,
-                NotificationTypes.Game,
-                "Игра добавлена",
-                $"Предложенная игра «{game.Name}» добавлена в каталог.",
-                $"/Games/Details/{game.Id}");
-            await _context.SaveChangesAsync();
+            var result = await ApproveGameRequestCoreAsync(request);
 
             return AdminDynamicOrRedirect(
                 nameof(Games),
-                new { requestsPage, gamesPage },
+                new { requestsPage, gamesPage, requestSearch },
                 "game-requests",
-                successMessage: "Игра успешно добавлена в каталог.",
-                status: request.Status,
-                statusClass: GameRequestStatusClass(request.Status));
+                successMessage: result.Success ? result.Message : null,
+                errorMessage: result.Success ? null : result.Message,
+                status: result.Status,
+                statusClass: result.StatusClass,
+                disableActions: result.DisableActions);
         }
 
         [HttpPost]
@@ -708,7 +832,7 @@ namespace WebApplication1.Controllers
             if (request == null)
                 return View("~/Views/Shared/NotFound.cshtml", "Запись не найдена.");
 
-            if (request.Status != "Pending")
+            if (request.Status != CustomAchievementRequestStatuses.Pending)
                 return RedirectToAction(nameof(Achievements), null, null, "custom-achievement-requests");
 
             var duplicate = await _context.Achievements.AnyAsync(x =>
@@ -717,36 +841,25 @@ namespace WebApplication1.Controllers
 
             if (duplicate)
             {
-                request.Status = "Rejected";
+                request.Status = CustomAchievementRequestStatuses.Rejected;
                 await _context.SaveChangesAsync();
                 TempData["AdminError"] = "Похожее достижение уже есть в этой игре. Заявка отклонена.";
                 return RedirectToAction(nameof(Achievements), null, null, "custom-achievement-requests");
             }
 
-            _context.Achievements.Add(new Achievement
-            {
-                GameId = request.GameId,
-                Title = request.Title,
-                Description = request.Description,
-                ObtainMethod = request.ObtainMethod,
-                IconUrl = string.IsNullOrWhiteSpace(request.IconUrl) ? request.Game.AvatarUrl : request.IconUrl,
-                ApiName = $"custom:{request.GameId}:{Guid.NewGuid():N}",
-                IsCustom = true,
-                CreatedByUserId = request.RequestedByUserId,
-                CreatedAt = DateTime.UtcNow,
-                GlobalUnlockRate = 0
-            });
-
-            request.Status = "Approved";
+            var now = DateTime.UtcNow;
+            request.Status = CustomAchievementRequestStatuses.Voting;
+            request.VotingStartedAt = now;
+            request.VotingEndsAt = CustomAchievementVotingService.GetVotingEnd(now);
             await _notificationService.AddAsync(
                 request.RequestedByUserId,
                 NotificationTypes.Achievement,
-                "Достижение добавлено",
-                $"Предложенное достижение «{request.Title}» добавлено в игру «{request.Game.Name}».",
-                $"/Games/Details/{request.GameId}");
+                "Достижение отправлено на голосование",
+                $"Предложенное достижение «{request.Title}» прошло модерацию и отправлено на голосование пользователей.",
+                "/Home/AchievementVoting");
             await _context.SaveChangesAsync();
 
-            TempData["AdminSuccess"] = $"Достижение «{request.Title}» добавлено в игру «{request.Game.Name}».";
+            TempData["AdminSuccess"] = $"Достижение «{request.Title}» отправлено на голосование.";
             return RedirectToAction(nameof(Achievements), null, null, "custom-achievement-requests");
         }
 
@@ -761,7 +874,8 @@ namespace WebApplication1.Controllers
             if (request == null)
                 return View("~/Views/Shared/NotFound.cshtml", "Запись не найдена.");
 
-            request.Status = "Rejected";
+            request.Status = CustomAchievementRequestStatuses.Rejected;
+            request.ResolvedAt = DateTime.UtcNow;
             await _context.SaveChangesAsync();
 
             TempData["AdminSuccess"] = "Заявка на достижение отклонена.";
@@ -770,7 +884,7 @@ namespace WebApplication1.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> RejectGameRequest(int id, int requestsPage = 1, int gamesPage = 1)
+        public async Task<IActionResult> RejectGameRequest(int id, int requestsPage = 1, int gamesPage = 1, string requestSearch = "")
         {
             if (!await IsAdminAuthenticatedAsync())
                 return RedirectToAction(nameof(Login));
@@ -779,7 +893,7 @@ namespace WebApplication1.Controllers
             if (request == null)
             {
                 if (IsDynamicAdminRequest())
-                    return AdminDynamicOrRedirect(nameof(Games), new { requestsPage, gamesPage }, "game-requests", errorMessage: "Запись не найдена.");
+                    return AdminDynamicOrRedirect(nameof(Games), new { requestsPage, gamesPage, requestSearch }, "game-requests", errorMessage: "Запись не найдена.");
 
                 return View("~/Views/Shared/NotFound.cshtml", "Запись не найдена.");
             }
@@ -789,11 +903,72 @@ namespace WebApplication1.Controllers
 
             return AdminDynamicOrRedirect(
                 nameof(Games),
-                new { requestsPage, gamesPage },
+                new { requestsPage, gamesPage, requestSearch },
                 "game-requests",
                 successMessage: "Заявка отклонена.",
                 status: request.Status,
                 statusClass: GameRequestStatusClass(request.Status));
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> ApproveAllGameRequests(int requestsPage = 1, int gamesPage = 1, string requestSearch = "")
+        {
+            if (!await IsAdminAuthenticatedAsync())
+                return RedirectToAction(nameof(Login));
+
+            var pendingRequests = await ApplyGameRequestSearch(
+                    _context.GameRequests.Where(x => x.Status == "Pending"),
+                    requestSearch)
+                .OrderBy(x => x.CreatedAt)
+                .ToListAsync();
+
+            var approved = 0;
+            var failed = 0;
+
+            foreach (var request in pendingRequests)
+            {
+                var result = await ApproveGameRequestCoreAsync(request);
+                if (result.Success)
+                    approved++;
+                else
+                    failed++;
+            }
+
+            TempData["AdminSuccess"] = $"Массовая обработка завершена. Одобрено: {approved}. Ошибок/отклонений: {failed}.";
+            return RedirectToAction(nameof(Games), null, new { requestsPage, gamesPage, requestSearch }, "game-requests");
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> RejectAllGameRequests(int requestsPage = 1, int gamesPage = 1, string requestSearch = "")
+        {
+            if (!await IsAdminAuthenticatedAsync())
+                return RedirectToAction(nameof(Login));
+
+            var rejected = await ApplyGameRequestSearch(
+                    _context.GameRequests.Where(x => x.Status == "Pending"),
+                    requestSearch)
+                .ExecuteUpdateAsync(setters => setters.SetProperty(x => x.Status, "Rejected"));
+
+            TempData["AdminSuccess"] = $"Отклонено заявок: {rejected}.";
+            return RedirectToAction(nameof(Games), null, new { requestsPage, gamesPage, requestSearch }, "game-requests");
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> ClearApprovedGameRequests(int requestsPage = 1, int gamesPage = 1, string requestSearch = "")
+        {
+            if (!await IsAdminAuthenticatedAsync())
+                return RedirectToAction(nameof(Login));
+
+            var cleared = await ApplyGameRequestSearch(
+                    _context.GameRequests.Where(x => x.Status == "Approved" || x.Status == "Rejected"),
+                    requestSearch)
+                .ExecuteUpdateAsync(setters => setters.SetProperty(x => x.Status, "Deleted"));
+
+            TempData["AdminSuccess"] = $"Скрыто обработанных заявок из админки: {cleared}.";
+            return RedirectToAction(nameof(Games), null, new { requestsPage, gamesPage, requestSearch }, "game-requests");
         }
 
         [HttpPost]
@@ -921,6 +1096,181 @@ namespace WebApplication1.Controllers
             await _context.SaveChangesAsync();
 
             TempData["AdminSuccess"] = $"Обновление русской локализации завершено. Игр: {games.Count}, изменений: {changes}.";
+            return RedirectToAction(nameof(Games), null, new { requestsPage, gamesPage }, "admin-games");
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> DeleteDuplicateGames(int requestsPage = 1, int gamesPage = 1)
+        {
+            if (!await IsAdminAuthenticatedAsync())
+                return RedirectToAction(nameof(Login));
+
+            var catalogGames = await _context.Games
+                .AsNoTracking()
+                .Where(x => x.SteamAppId > 0)
+                .Select(x => new { x.Id, x.SteamAppId })
+                .ToListAsync();
+
+            var duplicateGroups = catalogGames
+                .GroupBy(x => x.SteamAppId)
+                .Where(g => g.Count() > 1)
+                .Select(g => new
+                {
+                    SteamAppId = g.Key,
+                    GameIds = g
+                        .OrderBy(x => x.Id)
+                        .Select(x => x.Id)
+                        .ToList()
+                })
+                .ToList();
+
+            if (duplicateGroups.Count == 0)
+            {
+                TempData["AdminSuccess"] = "Дубликатов игр в каталоге не найдено.";
+                return RedirectToAction(nameof(Games), null, new { requestsPage, gamesPage }, "admin-games");
+            }
+
+            await using var transaction = await _context.Database.BeginTransactionAsync();
+
+            var affectedUserIds = new HashSet<int>();
+            var removedGames = 0;
+            var removedAchievements = 0;
+            var removedProfileAchievements = 0;
+            var transferredProfileAchievements = 0;
+
+            foreach (var group in duplicateGroups)
+            {
+                var keepGameId = group.GameIds[0];
+                var duplicateGameIds = group.GameIds.Skip(1).ToList();
+
+                var keptAchievements = await _context.Achievements
+                    .Where(x => x.GameId == keepGameId)
+                    .ToListAsync();
+
+                foreach (var duplicateGameId in duplicateGameIds)
+                {
+                    var duplicateAchievements = await _context.Achievements
+                        .AsNoTracking()
+                        .Where(x => x.GameId == duplicateGameId)
+                        .OrderBy(x => x.Id)
+                        .ToListAsync();
+
+                    foreach (var duplicateAchievement in duplicateAchievements)
+                    {
+                        var duplicateApiName = DuplicateKey(duplicateAchievement.ApiName);
+                        var duplicateTitle = DuplicateKey(duplicateAchievement.Title);
+
+                        var targetAchievement = keptAchievements.FirstOrDefault(x =>
+                            !string.IsNullOrEmpty(duplicateApiName) &&
+                            DuplicateKey(x.ApiName) == duplicateApiName);
+
+                        targetAchievement ??= keptAchievements.FirstOrDefault(x =>
+                            !string.IsNullOrEmpty(duplicateTitle) &&
+                            DuplicateKey(x.Title) == duplicateTitle);
+
+                        if (targetAchievement == null)
+                        {
+                            targetAchievement = new Achievement
+                            {
+                                GameId = keepGameId,
+                                Title = duplicateAchievement.Title,
+                                Description = duplicateAchievement.Description,
+                                ApiName = duplicateAchievement.ApiName,
+                                IconUrl = duplicateAchievement.IconUrl,
+                                ObtainMethod = duplicateAchievement.ObtainMethod,
+                                IsCustom = duplicateAchievement.IsCustom,
+                                IsHidden = duplicateAchievement.IsHidden,
+                                CreatedByUserId = duplicateAchievement.CreatedByUserId,
+                                CreatedAt = duplicateAchievement.CreatedAt,
+                                GlobalUnlockRate = duplicateAchievement.GlobalUnlockRate
+                            };
+
+                            _context.Achievements.Add(targetAchievement);
+                            await _context.SaveChangesAsync();
+                            keptAchievements.Add(targetAchievement);
+                        }
+
+                        var profileAchievements = await _context.UserAchievements
+                            .Where(x => x.AchievementId == duplicateAchievement.Id)
+                            .ToListAsync();
+
+                        var targetUserIds = await _context.UserAchievements
+                            .Where(x => x.AchievementId == targetAchievement.Id)
+                            .Select(x => x.UserId)
+                            .ToListAsync();
+
+                        var targetUserIdSet = targetUserIds.ToHashSet();
+
+                        foreach (var profileAchievement in profileAchievements)
+                        {
+                            affectedUserIds.Add(profileAchievement.UserId);
+
+                            if (targetUserIdSet.Contains(profileAchievement.UserId))
+                            {
+                                _context.UserAchievements.Remove(profileAchievement);
+                                removedProfileAchievements++;
+                            }
+                            else
+                            {
+                                profileAchievement.AchievementId = targetAchievement.Id;
+                                targetUserIdSet.Add(profileAchievement.UserId);
+                                transferredProfileAchievements++;
+                            }
+                        }
+
+                        await _context.SaveChangesAsync();
+                    }
+
+                    removedProfileAchievements += await _context.UserAchievements
+                        .Where(x => x.Achievement.GameId == duplicateGameId)
+                        .ExecuteDeleteAsync();
+
+                    removedAchievements += await _context.Achievements
+                        .Where(x => x.GameId == duplicateGameId)
+                        .ExecuteDeleteAsync();
+
+                    await _context.Games
+                        .Where(x => x.Id == duplicateGameId)
+                        .ExecuteDeleteAsync();
+
+                    removedGames++;
+                }
+
+                await _context.GameRequests
+                    .Where(x => x.SteamAppId == group.SteamAppId && x.Status == "Approved")
+                    .ExecuteUpdateAsync(setters => setters.SetProperty(x => x.Status, "Deleted"));
+            }
+
+            if (affectedUserIds.Count > 0)
+            {
+                var totals = await _context.UserAchievements
+                    .Where(x => affectedUserIds.Contains(x.UserId) && x.Completed)
+                    .GroupBy(x => x.UserId)
+                    .Select(g => new
+                    {
+                        UserId = g.Key,
+                        Count = g.Count()
+                    })
+                    .ToDictionaryAsync(x => x.UserId, x => x.Count);
+
+                var users = await _context.Users
+                    .Where(x => affectedUserIds.Contains(x.Id))
+                    .ToListAsync();
+
+                foreach (var user in users)
+                {
+                    user.TotalAchievements = totals.TryGetValue(user.Id, out var total)
+                        ? total
+                        : 0;
+                }
+
+                await _context.SaveChangesAsync();
+            }
+
+            await transaction.CommitAsync();
+
+            TempData["AdminSuccess"] = $"Дубликаты очищены. Удалено игр: {removedGames}, достижений: {removedAchievements}, перенесено записей профилей: {transferredProfileAchievements}, удалено дублей записей профилей: {removedProfileAchievements}.";
             return RedirectToAction(nameof(Games), null, new { requestsPage, gamesPage }, "admin-games");
         }
 
@@ -1198,6 +1548,33 @@ namespace WebApplication1.Controllers
         {
             ClearAdminSession();
             return RedirectToAction(nameof(Login));
+        }
+
+        private sealed class GameRequestProcessResult
+        {
+            public GameRequestProcessResult(
+                bool success,
+                string message,
+                string status,
+                string statusClass,
+                bool disableActions = true)
+            {
+                Success = success;
+                Message = message;
+                Status = status;
+                StatusClass = statusClass;
+                DisableActions = disableActions;
+            }
+
+            public bool Success { get; }
+
+            public string Message { get; }
+
+            public string Status { get; }
+
+            public string StatusClass { get; }
+
+            public bool DisableActions { get; }
         }
     }
 }

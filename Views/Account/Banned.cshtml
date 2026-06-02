@@ -1,0 +1,129 @@
+@model WebApplication1.Models.BanStatusViewModel
+
+@{
+    ViewData["Title"] = "Аккаунт заблокирован";
+}
+
+<section class="ban-page">
+    <article class="ban-card">
+        <div class="ban-kicker">Доступ ограничен</div>
+        <h1>Аккаунт заблокирован</h1>
+        <p>Пока бан активен, переходы по сайту недоступны.</p>
+
+        <div class="ban-meta">
+            <div>
+                <span>До</span>
+                <strong>@(Model.BannedUntil?.ToLocalTime().ToString("dd.MM.yyyy HH:mm") ?? "не указано")</strong>
+            </div>
+            <div>
+                <span>Причина</span>
+                <strong>@Model.Reason</strong>
+            </div>
+        </div>
+
+        <form asp-controller="Account" asp-action="Logout" method="post">
+            @Html.AntiForgeryToken()
+            <button type="submit">Выйти из аккаунта</button>
+        </form>
+    </article>
+</section>
+
+<style>
+    .ban-page {
+        min-height: 60vh;
+        display: grid;
+        place-items: center;
+        padding: 48px 16px;
+    }
+
+    .ban-card {
+        width: min(560px, 100%);
+        padding: 28px;
+        border-radius: 8px;
+        border: 1px solid rgba(212, 175, 55, 0.28);
+        background: linear-gradient(180deg, rgba(32, 26, 18, 0.98), rgba(18, 16, 12, 0.98));
+        box-shadow: 0 24px 60px rgba(0, 0, 0, 0.28);
+    }
+
+    .ban-kicker {
+        color: #f59e0b;
+        font-weight: 900;
+        text-transform: uppercase;
+        font-size: 13px;
+        margin-bottom: 10px;
+    }
+
+    .ban-card h1 {
+        margin: 0 0 10px;
+        color: #fef3d6;
+        font-size: 36px;
+        line-height: 1.1;
+    }
+
+    .ban-card p {
+        margin: 0 0 20px;
+        color: #dcbc6a;
+        line-height: 1.6;
+    }
+
+    .ban-meta {
+        display: grid;
+        gap: 12px;
+        margin-bottom: 20px;
+    }
+
+    .ban-meta div {
+        padding: 14px;
+        border-radius: 8px;
+        border: 1px solid rgba(212, 175, 55, 0.18);
+        background: rgba(212, 175, 55, 0.07);
+    }
+
+    .ban-meta span {
+        display: block;
+        color: #e6c87a;
+        font-size: 12px;
+        font-weight: 900;
+        text-transform: uppercase;
+        margin-bottom: 5px;
+    }
+
+    .ban-meta strong {
+        color: #fef3d6;
+        overflow-wrap: anywhere;
+    }
+
+    .ban-card button {
+        width: 100%;
+        min-height: 44px;
+        border-radius: 8px;
+        border: 1px solid rgba(212, 175, 55, 0.35);
+        background: rgba(212, 175, 55, 0.1);
+        color: #f3d58e;
+        font-weight: 900;
+        cursor: pointer;
+    }
+
+    html[data-theme="light"] .ban-card {
+        background: #fffaf1;
+        border-color: var(--ar-border);
+        box-shadow: 0 18px 42px var(--ar-shadow);
+    }
+
+    html[data-theme="light"] .ban-card h1,
+    html[data-theme="light"] .ban-meta strong {
+        color: var(--ar-text);
+    }
+
+    html[data-theme="light"] .ban-card p,
+    html[data-theme="light"] .ban-meta span {
+        color: var(--ar-muted-strong);
+    }
+
+    html[data-theme="light"] .ban-meta div,
+    html[data-theme="light"] .ban-card button {
+        background: rgba(119, 140, 42, 0.08);
+        border-color: var(--ar-border);
+        color: var(--ar-text);
+    }
+</style>

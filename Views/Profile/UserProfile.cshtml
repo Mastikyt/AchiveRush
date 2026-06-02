@@ -17,12 +17,12 @@
         }
         else
         {
-            avatarUrl = "/images/default_avatar.png";
+            avatarUrl = "/img/standart.jpg";
         }
     }
     else if (string.IsNullOrWhiteSpace(avatarUrl))
     {
-        avatarUrl = "/images/default_avatar.png";
+        avatarUrl = "/img/standart.jpg";
     }
 
     var recentAchievements = (IEnumerable<WebApplication1.Models.AchievementCardViewModel>)ViewBag.RecentAchievements;

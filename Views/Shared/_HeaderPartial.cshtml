@@ -19,17 +19,22 @@
     };
 }
 
-<header>
+<header data-mobile-header>
     <div class="header-left">
-        <a asp-controller="Home" asp-action="Index" class="logo">AchiveRush</a>
-        <nav>
+        <a asp-controller="Home"
+           asp-action="Index"
+           class="logo"
+           data-mobile-header-toggle
+           aria-expanded="false"
+           aria-controls="mobile-header-nav mobile-header-actions">AchiveRush</a>
+        <nav id="mobile-header-nav">
             <a asp-controller="Home" asp-action="Catalog">Каталог игр</a>
             <a asp-controller="Home" asp-action="Leaderboard">Таблица лидеров</a>
             <a asp-controller="Challenges" asp-action="Index">Челленджи</a>
         </nav>
     </div>
 
-    <div class="header-right">
+    <div class="header-right" id="mobile-header-actions">
         @if (SignInManager.IsSignedIn(User))
         {
             var identityUser = await UserManager.GetUserAsync(User);
@@ -40,7 +45,7 @@
 
             var avatarUrl = !string.IsNullOrWhiteSpace(publicUser?.AvatarID)
             ? publicUser!.AvatarID
-            : (!string.IsNullOrWhiteSpace(identityUser?.AvatarUrl) ? identityUser!.AvatarUrl : "/images/default_avatar.png");
+            : (!string.IsNullOrWhiteSpace(identityUser?.AvatarUrl) ? identityUser!.AvatarUrl : "/img/standart.jpg");
 
             var personaName = !string.IsNullOrWhiteSpace(publicUser?.SteamName)
             ? publicUser!.SteamName
@@ -180,7 +185,7 @@
             </div>
 
             <div class="user-info dropdown">
-                <img src="@avatarUrl" class="avatar" alt="Avatar" />
+                <img src="@avatarUrl" class="avatar" alt="" onerror="this.onerror=null;this.src='/img/standart.jpg';" />
                 <div class="dropdown-toggle">@personaName</div>
 
                 <div class="dropdown-menu">
@@ -690,17 +695,21 @@
     @@media (max-width: 768px) {
         header {
             padding: 18px 16px;
+            display: block;
         }
 
         .header-left {
             flex-direction: column;
             align-items: stretch;
-            gap: 14px;
+            gap: 0;
         }
 
         .logo {
+            display: block;
             text-align: center;
             line-height: 1;
+            cursor: pointer;
+            user-select: none;
         }
 
         nav {
@@ -708,6 +717,7 @@
             grid-template-columns: repeat(3, minmax(0, 1fr));
             gap: 8px;
             width: 100%;
+            margin-top: 14px;
         }
 
             nav a {
@@ -723,6 +733,20 @@
         .header-right {
             justify-content: center;
             flex-wrap: wrap;
+            margin-top: 14px;
+        }
+
+        header:not(.is-mobile-open) nav,
+        header:not(.is-mobile-open) .header-right {
+            display: none;
+        }
+
+        header.is-mobile-open nav {
+            display: grid;
+        }
+
+        header.is-mobile-open .header-right {
+            display: flex;
         }
 
         .daily-quest-widget,
@@ -847,3 +871,35 @@
         }
     }
 </style>
+
+<script>
+    (() => {
+        const header = document.querySelector('[data-mobile-header]');
+        const toggle = header?.querySelector('[data-mobile-header-toggle]');
+        const mobileQuery = window.matchMedia('(max-width: 768px)');
+
+        if (!header || !toggle || !mobileQuery) {
+            return;
+        }
+
+        const setOpen = (isOpen) => {
+            header.classList.toggle('is-mobile-open', isOpen);
+            toggle.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
+        };
+
+        toggle.addEventListener('click', (event) => {
+            if (!mobileQuery.matches) {
+                return;
+            }
+
+            event.preventDefault();
+            setOpen(!header.classList.contains('is-mobile-open'));
+        });
+
+        mobileQuery.addEventListener?.('change', (event) => {
+            if (!event.matches) {
+                setOpen(false);
+            }
+        });
+    })();
+</script>

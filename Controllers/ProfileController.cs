@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Identity;
+using Microsoft.Extensions.Caching.Memory;
 using Microsoft.AspNetCore.Mvc;
 using System.Globalization;
 using Microsoft.EntityFrameworkCore;
@@ -17,6 +18,7 @@ namespace WebApplication1.Controllers
         private readonly QuestProgressService _questProgressService;
         private readonly NotificationService _notificationService;
         private readonly AchievementSyncService _achievementSyncService;
+        private readonly IMemoryCache _memoryCache;
 
         public ProfileController(
             ApplicationDbContext db,
@@ -25,7 +27,8 @@ namespace WebApplication1.Controllers
             CacheService cacheService,
             QuestProgressService questProgressService,
             NotificationService notificationService,
-            AchievementSyncService achievementSyncService)
+            AchievementSyncService achievementSyncService,
+            IMemoryCache memoryCache)
         {
             _db = db;
             _steamService = steamService;
@@ -34,6 +37,7 @@ namespace WebApplication1.Controllers
             _questProgressService = questProgressService;
             _notificationService = notificationService;
             _achievementSyncService = achievementSyncService;
+            _memoryCache = memoryCache;
         }
 
         private static string Normalize(string? s)
@@ -101,7 +105,7 @@ namespace WebApplication1.Controllers
 
             var profileAvatarUrl = !string.IsNullOrWhiteSpace(user.AvatarID)
                 ? user.AvatarID
-                : (!string.IsNullOrWhiteSpace(identityUser?.AvatarUrl) ? identityUser!.AvatarUrl : "/images/default_avatar.png");
+                : (!string.IsNullOrWhiteSpace(identityUser?.AvatarUrl) ? identityUser!.AvatarUrl : "/img/standart.jpg");
 
             var safePage = Math.Max(1, page);
             var safePageSize = Math.Clamp(pageSize, 12, 60);
@@ -389,6 +393,9 @@ namespace WebApplication1.Controllers
             if (user == null)
                 return NotFound();
 
+            if (await ApplySyncSpamBanIfNeededAsync(user))
+                return RedirectToAction("Banned", "Account");
+
             try
             {
                 await SyncProfileProgressAsync(user.Id, force: true);
@@ -413,6 +420,15 @@ namespace WebApplication1.Controllers
             var user = await _db.Users.FirstOrDefaultAsync(x => x.SteamId == identityUser.SteamId);
             if (user == null)
                 return NotFound();
+
+            if (await ApplySyncSpamBanIfNeededAsync(user))
+            {
+                return StatusCode(StatusCodes.Status429TooManyRequests, new
+                {
+                    banned = true,
+                    redirectUrl = Url.Action("Banned", "Account")
+                });
+            }
 
             try
             {
@@ -448,6 +464,34 @@ namespace WebApplication1.Controllers
             }
 
             return result;
+        }
+
+        private async Task<bool> ApplySyncSpamBanIfNeededAsync(User user)
+        {
+            const int maxAttempts = 5;
+            var cacheKey = $"profile-sync-attempts:{user.Id}";
+            var now = DateTime.UtcNow;
+
+            var attempts = _memoryCache.GetOrCreate(cacheKey, entry =>
+            {
+                entry.AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(1);
+                return new List<DateTime>();
+            })!;
+
+            attempts.RemoveAll(x => now - x > TimeSpan.FromMinutes(1));
+            attempts.Add(now);
+            _memoryCache.Set(cacheKey, attempts, TimeSpan.FromMinutes(1));
+
+            if (attempts.Count <= maxAttempts)
+                return false;
+
+            user.BannedAt = now;
+            user.BannedUntil = now.AddMinutes(5);
+            user.BanReason = "Автобан на 5 минут: слишком частые попытки синхронизации ачивок.";
+            await _db.SaveChangesAsync();
+            _memoryCache.Remove(cacheKey);
+
+            return true;
         }
 
     }

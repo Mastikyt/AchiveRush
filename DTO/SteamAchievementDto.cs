@@ -13,5 +13,7 @@ namespace WebApplication1.DTO
         public string? Icon { get; set; }
 
         public double Percent { get; set; }
+
+        public bool IsHidden { get; set; }
     }
 }

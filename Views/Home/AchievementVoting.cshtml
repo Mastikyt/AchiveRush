@@ -1,0 +1,126 @@
+@model WebApplication1.Models.AchievementVotingViewModel
+
+@{
+    ViewData["Title"] = "Голосование за новые достижения";
+    var now = DateTime.UtcNow;
+}
+
+<main class="catalog-page achievement-voting-page">
+    <section class="catalog-hero">
+        <div>
+            <span class="section-kicker">Каталог</span>
+            <h1>Голосование за новые достижения</h1>
+            <p>После проверки админом достижение три дня проходит голосование пользователей. Равенство голосов отклоняет заявку, а больше 80% голосов за после первых суток добавляют её досрочно.</p>
+        </div>
+    </section>
+
+    <nav class="catalog-tabs" aria-label="Разделы каталога">
+        <a asp-controller="Home" asp-action="Catalog" class="catalog-tab-link">Каталог игр</a>
+    </nav>
+
+    @if (TempData["VotingSuccess"] != null)
+    {
+        <div class="catalog-alert success-alert">@TempData["VotingSuccess"]</div>
+    }
+    @if (TempData["VotingError"] != null)
+    {
+        <div class="catalog-alert error-alert">@TempData["VotingError"]</div>
+    }
+
+    @if (!Model.Items.Any())
+    {
+        <section class="voting-empty">
+            <h2>Активных голосований нет</h2>
+            <p>Когда админ подтвердит новую пользовательскую заявку, она появится здесь.</p>
+        </section>
+    }
+    else
+    {
+        <section class="voting-grid">
+            @foreach (var item in Model.Items)
+            {
+                var endsAt = item.VotingEndsAt ?? now;
+                var remaining = endsAt - now;
+                var remainingText = remaining.TotalSeconds <= 0
+                    ? "завершается"
+                    : remaining.TotalDays >= 1
+                        ? $"{Math.Ceiling(remaining.TotalDays)} дн."
+                        : $"{Math.Max(1, Math.Ceiling(remaining.TotalHours))} ч.";
+                var currentVoteText = item.CurrentUserVote == true
+                    ? "Ты проголосовал за"
+                    : item.CurrentUserVote == false
+                        ? "Ты проголосовал против"
+                        : "";
+
+                <article class="voting-card">
+                    <div class="voting-card-media">
+                        <img src="@item.IconUrl" alt="@item.Title" />
+                        <span>@item.PositivePercent% за</span>
+                    </div>
+
+                    <div class="voting-card-body">
+                        <div class="voting-card-top">
+                            <div>
+                                <a asp-controller="Games" asp-action="Details" asp-route-id="@item.GameId" class="voting-game">@item.GameName</a>
+                                <h2>@item.Title</h2>
+                            </div>
+                            <div class="voting-time">Осталось: @remainingText</div>
+                        </div>
+
+                        <p class="voting-description">@item.Description</p>
+                        <div class="voting-method">
+                            <span>Как получить</span>
+                            <p>@item.ObtainMethod</p>
+                        </div>
+
+                        <div class="voting-meta">
+                            <span>Автор: @item.RequestedBy</span>
+                            <span>До @endsAt.ToLocalTime().ToString("dd.MM.yyyy HH:mm")</span>
+                        </div>
+
+                        <div class="voting-progress" aria-label="Голоса за">
+                            <span style="width:@item.PositivePercent%"></span>
+                        </div>
+
+                        <div class="voting-counts">
+                            <strong>За: @item.PositiveVotes</strong>
+                            <strong>Против: @item.NegativeVotes</strong>
+                            <strong>Всего: @item.TotalVotes</strong>
+                        </div>
+
+                        @if (!string.IsNullOrWhiteSpace(currentVoteText))
+                        {
+                            <div class="voting-current">@currentVoteText</div>
+                        }
+
+                        @if (!Model.IsSignedIn)
+                        {
+                            <a asp-controller="Account" asp-action="Login" class="voting-login">Войти, чтобы голосовать</a>
+                        }
+                        else if (!item.CanVote)
+                        {
+                            <div class="voting-disabled">Автор заявки не может голосовать за неё.</div>
+                        }
+                        else
+                        {
+                            <div class="voting-actions">
+                                <form method="post" asp-controller="Home" asp-action="VoteCustomAchievement">
+                                    @Html.AntiForgeryToken()
+                                    <input type="hidden" name="id" value="@item.Id" />
+                                    <input type="hidden" name="approve" value="true" />
+                                    <button type="submit" class="primary-btn">За</button>
+                                </form>
+                                <form method="post" asp-controller="Home" asp-action="VoteCustomAchievement">
+                                    @Html.AntiForgeryToken()
+                                    <input type="hidden" name="id" value="@item.Id" />
+                                    <input type="hidden" name="approve" value="false" />
+                                    <button type="submit" class="secondary-btn">Против</button>
+                                </form>
+                            </div>
+                        }
+                    </div>
+                </article>
+            }
+        </section>
+    }
+</main>

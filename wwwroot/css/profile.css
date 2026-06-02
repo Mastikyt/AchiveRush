@@ -3,6 +3,8 @@
     margin: 55px auto 80px;
     padding: 0 24px;
     min-height: 60vh;
+    box-sizing: border-box;
+    overflow-x: hidden;
 }
 
 .profile-page a,
@@ -20,6 +22,9 @@
     box-shadow: 0 20px 50px rgba(0, 0, 0, 0.4), 0 0 0 1px rgba(212, 175, 55, 0.08) inset;
     padding: 34px 38px;
     backdrop-filter: blur(8px);
+    box-sizing: border-box;
+    width: 100%;
+    min-width: 0;
 }
 
 .profile-main {
@@ -27,6 +32,7 @@
     grid-template-columns: 150px 1fr;
     gap: 28px;
     align-items: center;
+    min-width: 0;
 }
 
 .profile-avatar {
@@ -42,6 +48,7 @@
     display: flex;
     flex-direction: column;
     gap: 22px;
+    min-width: 0;
 }
 
 .profile-top {
@@ -49,6 +56,7 @@
     justify-content: space-between;
     align-items: flex-start;
     gap: 24px;
+    min-width: 0;
 }
 
 .profile-name {
@@ -64,12 +72,18 @@
     flex-wrap: wrap;
     gap: 12px;
     justify-content: flex-end;
+    min-width: 0;
+}
+
+.profile-actions form {
+    min-width: 0;
 }
 
 .profile-stats {
     display: grid;
-    grid-template-columns: repeat(4, minmax(130px, 1fr));
+    grid-template-columns: repeat(4, minmax(0, 1fr));
     gap: 18px;
+    min-width: 0;
 }
 
 .profile-stat {
@@ -105,6 +119,10 @@
     cursor: pointer;
     transition: all 0.3s ease;
     text-decoration: none;
+    max-width: 100%;
+    white-space: normal;
+    text-align: center;
+    overflow-wrap: anywhere;
 }
 
 .profile-steam-link {
@@ -201,6 +219,8 @@
     opacity: 0;
     transform: translateY(18px);
     animation: timeline-panel-in 0.62s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+    box-sizing: border-box;
+    overflow: hidden;
 }
 
 .achievement-timeline-panel.is-visible {
@@ -257,6 +277,7 @@
 .achievement-timeline-chart {
     display: none;
     overflow-x: auto;
+    max-width: 100%;
 }
 
 .achievement-timeline-chart.active {
@@ -282,6 +303,7 @@
 
 .achievement-graph-scroll {
     overflow-x: auto;
+    max-width: 100%;
     padding-bottom: 4px;
     scrollbar-color: rgba(212, 175, 55, 0.5) rgba(255, 255, 255, 0.05);
     scrollbar-width: thin;
@@ -660,9 +682,84 @@
 }
 
 @media (max-width: 640px) {
+    .profile-page {
+        margin-top: 28px;
+        padding: 0 14px;
+    }
+
+    .profile-card {
+        padding: 18px;
+        border-radius: 20px;
+        max-width: 100%;
+    }
+
+    .profile-main,
+    .profile-content,
+    .profile-top {
+        width: 100%;
+        max-width: 100%;
+    }
+
+    .profile-avatar {
+        width: 96px;
+        height: 96px;
+        border-radius: 16px;
+    }
+
+    .profile-name {
+        font-size: 30px;
+        overflow-wrap: anywhere;
+    }
+
+    .profile-actions {
+        width: 100%;
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .profile-actions form,
+    .profile-actions .profile-sync-btn {
+        width: 100%;
+    }
+
+    .profile-sync-btn {
+        min-height: 48px;
+        padding: 12px 14px;
+    }
+
+    .profile-stat {
+        padding: 14px;
+        border-radius: 14px;
+        min-width: 0;
+    }
+
+    .profile-stat-value {
+        font-size: 25px;
+        overflow-wrap: anywhere;
+    }
+
+    .profile-level-head {
+        flex-direction: column;
+        gap: 6px;
+    }
+
+    .rarity-summary,
+    .profile-rarity-filter {
+        flex-wrap: nowrap;
+        overflow-x: auto;
+        padding-bottom: 4px;
+        justify-content: flex-start;
+    }
+
+    .rarity-chip,
+    .rarity-filter-btn {
+        flex: 0 0 auto;
+    }
+
     .achievement-timeline-panel {
         padding: 16px;
         border-radius: 20px;
+        max-width: 100%;
     }
 
     .achievement-chart-bars {
@@ -673,6 +770,14 @@
 
     .achievement-timeline-head h2 {
         font-size: 21px;
+    }
+
+    .achievement-graph {
+        min-width: 620px;
+    }
+
+    .achievements-grid {
+        grid-template-columns: 1fr;
     }
 }
 

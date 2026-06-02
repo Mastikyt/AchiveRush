@@ -1,7 +1,24 @@
+using System.ComponentModel.DataAnnotations;
 using Microsoft.AspNetCore.Http;
 
 namespace WebApplication1.Models
 {
+    public static class ChallengeInputLimits
+    {
+        public const int TitleMaxLength = 180;
+        public const int DescriptionMaxLength = 2000;
+        public const int ManualProofDescriptionMaxLength = 1000;
+        public const int CoverImageUrlMaxLength = 2048;
+        public const int ProofUrlMaxLength = 2048;
+        public const int SubmissionCommentMaxLength = 2000;
+        public const int TargetValueMin = 1;
+        public const int TargetValueMax = 500;
+        public const int RewardExperienceMin = 1;
+        public const int RewardExperienceMax = 100000;
+        public const int ParticipantLimitMin = 1;
+        public const int ParticipantLimitMax = 1000;
+    }
+
     public class ChallengesIndexViewModel
     {
         public bool IsSignedIn { get; set; }
@@ -19,8 +36,10 @@ namespace WebApplication1.Models
 
     public class ChallengeCreateInputModel
     {
+        [StringLength(ChallengeInputLimits.TitleMaxLength)]
         public string Title { get; set; } = "";
 
+        [StringLength(ChallengeInputLimits.DescriptionMaxLength)]
         public string Description { get; set; } = "";
 
         public string Difficulty { get; set; } = ChallengeDifficulties.Normal;
@@ -33,18 +52,23 @@ namespace WebApplication1.Models
 
         public string AutoGoalType { get; set; } = ChallengeAutoGoalTypes.GameCompletion100;
 
+        [Range(ChallengeInputLimits.TargetValueMin, ChallengeInputLimits.TargetValueMax)]
         public int TargetValue { get; set; } = 1;
 
+        [StringLength(ChallengeInputLimits.ManualProofDescriptionMaxLength)]
         public string ManualProofDescription { get; set; } = "";
 
+        [StringLength(ChallengeInputLimits.CoverImageUrlMaxLength)]
         public string CoverImageUrl { get; set; } = "";
 
         public IFormFile? CoverImage { get; set; }
 
         public int? GameId { get; set; }
 
+        [Range(ChallengeInputLimits.RewardExperienceMin, ChallengeInputLimits.RewardExperienceMax)]
         public int RewardExperience { get; set; } = 100;
 
+        [Range(ChallengeInputLimits.ParticipantLimitMin, ChallengeInputLimits.ParticipantLimitMax)]
         public int ParticipantLimit { get; set; } = 10;
     }
 
@@ -295,5 +319,11 @@ namespace WebApplication1.Models
         public DateTime CreatedAt { get; set; }
 
         public DateTime? LastSync { get; set; }
+
+        public DateTime? BannedUntil { get; set; }
+
+        public string BanReason { get; set; } = "";
+
+        public bool IsBanned { get; set; }
     }
 }

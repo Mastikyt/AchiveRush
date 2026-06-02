@@ -234,7 +234,14 @@ html[data-theme="light"] :where(
     .daily-quest-card,
     .notifications-menu,
     .dropdown-menu,
-    .not-found-card
+    .not-found-card,
+    .voting-empty,
+    .voting-card,
+    .voting-method,
+    .voting-time,
+    .voting-current,
+    .voting-disabled,
+    .voting-login
 ) {
     background: linear-gradient(180deg, rgba(255, 250, 241, 0.98), rgba(242, 231, 207, 0.98)) !important;
     color: var(--ar-text) !important;
@@ -407,6 +414,11 @@ html[data-theme="light"] :where(
     .profile-level-next,
     .leaderboard-title-block p,
     .leaderboard-board-title p,
+    .catalog-hero p,
+    .voting-description,
+    .voting-method p,
+    .voting-meta,
+    .voting-counts,
     .admin-header p,
     .admin-section-head p,
     .request-date,
@@ -439,6 +451,9 @@ html[data-theme="light"] :where(
     .profile-section-title,
     .leaderboard-title-block h1,
     .leaderboard-board-title h2,
+    .catalog-hero h1,
+    .voting-empty h2,
+    .voting-card h2,
     .game-title,
     .game-achievements-head h2,
     .admin-header h1,
@@ -460,6 +475,14 @@ html[data-theme="light"] :where(
 
 html[data-theme="light"] :where(.dropdown-menu a, .dropdown-menu button, .user-info .dropdown-toggle, .footer-contacts a, .request-link-box a, .link-rule) {
     color: var(--ar-muted-strong) !important;
+}
+
+html[data-theme="light"] :where(.catalog-tab-link, .voting-game) {
+    color: var(--ar-muted-strong) !important;
+}
+
+html[data-theme="light"] .catalog-tab-link.active {
+    color: #fffdf8 !important;
 }
 
 html[data-theme="light"] :where(.success-alert, .challenge-flash.success, .admin-flash-success, .admin-dynamic-flash.success, .game-details-alert.success, .profile-sync-status) {
@@ -600,4 +623,59 @@ html[data-theme="light"] .profile-achievements-panel.is-loading::after {
     background: rgba(255, 250, 241, 0.9) !important;
     border-color: var(--ar-border) !important;
     box-shadow: 0 16px 34px var(--ar-shadow) !important;
+}
+
+/* Catalog cards already own the surface; keep inner text blocks transparent. */
+html[data-theme="light"] .catalog .game-content,
+html[data-theme="light"] .catalog .game-description,
+html[data-theme="light"] .catalog .game-content p,
+html[data-theme="light"] .catalog .achievements-count {
+    background: transparent !important;
+    box-shadow: none !important;
+}
+
+html[data-theme="light"] .user-info.dropdown {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    min-height: 62px;
+    padding: 8px 14px;
+    border-radius: 8px;
+    background: #fffdf8 !important;
+    border: 1px solid var(--ar-border) !important;
+    box-shadow: none !important;
+}
+
+html[data-theme="light"] .user-info.dropdown .dropdown-toggle {
+    margin-left: 0;
+    padding: 0;
+    background: transparent !important;
+    border: 0 !important;
+    box-shadow: none !important;
+    color: var(--ar-muted-strong) !important;
+    text-decoration: none !important;
+    line-height: 1.2;
+}
+
+html[data-theme="light"] .user-info.dropdown .avatar {
+    border: 1px solid var(--ar-border);
+}
+
+html[data-theme="light"] .hidden-achievements-section {
+    border-top-color: var(--ar-border) !important;
+}
+
+html[data-theme="light"] .hidden-achievements-head h3 {
+    color: var(--ar-text) !important;
+}
+
+html[data-theme="light"] .hidden-achievements-kicker,
+html[data-theme="light"] .hidden-achievements-head > span {
+    color: var(--ar-accent-strong) !important;
+}
+
+html[data-theme="light"] .hidden-achievements-head > span,
+html[data-theme="light"] .hidden-achievement-icon {
+    background: rgba(119, 140, 42, 0.08) !important;
+    border-color: var(--ar-border) !important;
 }

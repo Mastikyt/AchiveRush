@@ -83,9 +83,28 @@ namespace WebApplication1.Services
                 .Distinct()
                 .ToList();
 
-            var existingUserAchievements = await _db.UserAchievements
-                .Where(x => x.UserId == userId && allAchievementIds.Contains(x.AchievementId))
-                .ToDictionaryAsync(x => x.AchievementId);
+            var existingUserAchievementRows = await _db.UserAchievements
+                .Where(x => x.UserId == userId)
+                .ToListAsync();
+
+            var duplicateUserAchievements = existingUserAchievementRows
+                .GroupBy(x => x.AchievementId)
+                .Where(g => g.Count() > 1)
+                .ToList();
+
+            foreach (var duplicateGroup in duplicateUserAchievements)
+            {
+                var preferred = SelectPreferredUserAchievement(duplicateGroup);
+                foreach (var duplicate in duplicateGroup.Where(x => x.Id != preferred.Id))
+                {
+                    _db.UserAchievements.Remove(duplicate);
+                }
+            }
+
+            var existingUserAchievements = existingUserAchievementRows
+                .Where(x => allAchievementIds.Contains(x.AchievementId))
+                .GroupBy(x => x.AchievementId)
+                .ToDictionary(g => g.Key, SelectPreferredUserAchievement);
 
             var now = DateTime.UtcNow;
             using var semaphore = new SemaphoreSlim(SteamSyncConcurrency);
@@ -138,14 +157,17 @@ namespace WebApplication1.Services
                     }
                     else
                     {
-                        _db.UserAchievements.Add(new UserAchievement
+                        var newUserAchievement = new UserAchievement
                         {
                             UserId = userId,
                             AchievementId = achievement.Id,
                             Completed = completed,
                             UnlockTime = completed ? unlockTime : null,
                             IconUrl = achievement.IconUrl
-                        });
+                        };
+
+                        _db.UserAchievements.Add(newUserAchievement);
+                        existingUserAchievements[achievement.Id] = newUserAchievement;
                     }
                 }
             }
@@ -153,7 +175,10 @@ namespace WebApplication1.Services
             await _db.SaveChangesAsync();
 
             user.TotalAchievements = await _db.UserAchievements
-                .CountAsync(x => x.UserId == userId && x.Completed);
+                .Where(x => x.UserId == userId && x.Completed)
+                .Select(x => x.AchievementId)
+                .Distinct()
+                .CountAsync();
 
             user.LastSync = now;
             await _db.SaveChangesAsync();
@@ -173,6 +198,15 @@ namespace WebApplication1.Services
                 return "";
 
             return s.Trim().ToLowerInvariant();
+        }
+
+        private static UserAchievement SelectPreferredUserAchievement(IEnumerable<UserAchievement> achievements)
+        {
+            return achievements
+                .OrderByDescending(x => x.Completed)
+                .ThenBy(x => x.UnlockTime ?? DateTime.MaxValue)
+                .ThenBy(x => x.Id)
+                .First();
         }
 
         private sealed class SyncGame

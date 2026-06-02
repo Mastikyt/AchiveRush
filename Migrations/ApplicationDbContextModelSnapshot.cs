@@ -270,6 +270,9 @@ namespace WebApplication1.Migrations
                     b.Property<bool>("IsCustom")
                         .HasColumnType("bit");
 
+                    b.Property<bool>("IsHidden")
+                        .HasColumnType("bit");
+
                     b.Property<string>("ObtainMethod")
                         .IsRequired()
                         .HasMaxLength(2000)
@@ -525,7 +528,8 @@ namespace WebApplication1.Migrations
 
                     b.Property<string>("Description")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(2000)
+                        .HasColumnType("nvarchar(2000)");
 
                     b.Property<int>("GameId")
                         .HasColumnType("int");
@@ -543,6 +547,9 @@ namespace WebApplication1.Migrations
                     b.Property<int?>("RequestedByUserId")
                         .HasColumnType("int");
 
+                    b.Property<DateTime?>("ResolvedAt")
+                        .HasColumnType("datetime2");
+
                     b.Property<string>("Status")
                         .IsRequired()
                         .HasMaxLength(32)
@@ -553,6 +560,12 @@ namespace WebApplication1.Migrations
                         .HasMaxLength(256)
                         .HasColumnType("nvarchar(256)");
 
+                    b.Property<DateTime?>("VotingEndsAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime?>("VotingStartedAt")
+                        .HasColumnType("datetime2");
+
                     b.HasKey("Id");
 
                     b.HasIndex("GameId");
@@ -561,7 +574,39 @@ namespace WebApplication1.Migrations
 
                     b.HasIndex("Status", "CreatedAt");
 
+                    b.HasIndex("Status", "VotingEndsAt");
+
                     b.ToTable("CustomAchievementRequests");
+                });
+
+            modelBuilder.Entity("WebApplication1.Models.CustomAchievementVote", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("CustomAchievementRequestId")
+                        .HasColumnType("int");
+
+                    b.Property<bool>("IsPositive")
+                        .HasColumnType("bit");
+
+                    b.Property<int>("UserId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserId");
+
+                    b.HasIndex("CustomAchievementRequestId", "UserId")
+                        .IsUnique();
+
+                    b.ToTable("CustomAchievementVotes");
                 });
 
             modelBuilder.Entity("WebApplication1.Models.DailyQuest", b =>
@@ -751,25 +796,29 @@ namespace WebApplication1.Migrations
 
                     b.Property<string>("ImageUrl")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(2048)
+                        .HasColumnType("nvarchar(2048)");
 
                     b.Property<string>("Name")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(256)
+                        .HasColumnType("nvarchar(256)");
 
                     b.Property<int?>("RequestedByUserId")
                         .HasColumnType("int");
 
                     b.Property<string>("Status")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(32)
+                        .HasColumnType("nvarchar(32)");
 
                     b.Property<int>("SteamAppId")
                         .HasColumnType("int");
 
                     b.Property<string>("SteamUrl")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(2048)
+                        .HasColumnType("nvarchar(2048)");
 
                     b.HasKey("Id");
 
@@ -834,6 +883,16 @@ namespace WebApplication1.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<string>("BanReason")
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
+
+                    b.Property<DateTime?>("BannedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime?>("BannedUntil")
+                        .HasColumnType("datetime2");
+
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime2");
 
@@ -869,6 +928,8 @@ namespace WebApplication1.Migrations
                         .HasColumnType("int");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("BannedUntil");
 
                     b.HasIndex("SteamId");
 
@@ -1102,6 +1163,25 @@ namespace WebApplication1.Migrations
                     b.Navigation("RequestedByUser");
                 });
 
+            modelBuilder.Entity("WebApplication1.Models.CustomAchievementVote", b =>
+                {
+                    b.HasOne("WebApplication1.Models.CustomAchievementRequest", "CustomAchievementRequest")
+                        .WithMany("Votes")
+                        .HasForeignKey("CustomAchievementRequestId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("WebApplication1.Models.User", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("CustomAchievementRequest");
+
+                    b.Navigation("User");
+                });
+
             modelBuilder.Entity("WebApplication1.Models.DailyQuestAssignment", b =>
                 {
                     b.HasOne("WebApplication1.Models.DailyQuest", "DailyQuest")
@@ -1188,6 +1268,11 @@ namespace WebApplication1.Migrations
                     b.Navigation("Participants");
 
                     b.Navigation("Submissions");
+                });
+
+            modelBuilder.Entity("WebApplication1.Models.CustomAchievementRequest", b =>
+                {
+                    b.Navigation("Votes");
                 });
 
             modelBuilder.Entity("WebApplication1.Models.DailyQuest", b =>

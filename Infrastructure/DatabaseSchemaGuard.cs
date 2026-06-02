@@ -58,6 +58,35 @@ namespace WebApplication1.Infrastructure
                 IF OBJECT_ID(N'[CustomAchievementClaimRequests]', N'U') IS NOT NULL
                     AND COL_LENGTH('dbo.CustomAchievementClaimRequests', 'ProofUrl') IS NULL
                     ALTER TABLE [CustomAchievementClaimRequests] ADD [ProofUrl] nvarchar(2048) NOT NULL CONSTRAINT [DF_CustomAchievementClaimRequests_ProofUrl] DEFAULT(N'') WITH VALUES;
+
+                IF OBJECT_ID(N'[CustomAchievementRequests]', N'U') IS NOT NULL
+                BEGIN
+                    IF COL_LENGTH('dbo.CustomAchievementRequests', 'VotingStartedAt') IS NULL
+                        ALTER TABLE [CustomAchievementRequests] ADD [VotingStartedAt] datetime2 NULL;
+
+                    IF COL_LENGTH('dbo.CustomAchievementRequests', 'VotingEndsAt') IS NULL
+                        ALTER TABLE [CustomAchievementRequests] ADD [VotingEndsAt] datetime2 NULL;
+
+                    IF COL_LENGTH('dbo.CustomAchievementRequests', 'ResolvedAt') IS NULL
+                        ALTER TABLE [CustomAchievementRequests] ADD [ResolvedAt] datetime2 NULL;
+                END
+
+                IF OBJECT_ID(N'[CustomAchievementVotes]', N'U') IS NULL
+                BEGIN
+                    CREATE TABLE [CustomAchievementVotes] (
+                        [Id] int NOT NULL IDENTITY,
+                        [CustomAchievementRequestId] int NOT NULL,
+                        [UserId] int NOT NULL,
+                        [IsPositive] bit NOT NULL,
+                        [CreatedAt] datetime2 NOT NULL,
+                        CONSTRAINT [PK_CustomAchievementVotes] PRIMARY KEY ([Id]),
+                        CONSTRAINT [FK_CustomAchievementVotes_CustomAchievementRequests_CustomAchievementRequestId] FOREIGN KEY ([CustomAchievementRequestId]) REFERENCES [CustomAchievementRequests] ([Id]) ON DELETE CASCADE,
+                        CONSTRAINT [FK_CustomAchievementVotes_Users_UserId] FOREIGN KEY ([UserId]) REFERENCES [Users] ([Id]) ON DELETE CASCADE
+                    );
+
+                    CREATE UNIQUE INDEX [IX_CustomAchievementVotes_CustomAchievementRequestId_UserId] ON [CustomAchievementVotes] ([CustomAchievementRequestId], [UserId]);
+                    CREATE INDEX [IX_CustomAchievementVotes_UserId] ON [CustomAchievementVotes] ([UserId]);
+                END
                 """);
         }
     }

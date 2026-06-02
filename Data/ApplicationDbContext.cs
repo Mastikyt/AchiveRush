@@ -17,6 +17,8 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser>
 
     public DbSet<CustomAchievementRequest> CustomAchievementRequests { get; set; }
 
+    public DbSet<CustomAchievementVote> CustomAchievementVotes { get; set; }
+
     public DbSet<CustomAchievementClaimRequest> CustomAchievementClaimRequests { get; set; }
 
     public DbSet<Challenge> Challenges { get; set; }
@@ -59,6 +61,13 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser>
         builder.Entity<User>()
             .HasIndex(u => u.TotalAchievements);
 
+        builder.Entity<User>()
+            .Property(u => u.BanReason)
+            .HasMaxLength(500);
+
+        builder.Entity<User>()
+            .HasIndex(u => u.BannedUntil);
+
         builder.Entity<Game>()
             .HasIndex(g => g.SteamAppId);
 
@@ -86,6 +95,25 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser>
 
         builder.Entity<CustomAchievementRequest>()
             .HasIndex(r => new { r.Status, r.CreatedAt });
+
+        builder.Entity<CustomAchievementRequest>()
+            .HasIndex(r => new { r.Status, r.VotingEndsAt });
+
+        builder.Entity<CustomAchievementVote>()
+            .HasIndex(v => new { v.CustomAchievementRequestId, v.UserId })
+            .IsUnique();
+
+        builder.Entity<CustomAchievementVote>()
+            .HasOne(v => v.CustomAchievementRequest)
+            .WithMany(r => r.Votes)
+            .HasForeignKey(v => v.CustomAchievementRequestId)
+            .OnDelete(DeleteBehavior.Cascade);
+
+        builder.Entity<CustomAchievementVote>()
+            .HasOne(v => v.User)
+            .WithMany()
+            .HasForeignKey(v => v.UserId)
+            .OnDelete(DeleteBehavior.Cascade);
 
         builder.Entity<UserAchievement>()
             .HasIndex(ua => new { ua.UserId, ua.Completed, ua.UnlockTime });

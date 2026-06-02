@@ -50,7 +50,7 @@ public class AccountController : Controller
         }
 
         if (string.IsNullOrWhiteSpace(avatarUrl))
-            avatarUrl = "/images/default_avatar.png";
+            avatarUrl = "/img/standart.jpg";
 
         var identityUser = await _userManager.FindByLoginAsync("Steam", steamId);
 
@@ -121,6 +121,28 @@ public class AccountController : Controller
         {
             RedirectUri = Url.Action("SteamResponse", new { returnUrl })
         }, "Steam");
+    }
+
+    [HttpGet("/banned")]
+    public async Task<IActionResult> Banned()
+    {
+        var identityUser = await _userManager.GetUserAsync(User);
+        var publicUser = identityUser == null || string.IsNullOrWhiteSpace(identityUser.SteamId)
+            ? null
+            : await _context.Users
+                .AsNoTracking()
+                .FirstOrDefaultAsync(x => x.SteamId == identityUser.SteamId);
+
+        if (publicUser?.BannedUntil == null || publicUser.BannedUntil <= DateTime.UtcNow)
+            return RedirectToAction("Index", "Home");
+
+        return View(new BanStatusViewModel
+        {
+            BannedUntil = publicUser.BannedUntil,
+            Reason = string.IsNullOrWhiteSpace(publicUser.BanReason)
+                ? "Причина не указана."
+                : publicUser.BanReason
+        });
     }
 
     [HttpPost]

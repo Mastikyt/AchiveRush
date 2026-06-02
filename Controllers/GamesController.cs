@@ -86,6 +86,7 @@ public class GamesController : Controller
                 Description = schemaAchievement.Description ?? "",
                 ApiName = schemaAchievement.Name ?? "",
                 IconUrl = schemaAchievement.Icon,
+                IsHidden = schemaAchievement.IsHidden,
                 GlobalUnlockRate = globalRates.TryGetValue(normalizedApiName, out var percent) ? percent : 0
             });
         }
@@ -123,7 +124,7 @@ public class GamesController : Controller
 
         if (publicUser != null)
         {
-            completedAchievements = await _context.UserAchievements
+            var completedAchievementRows = await _context.UserAchievements
                 .Where(x => x.UserId == publicUser.Id &&
                             x.Completed &&
                             x.Achievement.GameId == game.Id)
@@ -132,7 +133,13 @@ public class GamesController : Controller
                     x.AchievementId,
                     x.UnlockTime
                 })
-                .ToDictionaryAsync(x => x.AchievementId, x => x.UnlockTime);
+                .ToListAsync();
+
+            completedAchievements = completedAchievementRows
+                .GroupBy(x => x.AchievementId)
+                .ToDictionary(
+                    g => g.Key,
+                    g => g.Select(x => x.UnlockTime).Where(x => x.HasValue).Min());
         }
 
         var pendingCustomClaimAchievementIds = publicUser == null
@@ -149,6 +156,7 @@ public class GamesController : Controller
             Game = game,
             TotalAchievements = game.Achievements.Count,
             CompletedAchievements = completedAchievements.Count,
+            HiddenAchievements = game.Achievements.Count(a => a.IsHidden),
             CanAddCustomAchievement = identityUser != null,
             CanManageCustomAchievements = isAdmin,
             CustomAchievement = new CustomAchievementInputModel
@@ -157,6 +165,7 @@ public class GamesController : Controller
             },
             AchievementItems = game.Achievements
                 .OrderByDescending(a => completedAchievements.ContainsKey(a.Id))
+                .ThenBy(a => a.IsHidden)
                 .ThenByDescending(a => a.IsCustom)
                 .ThenBy(a => a.Title)
                 .Select(a => new GameAchievementItemViewModel
@@ -170,6 +179,7 @@ public class GamesController : Controller
                     UnlockTime = completedAchievements.TryGetValue(a.Id, out var unlockTime) ? unlockTime : null,
                     IsCompleted = completedAchievements.ContainsKey(a.Id),
                     IsCustom = a.IsCustom,
+                    IsHidden = a.IsHidden,
                     HasPendingCompletionRequest = pendingCustomClaimAchievementIds.Contains(a.Id),
                     CanRequestCompletion = a.IsCustom && publicUser != null && !completedAchievements.ContainsKey(a.Id) && !pendingCustomClaimAchievementIds.Contains(a.Id),
                     CanDeleteCustomAchievement = isAdmin && a.IsCustom
@@ -215,16 +225,34 @@ public class GamesController : Controller
             return RedirectToAction(nameof(Details), new { id = input.GameId });
         }
 
+        if (title.Length > CustomAchievementInputModel.TitleMaxLength ||
+            description.Length > CustomAchievementInputModel.DescriptionMaxLength ||
+            obtainMethod.Length > CustomAchievementInputModel.ObtainMethodMaxLength ||
+            iconUrl.Length > CustomAchievementInputModel.IconUrlMaxLength)
+        {
+            TempData["GameDetailsError"] = "Поля пользовательского достижения превышают допустимую длину.";
+            return RedirectToAction(nameof(Details), new { id = input.GameId });
+        }
+
+        if (!string.IsNullOrWhiteSpace(iconUrl) &&
+            (!Uri.TryCreate(iconUrl, UriKind.Absolute, out var iconUri) ||
+             iconUri.Scheme is not ("http" or "https")))
+        {
+            TempData["GameDetailsError"] = "Ссылка на иконку должна начинаться с http:// или https://.";
+            return RedirectToAction(nameof(Details), new { id = input.GameId });
+        }
+
         var publicUser = await _context.Users.FirstOrDefaultAsync(x => x.SteamId == identityUser.SteamId);
 
         var duplicatePendingRequest = await _context.CustomAchievementRequests
             .AnyAsync(x => x.GameId == game.Id &&
-                           x.Status == "Pending" &&
+                           (x.Status == CustomAchievementRequestStatuses.Pending ||
+                            x.Status == CustomAchievementRequestStatuses.Voting) &&
                            x.Title == title);
 
         if (duplicatePendingRequest)
         {
-            TempData["GameDetailsError"] = "Такая заявка на достижение уже ожидает проверки.";
+            TempData["GameDetailsError"] = "Такая заявка на достижение уже ожидает проверки или голосования.";
             return RedirectToAction(nameof(Details), new { id = input.GameId });
         }
 
@@ -237,7 +265,7 @@ public class GamesController : Controller
             IconUrl = string.IsNullOrWhiteSpace(iconUrl) ? game.AvatarUrl : iconUrl,
             RequestedByUserId = publicUser?.Id,
             CreatedAt = DateTime.UtcNow,
-            Status = "Pending"
+            Status = CustomAchievementRequestStatuses.Pending
         });
 
         await _context.SaveChangesAsync();
@@ -282,13 +310,13 @@ public class GamesController : Controller
         var cleanedComment = SteamService.CleanText(comment);
         var cleanedProofUrl = (proofUrl ?? "").Trim();
 
-        if (cleanedComment.Length > 2000)
+        if (cleanedComment.Length > CustomAchievementClaimRequest.CommentMaxLength)
         {
             TempData["GameDetailsError"] = "Комментарий к доказательству слишком длинный.";
             return RedirectToAction(nameof(Details), new { id = achievement.GameId });
         }
 
-        if (cleanedProofUrl.Length > 2048)
+        if (cleanedProofUrl.Length > CustomAchievementClaimRequest.ProofUrlMaxLength)
         {
             TempData["GameDetailsError"] = "Ссылка на доказательство слишком длинная.";
             return RedirectToAction(nameof(Details), new { id = achievement.GameId });
@@ -535,6 +563,12 @@ public class GamesController : Controller
             return RedirectToCatalogFeedback();
         }
 
+        if (steamUrl.Length > GameRequest.UrlMaxLength)
+        {
+            TempData["ErrorMessage"] = "Ссылка на игру Steam слишком длинная.";
+            return RedirectToCatalogFeedback();
+        }
+
         var appId = ExtractAppId(steamUrl);
         if (appId == null)
         {
@@ -603,8 +637,8 @@ public class GamesController : Controller
     private int? ExtractAppId(string url)
     {
         var match = Regex.Match(url, @"app\/(\d+)");
-        if (match.Success)
-            return int.Parse(match.Groups[1].Value);
+        if (match.Success && int.TryParse(match.Groups[1].Value, out var appId) && appId > 0)
+            return appId;
 
         return null;
     }

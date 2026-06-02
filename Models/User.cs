@@ -24,6 +24,12 @@ public class User
 
     public DateTime? LastSync { get; set; }
 
+    public DateTime? BannedUntil { get; set; }
+
+    public DateTime? BannedAt { get; set; }
+
+    public string? BanReason { get; set; }
+
     public ICollection<UserAchievement> UserAchievements { get; set; } = new List<UserAchievement>();
 
     public ICollection<Challenge> CreatedChallenges { get; set; } = new List<Challenge>();

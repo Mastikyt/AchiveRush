@@ -35,6 +35,7 @@ public class Program
         .AddDefaultTokenProviders();
 
         builder.Services.AddDistributedMemoryCache();
+        builder.Services.AddMemoryCache();
         builder.Services.AddSession(options =>
         {
             options.IdleTimeout = TimeSpan.FromHours(3);
@@ -64,6 +65,8 @@ public class Program
         builder.Services.AddScoped<QuestProgressService>();
         builder.Services.AddScoped<NotificationService>();
         builder.Services.AddScoped<AchievementSyncService>();
+        builder.Services.AddScoped<CustomAchievementVotingService>();
+        builder.Services.AddHostedService<CustomAchievementVotingHostedService>();
         builder.Services.AddSingleton<IConnectionMultiplexer>(
             ConnectionMultiplexer.Connect("localhost:6379,abortConnect=false")
         );
@@ -85,6 +88,7 @@ public class Program
         app.UseAuthentication();
         app.UseAuthorization();
         app.UseSession();
+        app.UseMiddleware<BanGuardMiddleware>();
 
 
         app.MapControllerRoute(

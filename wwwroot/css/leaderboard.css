@@ -1,7 +1,7 @@
 .leaderboard-page {
-    width: min(1480px, 100%);
+    max-width: 1240px;
     margin: 42px auto 80px;
-    padding: 0 24px;
+    padding: 0 22px;
 }
 
 .leaderboard-title-block {
@@ -11,15 +11,17 @@
 .leaderboard-title-block h1 {
     margin: 0 0 8px;
     color: #fef3d6;
-    font-size: 34px;
-    line-height: 1.15;
+    font-size: 42px;
+    font-weight: 900;
+    line-height: 1.08;
 }
 
 .leaderboard-title-block p,
 .leaderboard-board-title p {
     margin: 0;
     color: #dcbc6a;
-    line-height: 1.45;
+    font-size: 16px;
+    line-height: 1.6;
 }
 
 .leaderboard-grid {
@@ -311,7 +313,7 @@ a.leaderboard-row.current-user {
 }
 
 .leaderboard-carousel {
-    max-width: 1080px;
+    max-width: 100%;
     margin: 0 auto;
 }
 
@@ -369,7 +371,7 @@ a.leaderboard-row.current-user {
 
 .leaderboard-carousel-window {
     overflow: hidden;
-    border-radius: 10px;
+    border-radius: 8px;
 }
 
 .leaderboard-carousel-track {

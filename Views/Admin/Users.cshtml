@@ -1,6 +1,10 @@
 @model WebApplication1.Models.AdminUsersViewModel
 
 @{
+    var defaultBanUntil = DateTime.Now.AddDays(1).ToString("yyyy-MM-ddTHH:mm");
+}
+
+@{
     ViewData["Title"] = "Админка: пользователи";
 }
 
@@ -55,7 +59,7 @@
                         <div class="request-card">
                             <div class="request-image-wrap">
                                 <img src="@user.AvatarUrl" alt="@user.SteamName" class="request-image" />
-                                <div class="request-status approved">#@user.Id</div>
+                                <div class="request-status @(user.IsBanned ? "rejected" : "approved")">#@user.Id</div>
                             </div>
                             <div class="request-body">
                                 <h3>@user.SteamName</h3>
@@ -66,11 +70,38 @@
                                     <div class="request-meta-item"><span>Челленджей</span><strong>@user.CompletedChallenges</strong></div>
                                 </div>
                                 <div class="request-link-box"><span>Steam ID</span><div>@user.SteamId</div></div>
+                                @if (user.IsBanned)
+                                {
+                                    <div class="request-link-box admin-ban-box">
+                                        <span>Бан активен до @user.BannedUntil?.ToLocalTime().ToString("dd.MM.yyyy HH:mm")</span>
+                                        <div>@(string.IsNullOrWhiteSpace(user.BanReason) ? "Причина не указана." : user.BanReason)</div>
+                                    </div>
+                                }
                                 <div class="request-date">
                                     Создан: @user.CreatedAt.ToLocalTime().ToString("dd.MM.yyyy HH:mm")
                                     @if (user.LastSync.HasValue)
                                     {
                                         <span> · sync: @user.LastSync.Value.ToLocalTime().ToString("dd.MM.yyyy HH:mm")</span>
+                                    }
+                                </div>
+                                <div class="request-actions">
+                                    @if (user.IsBanned)
+                                    {
+                                        <form method="post" asp-controller="Admin" asp-action="UnbanUser" asp-route-usersPage="@Model.UsersPage">
+                                            @Html.AntiForgeryToken()
+                                            <input type="hidden" name="id" value="@user.Id" />
+                                            <button type="submit" class="btn-approve">Разбанить</button>
+                                        </form>
+                                    }
+                                    else
+                                    {
+                                        <button type="button"
+                                                class="btn-reject"
+                                                data-ban-open
+                                                data-user-id="@user.Id"
+                                                data-user-name="@user.SteamName">
+                                            Бан
+                                        </button>
                                     }
                                 </div>
                             </div>
@@ -91,5 +122,61 @@
         </section>
     </div>
 </div>
+
+<div class="admin-modal-overlay" data-ban-modal hidden>
+    <div class="admin-modal">
+        <button type="button" class="admin-modal-close" data-ban-close aria-label="Закрыть">×</button>
+        <h2>Забанить пользователя</h2>
+        <p data-ban-user-name></p>
+
+        <form method="post" asp-controller="Admin" asp-action="BanUser" asp-route-usersPage="@Model.UsersPage">
+            @Html.AntiForgeryToken()
+            <input type="hidden" name="id" data-ban-user-id />
+
+            <label>
+                <span>Бан до</span>
+                <input type="datetime-local" name="bannedUntil" value="@defaultBanUntil" required />
+            </label>
+
+            <label>
+                <span>Причина</span>
+                <textarea name="reason" maxlength="500" rows="4" placeholder="Например: спам синхронизацией или нарушение правил"></textarea>
+            </label>
+
+            <button type="submit" class="btn-reject">Забанить</button>
+        </form>
+    </div>
+</div>
+
+<script>
+    (() => {
+        const modal = document.querySelector('[data-ban-modal]');
+        if (!modal) {
+            return;
+        }
+
+        const userIdInput = modal.querySelector('[data-ban-user-id]');
+        const userName = modal.querySelector('[data-ban-user-name]');
+
+        document.querySelectorAll('[data-ban-open]').forEach((button) => {
+            button.addEventListener('click', () => {
+                userIdInput.value = button.dataset.userId || '';
+                userName.textContent = button.dataset.userName || '';
+                modal.hidden = false;
+            });
+        });
+
+        const close = () => {
+            modal.hidden = true;
+        };
+
+        modal.querySelectorAll('[data-ban-close]').forEach((button) => button.addEventListener('click', close));
+        modal.addEventListener('click', (event) => {
+            if (event.target === modal) {
+                close();
+            }
+        });
+    })();
+</script>
 
 <partial name="_AdminStyles" />

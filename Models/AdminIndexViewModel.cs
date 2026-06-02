@@ -26,11 +26,15 @@
 
         public int RequestsPageSize { get; set; } = 12;
 
+        public string RequestSearch { get; set; } = "";
+
         public int GamesPage { get; set; } = 1;
 
         public int GamesTotalPages { get; set; } = 1;
 
         public int GamesTotalCount { get; set; }
+
+        public int DuplicateGamesCount { get; set; }
 
         public int GamesPageSize { get; set; } = 12;
 

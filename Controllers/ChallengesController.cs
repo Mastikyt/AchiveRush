@@ -127,8 +127,11 @@ namespace WebApplication1.Controllers
                 : ChallengeVerificationTypes.Automatic;
             var autoGoalType = ResolveAutoGoalType(challengeType, input.AutoGoalType);
             var targetValue = autoGoalType == ChallengeAutoGoalTypes.GameCompletion100
-                ? 1
-                : Math.Clamp(input.TargetValue, 1, 500);
+                ? ChallengeInputLimits.TargetValueMin
+                : Math.Clamp(
+                    input.TargetValue,
+                    ChallengeInputLimits.TargetValueMin,
+                    ChallengeInputLimits.TargetValueMax);
 
             if (string.IsNullOrWhiteSpace(title))
             {
@@ -142,7 +145,8 @@ namespace WebApplication1.Controllers
                 return RedirectToAction(nameof(Create));
             }
 
-            if (title.Length > 180 || description.Length > 2000)
+            if (title.Length > ChallengeInputLimits.TitleMaxLength ||
+                description.Length > ChallengeInputLimits.DescriptionMaxLength)
             {
                 TempData["ChallengesError"] = "Название или описание слишком длинные.";
                 return RedirectToAction(nameof(Create));
@@ -186,8 +190,14 @@ namespace WebApplication1.Controllers
                 TargetValue = targetValue,
                 ManualProofDescription = manualProofDescription,
                 CoverImageUrl = coverImageUrl,
-                RewardExperience = Math.Clamp(input.RewardExperience, 1, 100000),
-                ParticipantLimit = Math.Clamp(input.ParticipantLimit, 1, 1000),
+                RewardExperience = Math.Clamp(
+                    input.RewardExperience,
+                    ChallengeInputLimits.RewardExperienceMin,
+                    ChallengeInputLimits.RewardExperienceMax),
+                ParticipantLimit = Math.Clamp(
+                    input.ParticipantLimit,
+                    ChallengeInputLimits.ParticipantLimitMin,
+                    ChallengeInputLimits.ParticipantLimitMax),
                 GameId = gameId,
                 CreatedByUserId = publicUser.Id,
                 CreatedAt = DateTime.UtcNow,
@@ -328,6 +338,20 @@ namespace WebApplication1.Controllers
             }
 
             var cleanedProofUrl = (proofUrl ?? "").Trim();
+            var cleanedComment = SteamService.CleanText(comment);
+
+            if (cleanedProofUrl.Length > ChallengeInputLimits.ProofUrlMaxLength)
+            {
+                TempData["ChallengesError"] = "Ссылка на доказательство слишком длинная.";
+                return RedirectToLocalOrIndex(returnUrl);
+            }
+
+            if (cleanedComment.Length > ChallengeInputLimits.SubmissionCommentMaxLength)
+            {
+                TempData["ChallengesError"] = "Комментарий к доказательству слишком длинный.";
+                return RedirectToLocalOrIndex(returnUrl);
+            }
+
             if (!Uri.TryCreate(cleanedProofUrl, UriKind.Absolute, out var proofUri) ||
                 proofUri.Scheme is not ("http" or "https"))
             {
@@ -351,7 +375,7 @@ namespace WebApplication1.Controllers
                 ChallengeId = id,
                 UserId = publicUser.Id,
                 ProofUrl = cleanedProofUrl,
-                Comment = SteamService.CleanText(comment),
+                Comment = cleanedComment,
                 CreatedAt = DateTime.UtcNow,
                 Status = ChallengeSubmissionStatuses.Pending
             });
@@ -483,11 +507,11 @@ namespace WebApplication1.Controllers
                 return "";
 
             if (cleaned.StartsWith("/", StringComparison.Ordinal))
-                return cleaned.Length <= 2048 ? cleaned : "";
+                return cleaned.Length <= ChallengeInputLimits.CoverImageUrlMaxLength ? cleaned : "";
 
             return Uri.TryCreate(cleaned, UriKind.Absolute, out var uri) &&
                    uri.Scheme is "http" or "https" &&
-                   cleaned.Length <= 2048
+                   cleaned.Length <= ChallengeInputLimits.CoverImageUrlMaxLength
                 ? cleaned
                 : "";
         }

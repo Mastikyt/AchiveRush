@@ -58,6 +58,10 @@
         border: 1px solid rgba(212, 175, 55, 0.24);
         background: rgba(212, 175, 55, 0.08);
         cursor: pointer;
+        appearance: none;
+        box-sizing: border-box;
+        font: inherit;
+        line-height: 1;
         transition: transform 0.18s ease, border-color 0.18s ease, background 0.18s ease;
     }
 
@@ -157,6 +161,65 @@
         margin: 0;
         color: #dcbc6a;
         line-height: 1.55;
+    }
+
+    .admin-section-actions {
+        display: flex;
+        gap: 10px;
+        flex-wrap: wrap;
+        margin-top: 14px;
+    }
+
+    .admin-request-tools {
+        display: grid;
+        gap: 14px;
+        margin-bottom: 20px;
+    }
+
+    .admin-request-search {
+        display: grid;
+        grid-template-columns: minmax(260px, 1fr) auto auto;
+        gap: 10px;
+        align-items: end;
+    }
+
+    .admin-request-search label {
+        display: flex;
+        flex-direction: column;
+        gap: 7px;
+        color: #dcbc6a;
+        font-weight: 900;
+    }
+
+    .admin-request-search input {
+        width: 100%;
+        min-height: 42px;
+        border-radius: 8px;
+        border: 1px solid rgba(212, 175, 55, 0.18);
+        background: #0f0d0a;
+        color: #fef3d6;
+        padding: 10px 12px;
+        font: inherit;
+    }
+
+    .admin-request-search input::placeholder {
+        color: rgba(254, 243, 214, 0.55);
+    }
+
+    .admin-request-search .btn-refresh {
+        width: 104px;
+        min-height: 42px;
+        padding: 10px 14px;
+    }
+
+    .admin-bulk-actions {
+        display: flex;
+        gap: 10px;
+        flex-wrap: wrap;
+    }
+
+    .admin-bulk-actions form {
+        flex: 0 1 auto;
     }
 
     .admin-grid {
@@ -271,6 +334,128 @@
         width: 100%;
     }
 
+    .admin-ban-box {
+        border-color: rgba(248, 113, 113, 0.24);
+        background: rgba(127, 29, 29, 0.14);
+    }
+
+    .admin-modal-overlay[hidden] {
+        display: none;
+    }
+
+    .admin-modal-overlay {
+        position: fixed;
+        inset: 0;
+        z-index: 1000;
+        display: grid;
+        place-items: center;
+        padding: 18px;
+        background: rgba(0, 0, 0, 0.68);
+        backdrop-filter: blur(4px);
+    }
+
+    .admin-modal {
+        position: relative;
+        width: min(520px, 100%);
+        max-width: calc(100vw - 36px);
+        box-sizing: border-box;
+        padding: 24px;
+        border-radius: 8px;
+        border: 1px solid rgba(212, 175, 55, 0.28);
+        background: #1c1812;
+        box-shadow: 0 24px 60px rgba(0, 0, 0, 0.42);
+        overflow: hidden;
+    }
+
+    .admin-modal,
+    .admin-modal * {
+        min-width: 0;
+        max-width: 100%;
+        box-sizing: border-box;
+    }
+
+    .admin-modal h2 {
+        margin: 0 44px 8px 0;
+        color: #fef3d6;
+        font-size: 26px;
+        line-height: 1.15;
+    }
+
+    .admin-modal p {
+        margin: 0 0 18px;
+        color: #dcbc6a;
+        font-weight: 800;
+        overflow-wrap: anywhere;
+    }
+
+    .admin-modal form,
+    .admin-modal label {
+        display: grid;
+        gap: 10px;
+    }
+
+    .admin-modal form {
+        gap: 14px;
+        width: 100%;
+    }
+
+    .admin-modal label span {
+        color: #e6c87a;
+        font-weight: 900;
+    }
+
+    .admin-modal input,
+    .admin-modal textarea {
+        width: 100%;
+        box-sizing: border-box;
+        border-radius: 8px;
+        border: 1px solid rgba(212, 175, 55, 0.2);
+        background: #0f0d0a;
+        color: #fef3d6;
+        padding: 12px;
+        font: inherit;
+        resize: vertical;
+    }
+
+    .admin-modal-close {
+        position: absolute;
+        top: 16px;
+        right: 16px;
+        width: 36px;
+        height: 36px;
+        border-radius: 8px;
+        border: 1px solid rgba(212, 175, 55, 0.22);
+        background: rgba(212, 175, 55, 0.08);
+        color: #f3d58e;
+        font-size: 24px;
+        line-height: 1;
+        cursor: pointer;
+    }
+
+    html[data-theme="light"] .admin-modal {
+        background: #fffaf1;
+        border-color: var(--ar-border);
+        box-shadow: 0 24px 60px var(--ar-shadow);
+    }
+
+    html[data-theme="light"] .admin-modal h2,
+    html[data-theme="light"] .admin-modal input,
+    html[data-theme="light"] .admin-modal textarea {
+        color: var(--ar-text);
+    }
+
+    html[data-theme="light"] .admin-modal p,
+    html[data-theme="light"] .admin-modal label span {
+        color: var(--ar-muted-strong);
+    }
+
+    html[data-theme="light"] .admin-modal input,
+    html[data-theme="light"] .admin-modal textarea,
+    html[data-theme="light"] .admin-modal-close {
+        background: #fffdf8;
+        border-color: var(--ar-border);
+    }
+
     .admin-pagination {
         display: flex;
         gap: 8px;
@@ -306,6 +491,22 @@
 
         .request-actions {
             flex-direction: column;
+        }
+
+        .admin-section-actions,
+        .admin-section-actions form,
+        .admin-section-actions button {
+            width: 100%;
+        }
+
+        .admin-request-search {
+            grid-template-columns: 1fr;
+        }
+
+        .admin-bulk-actions,
+        .admin-bulk-actions form,
+        .admin-bulk-actions button {
+            width: 100%;
         }
     }
 </style>

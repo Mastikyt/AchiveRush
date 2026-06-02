@@ -136,17 +136,17 @@
 
                         <label class="challenge-auto-field" data-verification-panel="automatic">
                             Цель N
-                            <input type="number" name="TargetValue" id="targetValueInput" min="1" max="500" value="1" />
+                            <input type="number" name="TargetValue" id="targetValueInput" min="@ChallengeInputLimits.TargetValueMin" max="@ChallengeInputLimits.TargetValueMax" value="@ChallengeInputLimits.TargetValueMin" />
                         </label>
 
                         <label>
                             Награда XP
-                            <input type="number" name="RewardExperience" min="1" max="100000" value="100" required />
+                            <input type="number" name="RewardExperience" min="@ChallengeInputLimits.RewardExperienceMin" max="@ChallengeInputLimits.RewardExperienceMax" value="100" required />
                         </label>
 
                         <label>
                             Мест
-                            <input type="number" name="ParticipantLimit" min="1" max="1000" value="10" required />
+                            <input type="number" name="ParticipantLimit" min="@ChallengeInputLimits.ParticipantLimitMin" max="@ChallengeInputLimits.ParticipantLimitMax" value="10" required />
                         </label>
 
                         <label class="wide" id="gameField">

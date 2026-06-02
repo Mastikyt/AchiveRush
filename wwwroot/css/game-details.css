@@ -54,6 +54,8 @@
     line-height: 1.6;
     margin-bottom: 20px;
     border: 1px solid rgba(212, 175, 55, 0.12);
+    overflow-wrap: anywhere;
+    white-space: pre-line;
 }
 
 .game-stats {
@@ -235,6 +237,50 @@
     gap: 8px;
 }
 
+.hidden-achievements-section {
+    margin-top: 22px;
+    padding-top: 18px;
+    border-top: 1px solid rgba(212, 175, 55, 0.18);
+}
+
+.hidden-achievements-head {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 16px;
+    margin-bottom: 14px;
+}
+
+.hidden-achievements-head h3 {
+    margin: 0;
+    color: #fef3d6;
+    font-size: 22px;
+    font-weight: 900;
+}
+
+.hidden-achievements-head > span {
+    min-width: 44px;
+    min-height: 34px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 8px;
+    color: #f3d58e;
+    background: rgba(212, 175, 55, 0.08);
+    border: 1px solid rgba(212, 175, 55, 0.16);
+    font-weight: 900;
+}
+
+.hidden-achievements-kicker {
+    display: inline-block;
+    margin-bottom: 6px;
+    color: #d4af37;
+    font-size: 12px;
+    font-weight: 900;
+    letter-spacing: 0;
+    text-transform: uppercase;
+}
+
 .game-achievement {
     display: grid;
     grid-template-columns: 64px minmax(0, 1fr) minmax(190px, auto);
@@ -260,6 +306,11 @@
     border-left-color: #e8792f;
 }
 
+.game-achievement.hidden-achievement.locked {
+    background: linear-gradient(90deg, rgba(148, 163, 184, 0.08), #202329 18%);
+    border-left-color: rgba(148, 163, 184, 0.45);
+}
+
 .game-achievement-icon {
     width: 56px;
     height: 56px;
@@ -268,6 +319,15 @@
     background: #0f0d0a;
     border: 1px solid rgba(212, 175, 55, 0.18);
     box-shadow: 0 0 18px rgba(212, 175, 55, 0.1);
+}
+
+.hidden-achievement-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #dcbc6a;
+    font-size: 24px;
+    font-weight: 900;
 }
 
 .game-achievement.locked .game-achievement-icon {

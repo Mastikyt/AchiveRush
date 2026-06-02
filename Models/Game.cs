@@ -34,6 +34,8 @@
 
         public bool IsCustom { get; set; }
 
+        public bool IsHidden { get; set; }
+
         public int? CreatedByUserId { get; set; }
 
         public User? CreatedByUser { get; set; }

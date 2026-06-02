@@ -1,12 +1,73 @@
 .catalog-page {
-    max-width: 1400px;
-    margin: 38px auto 80px;
-    padding: 0 18px;
+    max-width: 1240px;
+    margin: 42px auto 80px;
+    padding: 0 22px;
+}
+
+.catalog-hero {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 24px;
+    margin-bottom: 18px;
+}
+
+.catalog-hero h1 {
+    margin: 0 0 10px;
+    color: #fef3d6;
+    font-size: 42px;
+    font-weight: 900;
+    line-height: 1.08;
+}
+
+.catalog-hero p {
+    max-width: 760px;
+    margin: 0;
+    color: #dcbc6a;
+    font-size: 16px;
+    line-height: 1.6;
+}
+
+.catalog-tabs {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    margin: 0 0 22px;
+}
+
+.catalog-tabs:empty {
+    display: none;
+}
+
+.catalog-tab-link {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 42px;
+    padding: 10px 15px;
+    border-radius: 8px;
+    border: 1px solid rgba(212, 175, 55, 0.28);
+    background: rgba(212, 175, 55, 0.09);
+    color: #f3d58e;
+    text-decoration: none;
+    font-weight: 800;
+    transition: transform 0.18s ease, border-color 0.18s ease, background 0.18s ease;
+}
+
+.catalog-tab-link:hover {
+    transform: translateY(-1px);
+    border-color: rgba(212, 175, 55, 0.62);
+}
+
+.catalog-tab-link.active {
+    border-color: rgba(52, 211, 153, 0.34);
+    background: linear-gradient(135deg, #2f6f5c, #315e7a);
+    color: #f8fbff;
 }
 
 .catalog-toolbar {
     margin-bottom: 22px;
-    padding: 20px;
+    padding: 22px;
     border-radius: 8px;
     background: linear-gradient(180deg, rgba(33, 27, 20, 0.97), rgba(18, 16, 12, 0.97));
     border: 1px solid rgba(212, 175, 55, 0.18);
@@ -40,7 +101,7 @@
 
 .catalog-filter-bar {
     display: grid;
-    grid-template-columns: minmax(260px, 1fr) minmax(180px, 260px) auto;
+    grid-template-columns: minmax(260px, 1.4fr) minmax(160px, 1fr) auto;
     gap: 14px;
     align-items: end;
 }
@@ -99,6 +160,7 @@
     display: flex;
     gap: 10px;
     flex-wrap: wrap;
+    align-items: end;
 }
 
 .catalog-filter-actions button,
@@ -141,6 +203,196 @@
     justify-content: flex-end;
 }
 
+.achievement-voting-page {
+    max-width: 1180px;
+}
+
+.voting-empty {
+    padding: 28px;
+    border-radius: 8px;
+    border: 1px solid rgba(212, 175, 55, 0.18);
+    background: linear-gradient(180deg, rgba(33, 27, 20, 0.97), rgba(18, 16, 12, 0.97));
+}
+
+.voting-empty h2 {
+    margin: 0 0 8px;
+    color: #fef3d6;
+    font-size: 26px;
+}
+
+.voting-empty p {
+    margin: 0;
+    color: #dcbc6a;
+}
+
+.voting-grid {
+    display: grid;
+    gap: 18px;
+}
+
+.voting-card {
+    display: grid;
+    grid-template-columns: 180px minmax(0, 1fr);
+    gap: 18px;
+    padding: 18px;
+    border-radius: 8px;
+    border: 1px solid rgba(212, 175, 55, 0.18);
+    background: linear-gradient(180deg, rgba(33, 27, 20, 0.97), rgba(18, 16, 12, 0.97));
+    box-shadow: 0 14px 34px rgba(0, 0, 0, 0.22);
+}
+
+.voting-card-media {
+    position: relative;
+    min-width: 0;
+}
+
+.voting-card-media img {
+    width: 100%;
+    aspect-ratio: 1 / 1;
+    object-fit: cover;
+    display: block;
+    border-radius: 8px;
+    border: 1px solid rgba(212, 175, 55, 0.2);
+}
+
+.voting-card-media span {
+    position: absolute;
+    left: 10px;
+    right: 10px;
+    bottom: 10px;
+    min-height: 34px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 8px;
+    color: #f8fbff;
+    background: rgba(47, 111, 92, 0.92);
+    font-weight: 900;
+}
+
+.voting-card-body {
+    min-width: 0;
+}
+
+.voting-card-top {
+    display: flex;
+    justify-content: space-between;
+    gap: 16px;
+    align-items: flex-start;
+    margin-bottom: 10px;
+}
+
+.voting-game {
+    color: #d4af37;
+    font-size: 13px;
+    font-weight: 900;
+    text-decoration: none;
+}
+
+.voting-card h2 {
+    margin: 4px 0 0;
+    color: #fef3d6;
+    font-size: 26px;
+    line-height: 1.15;
+    overflow-wrap: anywhere;
+}
+
+.voting-time {
+    flex: 0 0 auto;
+    padding: 8px 10px;
+    border-radius: 8px;
+    color: #f3d58e;
+    border: 1px solid rgba(212, 175, 55, 0.2);
+    background: rgba(212, 175, 55, 0.08);
+    font-weight: 900;
+}
+
+.voting-description {
+    margin: 0 0 12px;
+    color: #e6c87a;
+    line-height: 1.55;
+}
+
+.voting-method {
+    margin-bottom: 12px;
+    padding: 12px;
+    border-radius: 8px;
+    border: 1px solid rgba(212, 175, 55, 0.14);
+    background: rgba(212, 175, 55, 0.05);
+}
+
+.voting-method span {
+    display: block;
+    margin-bottom: 4px;
+    color: #d4af37;
+    font-size: 12px;
+    font-weight: 900;
+    text-transform: uppercase;
+}
+
+.voting-method p {
+    margin: 0;
+    color: #dcbc6a;
+    line-height: 1.5;
+}
+
+.voting-meta,
+.voting-counts {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+    color: #dcbc6a;
+    font-size: 13px;
+    font-weight: 800;
+}
+
+.voting-progress {
+    height: 10px;
+    margin: 12px 0;
+    overflow: hidden;
+    border-radius: 999px;
+    background: rgba(127, 29, 29, 0.38);
+    border: 1px solid rgba(212, 175, 55, 0.14);
+}
+
+.voting-progress span {
+    display: block;
+    height: 100%;
+    border-radius: inherit;
+    background: linear-gradient(90deg, #34d399, #d4af37);
+}
+
+.voting-current,
+.voting-disabled,
+.voting-login {
+    margin-top: 12px;
+    display: inline-flex;
+    min-height: 38px;
+    align-items: center;
+    padding: 8px 12px;
+    border-radius: 8px;
+    border: 1px solid rgba(212, 175, 55, 0.18);
+    color: #f3d58e;
+    background: rgba(212, 175, 55, 0.07);
+    font-weight: 800;
+    text-decoration: none;
+}
+
+.voting-actions {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    margin-top: 14px;
+}
+
+.voting-actions form {
+    flex: 0 1 150px;
+}
+
+.voting-actions button {
+    width: 100%;
+}
+
 .catalog-wrapper {
     display: flex;
     flex-direction: column;
@@ -172,6 +424,7 @@
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
     gap: 22px;
+    min-width: 0;
 }
 
 .card {
@@ -185,6 +438,7 @@
     border: 1px solid rgba(212, 175, 55, 0.16);
     overflow: hidden;
     box-shadow: 0 10px 24px rgba(0, 0, 0, 0.16), inset 0 1px 0 rgba(255, 235, 180, 0.03);
+    min-width: 0;
 }
 
 .card:hover {
@@ -225,6 +479,7 @@
     display: flex;
     flex-direction: column;
     gap: 10px;
+    min-width: 0;
 }
 
 .game-content h3 {
@@ -240,10 +495,15 @@
     overflow: hidden;
 }
 
-.game-description,
-.game-content p {
+.catalog .game-description,
+.catalog .game-content p {
     min-height: 58px;
     margin: 0;
+    padding: 0;
+    border: 0;
+    border-radius: 0;
+    background: transparent;
+    box-shadow: none;
     color: #dcbc6a;
     font-size: 13px;
     line-height: 1.5;
@@ -424,9 +684,12 @@
 }
 
 @media (max-width: 900px) {
-    .catalog-toolbar-head,
     .catalog-filter-bar {
         grid-template-columns: 1fr;
+    }
+
+    .catalog-hero {
+        display: block;
     }
 
     .catalog-toolbar-head {
@@ -446,12 +709,20 @@
     .catalog-filter-actions {
         flex-direction: column;
     }
+
+    .voting-card {
+        grid-template-columns: 128px minmax(0, 1fr);
+    }
 }
 
 @media (max-width: 640px) {
     .catalog-page {
         margin-top: 28px;
-        padding: 0 12px;
+        padding: 0 14px;
+    }
+
+    .catalog-hero h1 {
+        font-size: 36px;
     }
 
     .catalog-toolbar {
@@ -459,8 +730,8 @@
     }
 
     .catalog {
-        grid-template-columns: 1fr 1fr;
-        gap: 14px;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 12px;
     }
 
     .game-content {
@@ -472,10 +743,11 @@
         font-size: 16px;
     }
 
-    .game-description,
-    .game-content p {
-        min-height: 50px;
+    .catalog .game-description,
+    .catalog .game-content p {
+        min-height: 54px;
         font-size: 12px;
+        line-height: 1.48;
     }
 
     .add-game-card {
@@ -499,6 +771,31 @@
     }
 
     .modal-buttons button {
+        width: 100%;
+    }
+
+    .catalog-tabs,
+    .library-request-form,
+    .library-request-btn,
+    .catalog-tab-link {
+        width: 100%;
+    }
+
+    .voting-card {
+        grid-template-columns: 1fr;
+        padding: 14px;
+    }
+
+    .voting-card-media {
+        max-width: 160px;
+    }
+
+    .voting-card-top {
+        flex-direction: column;
+    }
+
+    .voting-time,
+    .voting-actions form {
         width: 100%;
     }
 }

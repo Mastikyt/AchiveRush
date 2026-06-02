@@ -189,7 +189,8 @@ public class SteamService
                     Name = a.name ?? "",
                     DisplayName = CleanText(a.displayName ?? a.name),
                     Description = CleanText(a.description),
-                    Icon = a.icon
+                    Icon = a.icon,
+                    IsHidden = a.hidden == 1
                 })
                 .ToList();
         }
@@ -373,6 +374,7 @@ public class SteamAchievement
     public string? description { get; set; }
     public string? icon { get; set; }
     public double? percent { get; set; }
+    public int hidden { get; set; }
 }
 
 public class SteamPlayerResponse

@@ -3,26 +3,36 @@
 @{
     ViewData["Title"] = "Каталог игр";
     var achievementCounts = ViewBag.AchievementCounts as IDictionary<int, int> ?? new Dictionary<int, int>();
+    var maxAchievementFilter = Math.Max(0, achievementCounts.Values.DefaultIfEmpty(0).Max());
 }
 
 
 <main class="catalog-page">
-    <section class="catalog-toolbar">
-        <div class="catalog-toolbar-head">
-            <div>
-                <span>Каталог</span>
-                <h1>Игры</h1>
-            </div>
-
-            @if (User?.Identity?.IsAuthenticated == true)
-            {
-                <form asp-controller="Games" asp-action="AddOwnedLibrary" method="post" class="library-request-form">
-                    @Html.AntiForgeryToken()
-                    <button type="submit" class="library-request-btn">Запросить игры из моей библиотеки Steam</button>
-                </form>
-            }
+    <section class="catalog-hero">
+        <div>
+            <span class="section-kicker">Каталог</span>
+            <h1>Игры</h1>
+            <p>Выбирай игру из каталога, смотри достижения и добавляй недостающие проекты из Steam.</p>
         </div>
+    </section>
 
+    <nav class="catalog-tabs" aria-label="Действия каталога">
+        <a asp-controller="Home"
+           asp-action="AchievementVoting"
+           class="catalog-tab-link">
+            Голосование за новые достижения
+        </a>
+
+        @if (User?.Identity?.IsAuthenticated == true)
+        {
+            <form asp-controller="Games" asp-action="AddOwnedLibrary" method="post" class="library-request-form">
+                @Html.AntiForgeryToken()
+                <button type="submit" class="library-request-btn">Запросить игры из моей библиотеки Steam</button>
+            </form>
+        }
+    </nav>
+
+    <section class="catalog-toolbar">
         <div class="catalog-filter-bar">
             <label>
                 <span>Название</span>
@@ -31,7 +41,7 @@
 
             <label>
                 <span>Достижения</span>
-                <input type="number" id="filterAchievements" placeholder="Минимум" min="0" />
+                <input type="number" id="filterAchievements" placeholder="Минимум" min="0" max="@maxAchievementFilter" />
             </label>
 
             <div class="catalog-filter-actions">
@@ -123,6 +133,7 @@
                    id="steamUrl"
                    name="steamUrl"
                    placeholder="https://store.steampowered.com/app/12345"
+                   maxlength="@GameRequest.UrlMaxLength"
                    required />
 
             <div class="modal-buttons">
