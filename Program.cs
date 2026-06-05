@@ -1,5 +1,6 @@
 ﻿using AspNet.Security.OpenId.Steam;
 using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Http.Features;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using StackExchange.Redis;
@@ -14,6 +15,22 @@ public class Program
     {
 
         var builder = WebApplication.CreateBuilder(args);
+
+        builder.WebHost.ConfigureKestrel(options =>
+        {
+            options.Limits.MaxRequestBodySize = InputSizeLimits.MaxRequestBodyBytes;
+            options.Limits.MaxRequestLineSize = InputSizeLimits.MaxQueryStringLength + 1024;
+            options.Limits.MaxRequestHeadersTotalSize = 32 * 1024;
+        });
+
+        builder.Services.Configure<FormOptions>(options =>
+        {
+            options.KeyLengthLimit = InputSizeLimits.MaxFieldNameLength;
+            options.ValueLengthLimit = InputSizeLimits.MaxFieldValueLength;
+            options.ValueCountLimit = InputSizeLimits.MaxFormValueCount;
+            options.MultipartBodyLengthLimit = InputSizeLimits.MaxRequestBodyBytes;
+            options.MultipartHeadersLengthLimit = 16 * 1024;
+        });
 
         builder.Services.AddDbContextPool<ApplicationDbContext>(options =>
             options.UseSqlServer(
@@ -82,6 +99,8 @@ public class Program
         app.UseStatusCodePagesWithReExecute("/error/{0}");
 
         app.UseStaticFiles();
+
+        app.UseMiddleware<InputSizeLimitMiddleware>();
 
         app.UseRouting();
 

@@ -240,6 +240,7 @@ html[data-theme="light"] :where(
     .voting-method,
     .voting-time,
     .voting-current,
+    .voting-locked,
     .voting-disabled,
     .voting-login
 ) {

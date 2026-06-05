@@ -2,6 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Identity;
 using WebApplication1.DTO;
+using WebApplication1.Infrastructure;
 using WebApplication1.Models;
 using WebApplication1.Services;
 
@@ -159,6 +160,8 @@ namespace WebApplication1.Controllers
                 return query;
 
             var value = search.Trim();
+            if (value.Length > InputSizeLimits.MaxSearchLength)
+                value = value[..InputSizeLimits.MaxSearchLength];
             var hasAppId = int.TryParse(value, out var appId);
 
             query = query.Where(x =>
@@ -379,8 +382,15 @@ namespace WebApplication1.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Login(string password)
         {
+            password = password?.Trim() ?? "";
             var identityUser = await _userManager.GetUserAsync(User);
             await PrepareLoginViewAsync(identityUser);
+
+            if (password.Length > InputSizeLimits.MaxAdminPasswordLength)
+            {
+                ViewBag.Error = "Пароль слишком длинный.";
+                return View();
+            }
 
             if (identityUser == null)
             {

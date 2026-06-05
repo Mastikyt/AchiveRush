@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using WebApplication1.Infrastructure;
 using WebApplication1.Models;
 using WebApplication1.Services;
 
@@ -44,6 +45,8 @@ namespace WebApplication1.Controllers
             var publicUser = await GetPublicUserAsync(identityUser);
 
             var searchQuery = SteamService.CleanText(q);
+            if (searchQuery.Length > InputSizeLimits.MaxSearchLength)
+                searchQuery = searchQuery[..InputSizeLimits.MaxSearchLength];
             var selectedCategory = NormalizeCategory(category, allowEmpty: true);
             var selectedType = NormalizeChallengeType(type, allowEmpty: true);
             var selectedDifficulty = NormalizeDifficulty(difficulty, allowEmpty: true);
@@ -146,7 +149,8 @@ namespace WebApplication1.Controllers
             }
 
             if (title.Length > ChallengeInputLimits.TitleMaxLength ||
-                description.Length > ChallengeInputLimits.DescriptionMaxLength)
+                description.Length > ChallengeInputLimits.DescriptionMaxLength ||
+                manualProofDescription.Length > ChallengeInputLimits.ManualProofDescriptionMaxLength)
             {
                 TempData["ChallengesError"] = "Название или описание слишком длинные.";
                 return RedirectToAction(nameof(Create));

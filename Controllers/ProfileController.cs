@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using System.Globalization;
 using Microsoft.EntityFrameworkCore;
 using WebApplication1.DTO;
+using WebApplication1.Infrastructure;
 using WebApplication1.Models;
 using WebApplication1.Services;
 
@@ -90,7 +91,8 @@ namespace WebApplication1.Controllers
         [HttpGet]
         public async Task<IActionResult> UserProfile(string steamId, int page = 1, int pageSize = 24, string rarity = "all")
         {
-            if (string.IsNullOrWhiteSpace(steamId))
+            if (string.IsNullOrWhiteSpace(steamId) ||
+                steamId.Length > InputSizeLimits.MaxSteamIdLength)
                 return View("~/Views/Shared/NotFound.cshtml", "Профиль не найден.");
 
             var user = await _db.Users.AsNoTracking().FirstOrDefaultAsync(u => u.SteamId == steamId);
@@ -184,7 +186,8 @@ namespace WebApplication1.Controllers
         [HttpGet]
         public async Task<IActionResult> Achievements(string steamId, int page = 1, int pageSize = 24, string rarity = "all")
         {
-            if (string.IsNullOrWhiteSpace(steamId))
+            if (string.IsNullOrWhiteSpace(steamId) ||
+                steamId.Length > InputSizeLimits.MaxSteamIdLength)
                 return NotFound();
 
             var user = await _db.Users.AsNoTracking().FirstOrDefaultAsync(u => u.SteamId == steamId);

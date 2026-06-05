@@ -348,6 +348,9 @@
     color: #c9c0b1;
     font-size: 13px;
     line-height: 1.35;
+    max-width: 100%;
+    overflow-wrap: anywhere;
+    word-break: break-word;
 }
 
 .game-achievement-method {

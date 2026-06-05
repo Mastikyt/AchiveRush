@@ -311,6 +311,8 @@
     margin: 0 0 12px;
     color: #e6c87a;
     line-height: 1.55;
+    overflow-wrap: anywhere;
+    word-break: break-word;
 }
 
 .voting-method {
@@ -334,6 +336,8 @@
     margin: 0;
     color: #dcbc6a;
     line-height: 1.5;
+    overflow-wrap: anywhere;
+    word-break: break-word;
 }
 
 .voting-meta,
@@ -363,6 +367,7 @@
 }
 
 .voting-current,
+.voting-locked,
 .voting-disabled,
 .voting-login {
     margin-top: 12px;

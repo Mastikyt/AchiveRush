@@ -83,7 +83,7 @@
         <form asp-controller="Challenges" asp-action="Index" method="get" class="challenge-filter-form">
             <label class="challenge-search-field">
                 <span>Поиск</span>
-                <input type="search" name="q" value="@Model.SearchQuery" placeholder="Название, игра или описание" />
+                <input type="search" name="q" value="@Model.SearchQuery" placeholder="Название, игра или описание" maxlength="@InputSizeLimits.MaxSearchLength" />
             </label>
 
             <label>

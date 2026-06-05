@@ -605,12 +605,15 @@
 
 .creator-submission a {
     color: #93c5fd;
+    overflow-wrap: anywhere;
     word-break: break-all;
 }
 
 .creator-submission p {
     margin: 8px 0 0;
     color: #dcbc6a;
+    overflow-wrap: anywhere;
+    word-break: break-word;
 }
 
 @media (max-width: 1080px) {

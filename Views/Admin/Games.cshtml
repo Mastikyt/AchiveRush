@@ -125,7 +125,7 @@
                     <input type="hidden" name="gamesPage" value="@Model.GamesPage" />
                     <label>
                         <span>Поиск по заявкам</span>
-                        <input type="search" name="requestSearch" value="@Model.RequestSearch" placeholder="Название, AppID, ссылка или статус" />
+                        <input type="search" name="requestSearch" value="@Model.RequestSearch" placeholder="Название, AppID, ссылка или статус" maxlength="@InputSizeLimits.MaxSearchLength" />
                     </label>
                     <button type="submit" class="btn-refresh">Найти</button>
                     <a class="btn-refresh" asp-controller="Admin" asp-action="Games" asp-route-gamesPage="@Model.GamesPage" asp-fragment="game-requests">Сбросить</a>

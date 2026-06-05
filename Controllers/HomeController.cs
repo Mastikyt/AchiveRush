@@ -102,7 +102,7 @@ namespace WebApplication1.Controllers
                         PositiveVotes = x.Votes.Count(v => v.IsPositive),
                         NegativeVotes = x.Votes.Count(v => !v.IsPositive),
                         CurrentUserVote = userVote?.IsPositive,
-                        CanVote = currentUser != null && x.RequestedByUserId != currentUser.Id
+                        CanVote = currentUser != null && x.RequestedByUserId != currentUser.Id && userVote == null
                     };
                 }).ToList()
             };
@@ -148,20 +148,18 @@ namespace WebApplication1.Controllers
             }
 
             var vote = request.Votes.FirstOrDefault(x => x.UserId == publicUser.Id);
-            if (vote == null)
+            if (vote != null)
             {
-                request.Votes.Add(new CustomAchievementVote
-                {
-                    UserId = publicUser.Id,
-                    IsPositive = approve,
-                    CreatedAt = DateTime.UtcNow
-                });
+                TempData["VotingError"] = "Голос уже учтен. Изменить вариант нельзя.";
+                return RedirectToAction(nameof(AchievementVoting));
             }
-            else
+
+            request.Votes.Add(new CustomAchievementVote
             {
-                vote.IsPositive = approve;
-                vote.CreatedAt = DateTime.UtcNow;
-            }
+                UserId = publicUser.Id,
+                IsPositive = approve,
+                CreatedAt = DateTime.UtcNow
+            });
 
             await _context.SaveChangesAsync();
 
